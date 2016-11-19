@@ -2,12 +2,12 @@
 <#include "../macro-pagination.ftl">
 <@home "${type}">
 <div class="tabs-sub fn-clear">
-    <a href="${servePath}/member/${user.userName}"<#if type == "home"> class="current"</#if>>${articleLabel}</a>
+    <a href="${servePath}/member/${user.userName}"<#if type == "home"> class="current"</#if>>${articleLabel}<#if type == "home"> &nbsp;<span class="count">${paginationRecordCount?c}</span></#if></a>
     <a href="${servePath}/member/${user.userName}/comments"<#if type == "comments"> class="current"</#if>>${cmtLabel}</a>
     <#if currentUser?? && currentUser.userName == user.userName>
-    <a<#if type == "articlesAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/articles/anonymous">${anonymousArticleLabel}</a>
-    <a<#if type == "commentsAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/comments/anonymous">${anonymousCommentLabel}</a>
+    <a<#if type == "articlesAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/articles/anonymous">${anonymousArticleLabel}<#if type == "articlesAnonymous"> &nbsp;<span class="count">${paginationRecordCount?c}</span></#if></a>
     </#if>
+    <a<#if type == "commentsAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/comments/anonymous">${anonymousCommentLabel}</a>
 </div>
 <#if 0 == user.userArticleStatus || (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName))>
 <div class="list">
@@ -41,7 +41,7 @@
             </div>
             <#if isMyArticle && 3 != article.articleType>
             <div class="cmts">
-                <a class="ft-a-icon tooltipped tooltipped-w" href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"><span class="icon-edit"></span></a>
+                <a class="ft-a-title tooltipped tooltipped-w" href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"><span class="icon-edit"></span></a>
             </div>
             <#else>
             <#if article.articleCommentCount != 0>

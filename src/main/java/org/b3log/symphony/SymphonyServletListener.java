@@ -1,23 +1,26 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony;
 
 import eu.bitwalker.useragentutils.BrowserType;
 import eu.bitwalker.useragentutils.UserAgent;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.ResourceBundle;
 import javax.servlet.ServletContextEvent;
@@ -41,6 +44,7 @@ import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.latke.repository.jdbc.util.JdbcRepositories;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.servlet.AbstractServletListener;
+import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.MD5;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.StaticResources;
@@ -60,10 +64,13 @@ import org.b3log.symphony.event.solo.CommentSender;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Common;
 import org.b3log.symphony.model.Option;
+import org.b3log.symphony.model.Tag;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.OptionRepository;
+import org.b3log.symphony.repository.TagRepository;
 import org.b3log.symphony.repository.UserRepository;
 import org.b3log.symphony.service.ArticleMgmtService;
+import org.b3log.symphony.service.TagMgmtService;
 import org.b3log.symphony.service.UserMgmtService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Crypts;
@@ -75,7 +82,7 @@ import org.json.JSONObject;
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Bill Ho
- * @version 2.17.6.15, Oct 19, 2016
+ * @version 2.17.7.17, Nov 18, 2016
  * @since 0.2.0
  */
 public final class SymphonyServletListener extends AbstractServletListener {
@@ -141,11 +148,9 @@ public final class SymphonyServletListener extends AbstractServletListener {
         final ArticleSearchUpdater articleSearchUpdater = beanManager.getReference(ArticleSearchUpdater.class);
         eventManager.registerListener(articleSearchUpdater);
 
-        // Load icon tags to cache
         final TagCache tagCache = beanManager.getReference(TagCache.class);
-        tagCache.loadIconTags();
+        tagCache.loadTags();
 
-        // Load domains to cache
         final DomainCache domainCache = beanManager.getReference(DomainCache.class);
         domainCache.loadDomains();
 
@@ -191,6 +196,8 @@ public final class SymphonyServletListener extends AbstractServletListener {
 
     @Override
     public void requestInitialized(final ServletRequestEvent servletRequestEvent) {
+        Locales.setLocale(Latkes.getLocale());
+
         final HttpServletRequest httpServletRequest = (HttpServletRequest) servletRequestEvent.getServletRequest();
 
         httpServletRequest.setAttribute(Keys.TEMAPLTE_DIR_NAME, Symphonys.get("skinDirName"));
@@ -207,7 +214,8 @@ public final class SymphonyServletListener extends AbstractServletListener {
                 || StringUtils.containsIgnoreCase(userAgentStr, "MQQBrowser")
                 || StringUtils.containsIgnoreCase(userAgentStr, "iphone")) {
             browserType = BrowserType.MOBILE_BROWSER;
-        } else if (StringUtils.containsIgnoreCase(userAgentStr, "Iframely")) {
+        } else if (StringUtils.containsIgnoreCase(userAgentStr, "Iframely")
+                || StringUtils.containsIgnoreCase(userAgentStr, "B3log")) {
             browserType = BrowserType.ROBOT;
         } else if (BrowserType.UNKNOWN == browserType) {
             if (!StringUtils.containsIgnoreCase(userAgentStr, "Java")
@@ -247,6 +255,8 @@ public final class SymphonyServletListener extends AbstractServletListener {
 
     @Override
     public void requestDestroyed(final ServletRequestEvent servletRequestEvent) {
+        Locales.setLocale(null);
+
         try {
             super.requestDestroyed(servletRequestEvent);
 
@@ -287,6 +297,8 @@ public final class SymphonyServletListener extends AbstractServletListener {
         LOGGER.info("Initializing Sym....");
 
         final OptionRepository optionRepository = beanManager.getReference(OptionRepository.class);
+        final TagRepository tagRepository = beanManager.getReference(TagRepository.class);
+        final TagMgmtService tagMgmtService = beanManager.getReference(TagMgmtService.class);
         final ArticleMgmtService articleMgmtService = beanManager.getReference(ArticleMgmtService.class);
         final UserMgmtService userMgmtService = beanManager.getReference(UserMgmtService.class);
 
@@ -369,6 +381,12 @@ public final class SymphonyServletListener extends AbstractServletListener {
             option.put(Option.OPTION_CATEGORY, Option.CATEGORY_C_MISC);
             optionRepository.add(option);
 
+            option = new JSONObject();
+            option.put(Keys.OBJECT_ID, Option.ID_C_MISC_LANGUAGE);
+            option.put(Option.OPTION_VALUE, "0"); // user browser
+            option.put(Option.OPTION_CATEGORY, Option.CATEGORY_C_MISC);
+            optionRepository.add(option);
+
             transaction.commit();
 
             // Init admin
@@ -377,6 +395,7 @@ public final class SymphonyServletListener extends AbstractServletListener {
             admin.put(User.USER_EMAIL, init.getString("admin.email"));
             admin.put(User.USER_NAME, init.getString("admin.name"));
             admin.put(User.USER_PASSWORD, MD5.hash(init.getString("admin.password")));
+            admin.put(UserExt.USER_LANGUAGE, "en_US");
             admin.put(User.USER_ROLE, Role.ADMIN_ROLE);
             admin.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
             final String adminId = userMgmtService.addUser(admin);
@@ -387,9 +406,17 @@ public final class SymphonyServletListener extends AbstractServletListener {
             defaultCommenter.put(User.USER_EMAIL, UserExt.DEFAULT_CMTER_EMAIL);
             defaultCommenter.put(User.USER_NAME, UserExt.DEFAULT_CMTER_NAME);
             defaultCommenter.put(User.USER_PASSWORD, MD5.hash(String.valueOf(new Random().nextInt())));
+            defaultCommenter.put(UserExt.USER_LANGUAGE, "en_US");
             defaultCommenter.put(User.USER_ROLE, UserExt.DEFAULT_CMTER_ROLE);
             defaultCommenter.put(UserExt.USER_STATUS, UserExt.USER_STATUS_C_VALID);
             userMgmtService.addUser(defaultCommenter);
+
+            // Add the first tag
+            final String tagTitle = Symphonys.get("systemAnnounce");
+            final String tagId = tagMgmtService.addTag(adminId, tagTitle);
+            final JSONObject tag = tagRepository.get(tagId);
+            tag.put(Tag.TAG_URI, "announcement");
+            tagMgmtService.updateTag(tagId, tag);
 
             // Hello World!
             final JSONObject article = new JSONObject();
@@ -424,6 +451,15 @@ public final class SymphonyServletListener extends AbstractServletListener {
         try {
             final UserQueryService userQueryService = beanManager.getReference(UserQueryService.class);
             final UserRepository userRepository = beanManager.getReference(UserRepository.class);
+            final OptionRepository optionRepository = beanManager.getReference(OptionRepository.class);
+
+            final JSONObject optionLang = optionRepository.get(Option.ID_C_MISC_LANGUAGE);
+            final String optionLangValue = optionLang.optString(Option.OPTION_VALUE);
+            if ("0".equals(optionLangValue)) {
+                Locales.setLocale(request.getLocale());
+            } else {
+                Locales.setLocale(Locales.getLocale(optionLangValue));
+            }
 
             JSONObject user = userQueryService.getCurrentUser(request);
             if (null == user) {
@@ -471,6 +507,9 @@ public final class SymphonyServletListener extends AbstractServletListener {
             request.setAttribute(UserExt.USER_AVATAR_VIEW_MODE, user.optInt(UserExt.USER_AVATAR_VIEW_MODE));
 
             request.setAttribute(User.USER, user);
+
+            final Locale locale = Locales.getLocale(user.optString(UserExt.USER_LANGUAGE));
+            Locales.setLocale(locale);
         } catch (final Exception e) {
             LOGGER.log(Level.ERROR, "Resolves skin failed", e);
         } finally {

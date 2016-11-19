@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.util;
 
@@ -20,6 +22,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
@@ -35,6 +38,7 @@ import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.service.annotation.Service;
+import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.symphony.SymphonyServletListener;
 import org.b3log.symphony.cache.DomainCache;
@@ -249,7 +253,21 @@ public class Filler {
     public void fillIndexTags(final Map<String, Object> dataModel) throws Exception {
         Stopwatchs.start("Fills index tags");
         try {
-            dataModel.put(Tag.TAGS, tagQueryService.getTags(Symphonys.getInt("sideTagsCnt")));
+            for (int i = 0; i < 9; i++) {
+                final JSONObject tag = new JSONObject();
+                tag.put(Tag.TAG_URI, "");
+                tag.put(Tag.TAG_ICON_PATH, "");
+                tag.put(Tag.TAG_TITLE, "");
+
+                dataModel.put(Tag.TAG + i, tag);
+            }
+
+            final List<JSONObject> tags = tagQueryService.getTags(Symphonys.getInt("sideTagsCnt"));
+            for (int i = 0; i < tags.size(); i++) {
+                dataModel.put(Tag.TAG + i, tags.get(i));
+            }
+
+            dataModel.put(Tag.TAGS, tags);
         } finally {
             Stopwatchs.end();
         }
@@ -276,7 +294,7 @@ public class Filler {
         // fillTrendTags(dataModel);
         fillPersonalNav(request, response, dataModel);
 
-        fillLangs(dataModel);
+        fillLangs(dataModel, request);
         fillIcons(dataModel);
         fillSideAd(dataModel);
 
@@ -443,11 +461,18 @@ public class Filler {
      * Fills the all language labels.
      *
      * @param dataModel the specified data model
+     * @param request the specified HTTP servlet request
      */
-    private void fillLangs(final Map<String, Object> dataModel) {
+    private void fillLangs(final Map<String, Object> dataModel, final HttpServletRequest request) {
         Stopwatchs.start("Fills lang");
         try {
-            dataModel.putAll(langPropsService.getAll(Latkes.getLocale()));
+            if ((Boolean) request.getAttribute(Keys.HttpRequest.IS_SEARCH_ENGINE_BOT)) {
+                dataModel.putAll(langPropsService.getAll(Latkes.getLocale()));
+
+                return;
+            }
+
+            dataModel.putAll(langPropsService.getAll(Locales.getLocale()));
         } finally {
             Stopwatchs.end();
         }

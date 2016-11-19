@@ -1,17 +1,19 @@
-/**
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+/*
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -19,7 +21,7 @@
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.9.11.19, Oct 25, 2016
+ * @version 2.9.11.21, Nov 8, 2016
  */
 
 @import "variables";
@@ -148,6 +150,10 @@
     text-align: left;
 }
 
+#articleTitle {
+    margin-bottom: 20px;
+}
+
 #articleTitleTip {
     position: absolute;
     top: 32px;
@@ -183,7 +189,6 @@
 .article-content {
     width: 100%;
     position: relative;
-    margin-top: 20px;
 }
 
 #showReward {
@@ -196,98 +201,108 @@ label.article-anonymous {
     margin: 7px 15px 0 0;
 }
 
-.post .tags-wrap {
-    position: relative;
-}
+.post {
+    .tags-wrap {
+        position: relative;
+    }
 
-.post .tags-input {
-    border: 1px solid #CCCCCC;
-    background-color: #FAFAFA;
-    border-radius: 3px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
-    padding: 5px 5px 3px 5px;
-    width: 100%;
-    line-height: 17px;
-    box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    height: 33px;
-}
+    .tags-input {
+        border: 1px solid #CCCCCC;
+        background-color: #FAFAFA;
+        border-radius: 3px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
+        padding: 5px 5px 3px 5px;
+        width: 100%;
+        line-height: 17px;
+        box-sizing: border-box;
+        height: 33px;
+    }
 
-.post .tags-input span.tag {
-    margin: 2px 5px 0 0px;
-    color: $blue;
-}
+    .tags-input span.tag {
+        margin: 2px 5px 0 0px;
+        padding: 0 5px;
+        background: #eee;
+        color: #999;
+    }
 
-.post .tags-input .tag > span.close {
-    cursor: pointer;
-    margin-left: 5px;
-    color: #999;
-}
+    .tags-input .tag > span.close {
+        cursor: pointer;
+        margin-left: 5px;
+        color: #999;
+    }
 
-.post .tags-input span.tag.haved {
-    color: #333;
-    background-color: #ccc;
-    transition: background 0.5s ease-in,color 0.3s ease-out;
-}
+    .tags-input span.tag.haved {
+        color: #333;
+        background-color: #ccc;
+        transition: background 0.5s ease-in,color 0.3s ease-out;
+    }
 
-.post .tags-input input {
-    border: 0;
-    outline: none;
-    box-shadow: 0 0 0 transparent;
-    border-radius: 0;
-    padding: 2px;
-}
+    .tags-input input {
+        border: 0;
+        outline: none;
+        box-shadow: 0 0 0 transparent;
+        border-radius: 0;
+        padding: 2px;
+    }
 
-.post .tags-input input:focus {
-    border: 0;
-    background-color: transparent;
-    box-shadow: 0 0 0 transparent;
-}
+    .tags-input input:focus {
+        border: 0;
+        background-color: transparent;
+        box-shadow: 0 0 0 transparent;
+    }
 
-.post .domains-tags, 
-.post .completed-panel {
-    display: none;
-    position: absolute;
-    background-color: #FFF;
-    border: 1px solid #e5e5e5;
-    z-index: 10;
-    padding: 10px;
-    border-radius: 0 0 3px 3px;
-    width: 50%;
-    top: 32px;
-    box-sizing: border-box;
-}
+    .domains-tags,
+    .completed-panel {
+        display: none;
+        position: absolute;
+        background-color: #FFF;
+        border: 1px solid #e5e5e5;
+        z-index: 72;
+        padding: 10px;
+        border-radius: 0 0 3px 3px;
+        width: 50%;
+        top: 32px;
+        box-sizing: border-box;
+    }
 
-.post .domains-tags .tag {
-    cursor: pointer;
-    color: $blue;
-}
+    .domain-tags {
+        border-top: 1px solid #eee;
+        margin-top: 10px;
+        padding-top: 10px;
+    }
 
-.post .domains-tags > span.current {
-    color: #FFF;
-    background-color: #2c5d8d;
-    background-image: linear-gradient(#7ba9d6, #2c5d8d);
-    border-color: #689cd0;
-}
+    .domains-tags .tag {
+        cursor: pointer;
+        color: #999;
+        margin: 0 5px 5px 0;
+        padding: 2px 5px;
+        border: 1px solid #DDDDDD;
+        background-color: #f7f7f7;
+        border-radius: 3px;
+    }
 
-.post .completed-panel {
-    padding: 0;
-    overflow: auto;
-    left: 0;
-}
+    .domains-tags .tag:hover {
+        opacity: 0.7;
+    }
 
-.post .completed-panel a {
-    display: block;
-    padding: 3px;
-    text-decoration: none;
-    line-height: 18px;
-    height: 18px;
-}
+    .completed-panel {
+        padding: 0;
+        overflow: auto;
+        left: 0;
+    }
 
-.post .completed-panel a.selected,
-.post .completed-panel a:hover {
-    background-color: #F7F7F7;
+    .completed-panel a {
+        display: block;
+        padding: 3px;
+        text-decoration: none;
+        line-height: 18px;
+        height: 18px;
+    }
+
+    .completed-panel a.selected,
+    .completed-panel a:hover {
+        background-color: #F7F7F7;
+    }
 }
 /* end add article */
 
@@ -317,6 +332,10 @@ label.article-anonymous {
 
 .tabs a:hover {
     background-color: rgba(0,0,0,.03);
+}
+
+.tabs-sub > a > .count {
+    transform: scale(0.8);
 }
 /* end home */
 
@@ -411,7 +430,7 @@ label.article-anonymous {
 }
 
 .points .name a {
-   color: #595959;
+   color: #666;
 }
 
 .points .name a:hover {

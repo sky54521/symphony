@@ -1,23 +1,27 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.processor;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +43,7 @@ import org.b3log.latke.servlet.annotation.Before;
 import org.b3log.latke.servlet.annotation.RequestProcessing;
 import org.b3log.latke.servlet.annotation.RequestProcessor;
 import org.b3log.latke.servlet.renderer.freemarker.AbstractFreeMarkerRenderer;
+import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Common;
@@ -82,7 +87,8 @@ import org.json.JSONObject;
  * </p>
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.9.6.12, Sep 25, 2016
+ * @author <a href="http://vanessa.b3log.org">LiYuan Li</a>
+ * @version 1.11.7.15, Nov 10, 2016
  * @since 0.2.0
  */
 @RequestProcessor
@@ -166,6 +172,49 @@ public class LoginProcessor {
     private NotificationMgmtService notificationMgmtService;
 
     /**
+     * Wrong password tries.
+     *
+     * &lt;userId, {"wrongCount": int, "captcha": ""}&gt;
+     */
+    public static final Map<String, JSONObject> WRONG_PWD_TRIES = new ConcurrentHashMap<>();
+
+    /**
+     * Shows login page.
+     *
+     * @param context the specified context
+     * @param request the specified request
+     * @param response the specified response
+     * @throws Exception exception
+     */
+    @RequestProcessing(value = "/login", method = HTTPRequestMethod.GET)
+    @Before(adviceClass = StopwatchStartAdvice.class)
+    @After(adviceClass = StopwatchEndAdvice.class)
+    public void showLogin(final HTTPRequestContext context, final HttpServletRequest request, final HttpServletResponse response)
+            throws Exception {
+        if (null != userQueryService.getCurrentUser(request)
+                || userMgmtService.tryLogInWithCookie(request, response)) {
+            response.sendRedirect(Latkes.getServePath());
+
+            return;
+        }
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
+        context.setRenderer(renderer);
+
+        String referer = request.getParameter(Common.GOTO);
+        if (StringUtils.isBlank(referer)) {
+            referer = request.getHeader("referer");
+        }
+
+        renderer.setTemplateName("login.ftl");
+
+        final Map<String, Object> dataModel = renderer.getDataModel();
+        dataModel.put(Common.GOTO, referer);
+
+        filler.fillHeaderAndFooter(request, response, dataModel);
+    }
+
+    /**
      * Shows forget password page.
      *
      * @param context the specified context
@@ -178,7 +227,7 @@ public class LoginProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showForgetPwd(final HTTPRequestContext context, final HttpServletRequest request, final HttpServletResponse response)
             throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
 
@@ -247,7 +296,7 @@ public class LoginProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showResetPwd(final HTTPRequestContext context, final HttpServletRequest request, final HttpServletResponse response)
             throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
 
@@ -321,7 +370,14 @@ public class LoginProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showRegister(final HTTPRequestContext context, final HttpServletRequest request, final HttpServletResponse response)
             throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        if (null != userQueryService.getCurrentUser(request)
+                || userMgmtService.tryLogInWithCookie(request, response)) {
+            response.sendRedirect(Latkes.getServePath());
+
+            return;
+        }
+
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
         dataModel.put(Common.REFERRAL, "");
@@ -389,6 +445,8 @@ public class LoginProcessor {
         user.put(User.USER_NAME, name);
         user.put(User.USER_EMAIL, email);
         user.put(User.USER_PASSWORD, "");
+        final Locale locale = Locales.getLocale();
+        user.put(UserExt.USER_LANGUAGE, locale.getLanguage() + "_" + locale.getCountry());
 
         try {
             final String newUserId = userMgmtService.addUser(user);
@@ -467,7 +525,7 @@ public class LoginProcessor {
 
             userMgmtService.addUser(user);
 
-            Sessions.login(request, response, user);
+            Sessions.login(request, response, user, false);
 
             final String ip = Requests.getRemoteAddr(request);
             userMgmtService.updateOnlineStatus(user.optString(Keys.OBJECT_ID), ip, true);
@@ -581,17 +639,43 @@ public class LoginProcessor {
                 return;
             }
 
+            final String userId = user.optString(Keys.OBJECT_ID);
+            JSONObject wrong = WRONG_PWD_TRIES.get(userId);
+            if (null == wrong) {
+                wrong = new JSONObject();
+            }
+
+            final int wrongCount = wrong.optInt(Common.WRON_COUNT);
+            if (wrongCount > 3) {
+                final String captcha = requestJSONObject.optString(CaptchaProcessor.CAPTCHA);
+                if (!StringUtils.equals(wrong.optString(CaptchaProcessor.CAPTCHA), captcha)) {
+                    context.renderMsg(langPropsService.get("captchaErrorLabel"));
+                    context.renderJSONValue(Common.NEED_CAPTCHA, userId);
+
+                    return;
+                }
+            }
+
             final String userPassword = user.optString(User.USER_PASSWORD);
             if (userPassword.equals(requestJSONObject.optString(User.USER_PASSWORD))) {
-                Sessions.login(request, response, user);
+                Sessions.login(request, response, user, requestJSONObject.optBoolean(Common.REMEMBER_LOGIN));
 
                 final String ip = Requests.getRemoteAddr(request);
                 userMgmtService.updateOnlineStatus(user.optString(Keys.OBJECT_ID), ip, true);
 
                 context.renderMsg("").renderTrueResult();
 
+                WRONG_PWD_TRIES.remove(userId);
+
                 return;
             }
+
+            if (wrongCount > 2) {
+                context.renderJSONValue(Common.NEED_CAPTCHA, userId);
+            }
+
+            wrong.put(Common.WRON_COUNT, wrongCount + 1);
+            WRONG_PWD_TRIES.put(userId, wrong);
 
             context.renderMsg(langPropsService.get("wrongPwdLabel"));
         } catch (final ServiceException e) {

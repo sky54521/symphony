@@ -16,10 +16,10 @@
                 <div class="content fn-clear">
                     <div class="module">
                         <div class="module-header fn-clear">
-                            <span class="fn-right">
-                                <a<#if "" == current> class="ft-gray"</#if> href="${servePath}/city/my">${cityArticleLabel}</a>
-                                <span class="ft-fade">/</span>
-                                <a<#if "/users" == current> class="ft-gray"</#if> href="${servePath}/city/my/users">${cityUserLabel}</a>
+                            <span class="fn-right ft-fade">
+                                <a class="<#if "" == current>ft-gray</#if>" href="${servePath}/city/my">${cityArticleLabel}</a>
+                                /
+                                <a class="<#if "/users" == current>ft-gray</#if>" href="${servePath}/city/my/users">${cityUserLabel}</a>
                             </span>
                         </div>
                         <#if "" == current && articles?size gt 0>
@@ -89,6 +89,7 @@
                                 </#list>
                             </ul>
                         </div>
+                        <@pagination url="/city/${city?url('utf-8')}/users"/>
                         </#if>
                     </div>
                     <#include "common/domains.ftl">

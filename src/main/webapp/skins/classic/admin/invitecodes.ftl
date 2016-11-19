@@ -5,7 +5,7 @@
     <div class="module list">
         <form method="POST" action="${servePath}/admin/invitecodes/generate" class="form">
             <input name="quantity" type="number" placeholder="${quantityLabel}" style="width: 30%" />
-            <input name="memo" type="text" placeholder="${memoLabel}"/>
+            <input name="memo" type="text" placeholder="${memoLabel}" autocomplete="off" />
             <button type="submit" class="green">${generateLabel}</button>
         </form>
         <ul>
@@ -21,7 +21,7 @@
                     <font class="ft-red">${stopUseLabel}</font>
                     </#if>
                     <font class="ft-gray">${item.memo}</font>
-                    <a href="${servePath}/admin/invitecode/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-icon" aria-label="${editLabel}"><span class="icon-edit"></span></a>
+                    <a href="${servePath}/admin/invitecode/${item.oId}" class="fn-right tooltipped tooltipped-w ft-a-title" aria-label="${editLabel}"><span class="icon-edit"></span></a>
                 </div>
             </li>
             </#list>

@@ -2,8 +2,7 @@
     <div class="wrapper fn-clear">
         <div class="head-fn fn-left">
             <h1>
-                <a href="${servePath}/" style="background-image: url('${staticServePath}/images/hacpai.png')" alt="${symphonyLabel}" 
-                   title="${symphonyLabel}" width="42" class="fn-pointer"></a>
+                ${logoIcon}
             </h1>
         </div>
 
@@ -27,7 +26,7 @@
             <div class="form fn-none">
                 <table cellspacing="0" cellpadding="0">
                     <tr>
-                        <td width="40">
+                        <td width="80">
                             <label for="nameOrEmail">${accountLabel}</label>
                         </td>
                         <td>
@@ -40,6 +39,22 @@
                         </td>
                         <td>
                             <input type="password" id="loginPassword" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right">
+                            <label>${rememberLoginStatusLabel}</label>
+                        </td>
+                        <td>
+                            <input type="checkbox" id="rememberLogin" checked />
+                        </td>
+                    </tr>
+                    <tr class="fn-none">
+                        <td>
+                            <img id="captcha" class="fn-pointer" />
+                        </td>
+                        <td>
+                            <input type="text" id="captchaLogin" />
                         </td>
                     </tr>
                     <tr>

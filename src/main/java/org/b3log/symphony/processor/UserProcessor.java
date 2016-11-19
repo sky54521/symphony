@@ -1,25 +1,30 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.processor;
 
 import com.qiniu.util.Auth;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -85,9 +90,11 @@ import org.b3log.symphony.service.PostExportService;
 import org.b3log.symphony.service.UserMgmtService;
 import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Filler;
+import org.b3log.symphony.util.Languages;
 import org.b3log.symphony.util.Results;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Symphonys;
+import org.b3log.symphony.util.TimeZones;
 import org.json.JSONObject;
 
 /**
@@ -121,13 +128,14 @@ import org.json.JSONObject;
  * <li>Exports posts(article/comment) to a file (/export/posts), POST</li>
  * <li>Queries invitecode state (/invitecode/state), GET</li>
  * <li>Shows link forge (/member/{userName}/forge/link), GET</li>
+ * <li>i18n (/settings/i18n), POST</li>
  * </ul>
  * </p>
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Zephyr
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
- * @version 1.24.13.25, Sep 20, 2016
+ * @version 1.26.13.27, Nov 13, 2016
  * @since 0.2.0
  */
 @RequestProcessor
@@ -247,6 +255,52 @@ public class UserProcessor {
     private LinkForgeQueryService linkForgeQueryService;
 
     /**
+     * Updates user i18n.
+     *
+     * @param context the specified context
+     * @param request the specified request
+     * @param response the specified response
+     */
+    @RequestProcessing(value = "/settings/i18n", method = HTTPRequestMethod.POST)
+    @Before(adviceClass = {LoginCheck.class, CSRFCheck.class})
+    public void updateI18n(final HTTPRequestContext context,
+            final HttpServletRequest request, final HttpServletResponse response) {
+        context.renderJSON();
+
+        JSONObject requestJSONObject;
+        try {
+            requestJSONObject = Requests.parseRequestJSONObject(request, response);
+            request.setAttribute(Keys.REQUEST, requestJSONObject);
+        } catch (final Exception e) {
+            LOGGER.warn(e.getMessage());
+
+            requestJSONObject = new JSONObject();
+        }
+
+        String userLanguage = requestJSONObject.optString(UserExt.USER_LANGUAGE, Locale.SIMPLIFIED_CHINESE.toString());
+        if (!Languages.getAvailableLanguages().contains(userLanguage)) {
+            userLanguage = Locale.US.toString();
+        }
+
+        String userTimezone = requestJSONObject.optString(UserExt.USER_TIMEZONE, TimeZone.getDefault().getID());
+        if (!Arrays.asList(TimeZone.getAvailableIDs()).contains(userTimezone)) {
+            userTimezone = TimeZone.getDefault().getID();
+        }
+
+        try {
+            final JSONObject user = userQueryService.getCurrentUser(request);
+            user.put(UserExt.USER_LANGUAGE, userLanguage);
+            user.put(UserExt.USER_TIMEZONE, userTimezone);
+
+            userMgmtService.updateUser(user.optString(Keys.OBJECT_ID), user);
+
+            context.renderTrueResult();
+        } catch (final ServiceException e) {
+            context.renderMsg(e.getMessage());
+        }
+    }
+
+    /**
      * Shows user link forge.
      *
      * @param context the specified context
@@ -260,7 +314,7 @@ public class UserProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showLinkForge(final HTTPRequestContext context, final HttpServletRequest request,
             final HttpServletResponse response, final String userName) throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/link-forge.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -403,7 +457,7 @@ public class UserProcessor {
     @After(adviceClass = {CSRFToken.class, StopwatchEndAdvice.class})
     public void showSettings(final HTTPRequestContext context, final HttpServletRequest request, final HttpServletResponse response)
             throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         final String requestURI = request.getRequestURI();
         String page = StringUtils.substringAfter(requestURI, "/settings/");
@@ -481,6 +535,22 @@ public class UserProcessor {
             dataModel.put(Emotion.EMOTIONS, emojis);
         }
 
+        if (requestURI.contains("i18n")) {
+            dataModel.put(Common.LANGUAGES, Languages.getAvailableLanguages());
+
+            final List<JSONObject> timezones = new ArrayList<>();
+            final List<TimeZones.TimeZoneWithDisplayNames> timeZones = TimeZones.getInstance().getTimeZones();
+            for (final TimeZones.TimeZoneWithDisplayNames timeZone : timeZones) {
+                final JSONObject timezone = new JSONObject();
+
+                timezone.put(Common.ID, timeZone.getTimeZone().getID());
+                timezone.put(Common.NAME, timeZone.getDisplayName());
+
+                timezones.add(timezone);
+            }
+            dataModel.put(Common.TIMEZONES, timezones);
+        }
+
         dataModel.put(Common.TYPE, "settings");
     }
 
@@ -498,7 +568,7 @@ public class UserProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showHomeAnonymousComments(final HTTPRequestContext context, final HttpServletRequest request,
             final HttpServletResponse response, final String userName) throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/comments.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -552,10 +622,12 @@ public class UserProcessor {
                 pageNum, pageSize, currentUser);
         dataModel.put(Common.USER_HOME_COMMENTS, userComments);
 
+        int recordCount = 0;
         int pageCount = 0;
         if (!userComments.isEmpty()) {
             final JSONObject first = userComments.get(0);
             pageCount = first.optInt(Pagination.PAGINATION_PAGE_COUNT);
+            recordCount = first.optInt(Pagination.PAGINATION_RECORD_COUNT);
         }
 
         final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
@@ -567,6 +639,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, recordCount);
 
         dataModel.put(Common.TYPE, "commentsAnonymous");
     }
@@ -585,7 +658,7 @@ public class UserProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showAnonymousArticles(final HTTPRequestContext context, final HttpServletRequest request,
             final HttpServletResponse response, final String userName) throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/comments.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -640,10 +713,12 @@ public class UserProcessor {
                 user.optString(Keys.OBJECT_ID), Article.ARTICLE_ANONYMOUS_C_ANONYMOUS, pageNum, pageSize);
         dataModel.put(Common.USER_HOME_ARTICLES, userArticles);
 
+        int recordCount = 0;
         int pageCount = 0;
         if (!userArticles.isEmpty()) {
             final JSONObject first = userArticles.get(0);
             pageCount = first.optInt(Pagination.PAGINATION_PAGE_COUNT);
+            recordCount = first.optInt(Pagination.PAGINATION_RECORD_COUNT);
         }
 
         final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
@@ -655,6 +730,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, recordCount);
 
         dataModel.put(Common.IS_MY_ARTICLE, userName.equals(currentUser.optString(User.USER_NAME)));
 
@@ -709,7 +785,7 @@ public class UserProcessor {
 
         final int pageNum = Integer.valueOf(pageNumStr);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         final Map<String, Object> dataModel = renderer.getDataModel();
         filler.fillHeaderAndFooter(request, response, dataModel);
@@ -755,6 +831,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, articleCnt);
 
         final JSONObject currentUser = Sessions.currentUser(request);
         if (null == currentUser) {
@@ -782,7 +859,7 @@ public class UserProcessor {
             final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/comments.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -834,6 +911,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, commentCnt);
 
         dataModel.put(Common.TYPE, "comments");
     }
@@ -854,7 +932,7 @@ public class UserProcessor {
             final HttpServletResponse response, final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/following-users.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -912,6 +990,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, followingUserCnt);
 
         dataModel.put(Common.TYPE, "followingUsers");
     }
@@ -932,7 +1011,7 @@ public class UserProcessor {
             final HttpServletResponse response, final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/following-tags.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -989,6 +1068,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, followingTagCnt);
 
         dataModel.put(Common.TYPE, "followingTags");
     }
@@ -1009,7 +1089,7 @@ public class UserProcessor {
             final HttpServletResponse response, final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/following-articles.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -1067,6 +1147,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, followingArticleCnt);
 
         dataModel.put(Common.TYPE, "followingArticles");
     }
@@ -1087,7 +1168,7 @@ public class UserProcessor {
             final HttpServletResponse response, final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/followers.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -1146,6 +1227,7 @@ public class UserProcessor {
         dataModel.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
         dataModel.put(Pagination.PAGINATION_PAGE_COUNT, pageCount);
         dataModel.put(Pagination.PAGINATION_PAGE_NUMS, pageNums);
+        dataModel.put(Pagination.PAGINATION_RECORD_COUNT, followerUserCnt);
 
         dataModel.put(Common.TYPE, "followers");
     }
@@ -1166,7 +1248,7 @@ public class UserProcessor {
             final HttpServletResponse response, final String userName) throws Exception {
         final JSONObject user = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/points.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -1374,12 +1456,12 @@ public class UserProcessor {
         try {
             userListPageSize = Integer.valueOf(userListPageSizeStr);
 
-            if (15 > userListPageSize) {
-                userListPageSize = 15;
+            if (10 > userListPageSize) {
+                userListPageSize = 10;
             }
 
-            if (userListPageSize > 41) {
-                userListPageSize = 41;
+            if (userListPageSize > 30) {
+                userListPageSize = 30;
             }
         } catch (final Exception e) {
             userListPageSize = Symphonys.getInt("indexArticlesCnt");
@@ -1686,6 +1768,7 @@ public class UserProcessor {
             user.put(User.USER_NAME, name);
             user.put(User.USER_EMAIL, email);
             user.put(User.USER_PASSWORD, password);
+            user.put(UserExt.USER_LANGUAGE, "zh_CN");
             user.put(UserExt.USER_B3_KEY, clientB3Key);
             user.put(UserExt.USER_B3_CLIENT_ADD_ARTICLE_URL, addArticleURL);
             user.put(UserExt.USER_B3_CLIENT_UPDATE_ARTICLE_URL, updateArticleURL);

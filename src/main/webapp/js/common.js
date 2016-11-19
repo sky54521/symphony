@@ -1,26 +1,27 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * @fileoverview util and every page should be used.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Zephyr
- * @version 1.35.23.35, Oct 26, 2016
+ * @version 1.38.25.38, Nov 13, 2016
  */
 
 /**
@@ -132,7 +133,7 @@ var Util = {
             return false;
         }).bind('keyup', 'j', function (event) {
             // j 移动到下一项
-            var query = '.content .list > ul > ';
+            var query = '.content .list:last > ul > ';
             if ($('#comments').length === 1) {
                 query = '#comments .list > ul > ';
             }
@@ -147,7 +148,7 @@ var Util = {
             return false;
         }).bind('keyup', 'k', function (event) {
             // k 移动到上一项
-            var query = '.content .list > ul > ';
+            var query = '.content .list:last > ul > ';
             if ($('#comments').length === 1) {
                 query = '#comments .list > ul > ';
             }
@@ -162,7 +163,7 @@ var Util = {
             return false;
         }).bind('keyup', 'f', function (event) {
             // f 移动到第一项
-            var query = '.content .list > ul > ';
+            var query = '.content .list:last > ul > ';
             if ($('#comments').length === 1) {
                 query = '#comments .list > ul > ';
             }
@@ -175,7 +176,7 @@ var Util = {
             if (Util.prevKey) {
                 return false;
             }
-            var query = '.content .list > ul > ';
+            var query = '.content .list:last > ul > ';
             if ($('#comments').length === 1) {
                 query = '#comments .list > ul > ';
             }
@@ -185,22 +186,20 @@ var Util = {
             return false;
         }).bind('keyup', 'o', function (event) {
             // o/enter 打开选中项
-            var query = '.content .list > ul > ';
             if ($('#comments').length === 1) {
-                query = '#comments .list > ul > ';
+                return false;
             }
-            var href = $(query + 'li.focus .fn-flex-1 h2 > a').attr('href');
+            var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href');
             if (href) {
                 window.location = href;
             }
             return false;
         }).bind('keyup', 'return', function (event) {
             // o/enter 打开选中项
-            var query = '.content .list > ul > ';
             if ($('#comments').length === 1) {
-                query = '#comments .list > ul > ';
+                return false;
             }
-            var href = $(query + 'li.focus .fn-flex-1 h2 > a').attr('href');
+            var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href');
             if (href) {
                 window.location = href;
             }
@@ -244,7 +243,7 @@ var Util = {
             });
         }
 
-        // At last, if the user already denied any notification, and you 
+        // At last, if the user already denied any notification, and you
         // want to be respectful there is no need to bother them any more.
     },
     /**
@@ -323,11 +322,16 @@ var Util = {
     },
     /**
      * 粘贴中包含图片和文案时，需要处理为 markdown 语法
-     * @param {type} text
+     * @param {object} clipboardData
+     * @param {object} cm
      * @returns {String}
      */
-    processClipBoard: function (text, cm) {
-        var text = toMarkdown(text, {converters: [
+    processClipBoard: function (clipboardData, cm) {
+        if (clipboardData.getData("text/html") === '' && clipboardData.items.length === 2) {
+            return '';
+        }
+
+        var text = toMarkdown(clipboardData.getData("text/html"), {converters: [
                 {
                     filter: 'img',
                     replacement: function (innerHTML, node) {
@@ -375,7 +379,7 @@ var Util = {
         return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
     },
     /**
-     * 通过 UA 获取设备 
+     * 通过 UA 获取设备
      * @param {String} ua user agent
      * @returns {String} 设备
      */
@@ -664,60 +668,6 @@ var Util = {
         };
     },
     /**
-     * @description 鼠标移动到文章列表标题上时，显示其开头内容
-     */
-    _initArticlePreview: function () {
-        $(".article-list h2 > a").hover(function () {
-            var $ele = $(this);
-
-            if (3 === $ele.data('type')) { // 如果是思绪
-                // 不进行预览
-                return false;
-            }
-
-            $ele.addClass("previewing");
-
-            var $li = $ele.closest("li"),
-                    previewHTML = '<div class="preview"><span class="ico-arrow"></span><span class="ico-arrowborder"></span>';
-            $(".article-list .preview").hide();
-            if ($li.find('.preview').length === 1) {
-                $li.find('.preview').show();
-
-                return false;
-            }
-
-            if ($li.find('.no-preview').length === 1) {
-                return false;
-            }
-
-            setTimeout(function () {
-                if (!$ele.hasClass("previewing")) {
-                    return false;
-                }
-
-                $.ajax({
-                    url: Label.servePath + "/article/" + $ele.data('id') + "/preview",
-                    type: "GET",
-                    cache: false,
-                    success: function (result, textStatus) {
-                        if (!result.sc || $.trim(result.html) === '') {
-                            $li.append('<div class="no-preview"></div>');
-                            return false;
-                        }
-
-                        $li.append(previewHTML + result.html + '</div>');
-                        $li.find('.preview').show();
-                    }
-                });
-            }, 800);
-        }, function () {
-            var $li = $(this).closest("li");
-            $li.find('.preview').hide();
-
-            $(this).removeClass("previewing");
-        });
-    },
-    /**
      * @description 设置当前登录用户的未读提醒计数.
      */
     setUnreadNotificationCount: function () {
@@ -726,23 +676,116 @@ var Util = {
             type: "GET",
             cache: false,
             success: function (result, textStatus) {
-                var count = result.unreadNotificationCount;
+                // 生成消息的 li 标签
+                var genLiHTML = function (data) {
+                    var notiHTML = '';
+                    // 收到的回帖 unreadCommentedNotificationCnt
+                    if (data.unreadCommentedNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/commented">' + Label.notificationCommentedLabel +
+                                '<span class="count fn-right">' + data.unreadCommentedNotificationCnt + '</span></a></li>';
+                    }
+                    // 收到的回复 unreadReplyNotificationCnt
+                    if (data.unreadReplyNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/reply">' + Label.notificationReplyLabel +
+                                '<span class="count fn-right">' + data.unreadReplyNotificationCnt + '</span></a></li>';
+                    }
+                    // @ 我的 unreadAtNotificationCnt
+                    if (data.unreadAtNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/at">' + Label.notificationAtLabel +
+                                '<span class="count fn-right">' + data.unreadAtNotificationCnt + '</span></a></li>';
+                    }
+                    // 我关注的人 unreadFollowingUserNotificationCnt
+                    if (data.unreadFollowingUserNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/following-user">' + Label.notificationFollowingUserLabel +
+                                '<span class="count fn-right">' + data.unreadFollowingUserNotificationCnt + '</span></a></li>';
+                    }
+                    // 积分 unreadPointNotificationCnt
+                    if (data.unreadPointNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/point">' + Label.pointLabel +
+                                '<span class="count fn-right">' + data.unreadPointNotificationCnt + '</span></a></li>';
+                    }
+                    // 同城 unreadBroadcastNotificationCnt
+                    if (data.unreadBroadcastNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/broadcast">' + Label.sameCityLabel +
+                                '<span class="count fn-right">' + data.unreadBroadcastNotificationCnt + '</span></a></li>';
+                    }
+                    // 系统 unreadSysAnnounceNotificationCnt
+                    if (data.unreadSysAnnounceNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/sys-announce">' + Label.systemLabel +
+                                '<span class="count fn-right">' + data.unreadSysAnnounceNotificationCnt + '</span></a></li>';
+                    }
+                    return notiHTML;
+                };
 
-                if (0 < count) {
-                    $("#aNotifications").removeClass("no-msg").addClass("msg").text(count);
-
-                    if (window.localStorage) {
-                        if (count !== Number(window.localStorage.unreadNotificationCount) && 0 === result.userNotifyStatus) {
+                var count = result.unreadNotificationCnt;
+                // mobile
+                $.ua.set(navigator.userAgent);
+                if ($.ua.device.type && $.ua.device.type === 'mobile') {
+                    if (0 < count) {
+                        $("#aNotifications").removeClass("no-msg").addClass("msg").text(count).attr('href', 'javascript:void(0)');
+                        if (0 === result.userNotifyStatus && window.localStorage.hadNotificate !== count.toString()) {
                             Util.notifyMsg(count);
-                            window.localStorage.unreadNotificationCount = count;
+                            window.localStorage.hadNotificate = count;
                         }
-                    }
-                } else {
-                    $("#aNotifications").removeClass("msg").addClass("no-msg").text(count);
 
-                    if (window.localStorage) {
-                        window.localStorage.unreadNotificationCount = 0;
+                        var notiHTML = genLiHTML(result);
+
+                        if ($('#notificationsPanel').length === 1) {
+                            $('#notificationsPanel ul').html(notiHTML);
+                            return false;
+                        }
+                        $(".main:first").prepend('<div id="notificationsPanel" class="tab-current fn-clear fn-none"><ul class="tab fn-clear">' +
+                                notiHTML + '</ul></div>');
+
+                        $("#aNotifications").click(function () {
+                            $('#notificationsPanel').slideToggle();
+                        });
+                    } else {
+                        window.localStorage.hadNotificate = 'false';
+                        $("#aNotifications").removeClass("msg").addClass("no-msg").text(count).attr('href', Label.servePath + '/notifications');
                     }
+                    return false;
+                }
+
+                // browser
+                if (0 < count) {
+                    $("#aNotifications").removeClass("no-msg tooltipped tooltipped-w").addClass("msg").text(count);
+                    if (0 === result.userNotifyStatus && window.localStorage.hadNotificate !== count.toString()) {
+                        Util.notifyMsg(count);
+                        window.localStorage.hadNotificate = count;
+                    }
+
+                    var notiHTML = genLiHTML(result);
+
+                    if ($('#notificationsPanel').length === 1) {
+                        $('#notificationsPanel ul').html(notiHTML);
+                        return false;
+                    }
+
+                    $("#aNotifications").after('<div id="notificationsPanel" class="module person-list"><ul>' +
+                            notiHTML + '</ul></div>');
+
+					var hideTimeOut = undefined;
+                    $('#aNotifications').mouseover(function () {
+                        $('#notificationsPanel').show();
+                        $('#personListPanel').hide();
+						clearTimeout(hideTimeOut);
+                    }).mouseout(function () {
+						hideTimeOut = setTimeout(function () {
+							$('#notificationsPanel').hide();
+						}, 600);
+                    });
+
+                    $('#notificationsPanel').mouseover(function () {
+                        $('#notificationsPanel').show();
+												clearTimeout(hideTimeOut);
+                    }).mouseout(function () {
+                        $('#notificationsPanel').hide();
+                    });
+                } else {
+                    window.localStorage.hadNotificate = 'false';
+                    $("#notificationsPanel").remove();
+                    $("#aNotifications").removeClass("msg").addClass("no-msg tooltipped tooltipped-w").text(count);
                 }
             }
         });
@@ -836,30 +879,38 @@ var Util = {
         $('html, body').animate({scrollTop: 0}, 800);
     },
     /**
-     * @description 显示登录界面 
+     * @description 跳转到登录界面
      */
-    showLogin: function () {
-        $(".nav .form").show();
-        $("#nameOrEmail").focus();
+    goLogin: function () {
+         if (-1 !== location.href.indexOf("/login")) {
+            return;
+        }
+
+        var gotoURL = location.href;
+        if (location.search.indexOf('?goto') === 0) {
+            gotoURL = location.href.replace(location.search, '');
+        }
+        window.location.href = Label.servePath + "/login?goto=" + encodeURIComponent(gotoURL);
     },
     /**
-     * 
+     *
      * @returns {undefined}
      */
     needLogin: function () {
-        alert(Label.funNeedLoginLabel);
+        Util.goLogin();
     },
     /**
      * @description 跳转到注册页面
      */
     goRegister: function () {
         if (-1 !== location.href.indexOf("/register")) {
-            window.location.reload();
-
             return;
         }
-
-        window.location.href = Label.servePath + "/register?goto=" + encodeURIComponent(location.href);
+        var gotoURL = location.href;
+        if (location.search.indexOf('?goto') === 0) {
+            gotoURL = location.href.replace(location.search, '');
+        }
+        window.location.href = Label.servePath + "/register?goto=" + encodeURIComponent(gotoURL);
     },
     /**
      * @description 禁止 IE7 以下浏览器访问
@@ -939,14 +990,16 @@ var Util = {
         this._initNav();
         // 每日活跃
         this._initActivity();
-        // 如果有列表就展现描述预览
-        this._initArticlePreview();
-        // 登录密码输入框回车事件
-        $("#loginPassword").keyup(function (event) {
-            if (event.keyCode === 13) {
-                Util.login();
-            }
-        });
+        // 移动端分页
+        if ($('.pagination select').length === 1) {
+            $('.pagination select').change(function () {
+                var url = $(this).data('url') + '?p=' + $(this).val();
+                if ($(this).data('param')) {
+                    url += '&' + $(this).data('param');
+                }
+                window.location.href = url;
+            });
+        };
         // search input
         $(".nav .icon-search").click(function () {
             $(".nav input.search").focus();
@@ -967,12 +1020,16 @@ var Util = {
         });
 
         if (isLoggedIn) { // 如果登录了
+            if (!window.localStorage.hadNotificate) {
+                window.localStorage.hadNotificate = 'false';
+            }
+
             Util.setUnreadNotificationCount();
 
             // 定时获取并设置未读提醒计数
             setInterval(function () {
                 Util.setUnreadNotificationCount();
-            }, 60000);
+            }, 1000 * 60 * 10);
         }
 
         this._initCommonHotKey();
@@ -1008,6 +1065,14 @@ var Util = {
         };
 
         userChannel.onmessage = function (evt) {
+            var data = JSON.parse(evt.data);
+
+            switch (data.command) {
+                case "refreshNotification":
+                    Util.setUnreadNotificationCount();
+
+                    break;
+            }
         };
 
         userChannel.onclose = function () {
@@ -1028,82 +1093,39 @@ var Util = {
                 $(this).addClass("selected");
             } else if (location.pathname === "/register") {
                 // 注册没有使用 href，对其进行特殊处理
-                $("#aRegister").addClass("selected");
+                $(".user-nav a:last").addClass("selected");
+            } else if (location.pathname === "/login") {
+                // 登录没有使用 href，对其进行特殊处理
+                $(".user-nav a:first").addClass("selected");
             } else if (href.indexOf(Label.servePath + '/settings') === 0) {
                 $(".user-nav .nav-avatar").addClass("selected");
             }
         });
 
+				var hideTimeOut = undefined;
         $('.nav .avatar-small').parent().mouseover(function () {
-            $('.nav .person-list').show();
+            $('#personListPanel').show();
+            $('#notificationsPanel').hide();
+			clearTimeout(hideTimeOut);
         }).mouseout(function () {
-            $('.nav .person-list').hide();
+			hideTimeOut = setTimeout(function () {
+				  $('#personListPanel').hide();
+			}, 600);
         });
 
-        $('.nav .person-list').mouseover(function () {
-            $('.nav .person-list').show();
+        $('#personListPanel').mouseover(function () {
+            $('#personListPanel').show();
+			clearTimeout(hideTimeOut);
         }).mouseout(function () {
-            $('.nav .person-list').hide();
+            $('#personListPanel').hide();
         });
-        
+
         // 导航过长处理
-        if ($('.nav-tabs a:last').offset().top > 0) {
+        if ($('.nav-tabs a:last').length === 1 && $('.nav-tabs a:last').offset().top > 0) {
             $('.nav-tabs').mouseover(function () {
                 $('.user-nav').hide();
             }).mouseout(function () {
                 $('.user-nav').show();
-            });
-        }
-    },
-    /**
-     * @description 登录
-     */
-    login: function () {
-        if (Validate.goValidate({target: $('#loginTip'),
-            data: [{
-                    "target": $("#nameOrEmail"),
-                    "type": "string",
-                    "max": 256,
-                    "msg": Label.loginNameErrorLabel
-                }, {
-                    "target": $("#loginPassword"),
-                    "type": "password",
-                    "msg": Label.invalidPasswordLabel
-                }]})) {
-            var requestJSONObject = {
-                nameOrEmail: $("#nameOrEmail").val().replace(/(^\s*)|(\s*$)/g, ""),
-                userPassword: calcMD5($("#loginPassword").val())
-            };
-            $.ajax({
-                url: Label.servePath + "/login",
-                type: "POST",
-                cache: false,
-                data: JSON.stringify(requestJSONObject),
-                success: function (result, textStatus) {
-                    if (result.sc) {
-                        if ("/register" === document.location.pathname) {
-                            window.location.href = "/";
-                        } else {
-                            window.location.reload();
-                        }
-
-                        if (window.localStorage) {
-                            if (!window.localStorage.articleContent) {
-                                window.localStorage.articleContent = "";
-                            }
-
-                            if (!window.localStorage.commentContent) {
-                                window.localStorage.commentContent = "";
-                            }
-
-                            if (!window.localStorage.unreadNotificationCount) {
-                                window.localStorage.unreadNotificationCount = 0;
-                            }
-                        }
-                    } else {
-                        $("#loginTip").addClass('error').html('<ul><li>' + result.msg + '</li></ul>');
-                    }
-                }
             });
         }
     },
@@ -1114,12 +1136,12 @@ var Util = {
         if (window.localStorage) {
             // Clear localStorage
             window.localStorage.clear();
-            window.localStorage.unreadNotificationCount = 0;
+            window.localStorage.hadNotificate = 'false';
         }
         window.location.href = Label.servePath + '/logout?goto=' + Label.servePath;
     },
     /**
-     * @description 获取字符串开始位置     
+     * @description 获取字符串开始位置
      * @param {String} string 需要匹配的字符串
      * @param {String} prefix 匹配字符
      * @return {Integer} 以匹配字符开头的位置
@@ -1128,7 +1150,7 @@ var Util = {
         return (string.match("^" + prefix) == prefix);
     },
     /**
-     * @description 文件上传     
+     * @description 文件上传
      * @param {Obj} obj  文件上传参数
      * @param {String} obj.id 上传组件 id
      * @param {jQuery} obj.pasteZone 粘贴区域
@@ -1150,12 +1172,6 @@ var Util = {
                 url: Label.servePath + "/upload",
                 paramName: "file",
                 add: function (e, data) {
-                    filename = data.files[0].name;
-
-                    if (!filename) {
-                        ext = data.files[0].type.split("/")[1];
-                    }
-
                     if (window.File && window.FileReader && window.FileList && window.Blob) {
                         var reader = new FileReader();
                         reader.readAsArrayBuffer(data.files[0]);
@@ -1194,8 +1210,8 @@ var Util = {
                     }
                 },
                 done: function (e, data) {
-                    var qiniuKey = data.result.key;
-                    if (!qiniuKey) {
+                    var filePath = data.result.key;
+                    if (!filePath) {
                         alert("Upload error");
 
                         return;
@@ -1203,20 +1219,16 @@ var Util = {
 
                     if (obj.editor.replaceRange) {
                         var cursor = obj.editor.getCursor();
-
-                        if (!filename) {
-                            filename = new Date().getTime();
-                        }
-
+                        filename = data.result.name;
                         if (isImg) {
-                            obj.editor.replaceRange('![' + filename + '](' + qiniuKey + ') \n\n',
+                            obj.editor.replaceRange('![' + filename + '](' + filePath + ') \n\n',
                                     CodeMirror.Pos(cursor.line, cursor.ch - obj.uploadingLabel.length), cursor);
                         } else {
-                            obj.editor.replaceRange('[' + filename + '](' + qiniuKey + ') \n\n',
+                            obj.editor.replaceRange('[' + filename + '](' + filePath + ') \n\n',
                                     CodeMirror.Pos(cursor.line, cursor.ch - obj.uploadingLabel.length), cursor);
                         }
                     } else {
-                        obj.editor.$it.val(obj.editor.$it.val() + '![' + filename + '](' + qiniuKey + ') \n\n');
+                        obj.editor.$it.val(obj.editor.$it.val() + '![' + filename + '](' + filePath + ') \n\n');
                         $('#' + obj.id + ' input').prop('disabled', false);
                     }
                 },
@@ -1237,7 +1249,7 @@ var Util = {
                 }
             });
 
-            return;
+            return false;
         }
 
         $('#' + obj.id).fileupload({
@@ -1247,11 +1259,18 @@ var Util = {
             url: "https://up.qbox.me/",
             paramName: "file",
             add: function (e, data) {
-                filename = data.files[0].name;
+                if (data.files[0].name) {
+                    var processName = data.files[0].name.match(/[a-zA-Z0-9.]/g).join('');
+                    filename = getUUID() + '-' + processName;
 
-                if (!filename) {
-                    ext = data.files[0].type.split("/")[1];
+                    // 文件名称全为中文时，移除 ‘-’
+                    if (processName.split('.')[0] === '') {
+                        filename = getUUID() + processName;
+                    }
+                } else {
+                    filename = getUUID() + '.' + data.files[0].type.split("/")[1];
                 }
+
 
                 if (window.File && window.FileReader && window.FileList && window.Blob) {
                     var reader = new FileReader();
@@ -1281,12 +1300,8 @@ var Util = {
             formData: function (form) {
                 var data = form.serializeArray();
 
-                if (filename) {
-                    filename = filename.replace(/ /g, "_");
-                    data.push({name: 'key', value: "file/" + getUUID() + "/" + filename});
-                } else {
-                    data.push({name: 'key', value: getUUID() + "." + ext});
-                }
+                data.push({name: 'key', value: "file/" + (new Date()).getFullYear() + "/"
+                            + ((new Date()).getMonth() + 1) + '/' + filename});
 
                 data.push({name: 'token', value: obj.qiniuUploadToken});
 
@@ -1310,10 +1325,6 @@ var Util = {
 
                 if (obj.editor.replaceRange) {
                     var cursor = obj.editor.getCursor();
-
-                    if (!filename) {
-                        filename = new Date().getTime();
-                    }
 
                     if (isImg) {
                         obj.editor.replaceRange('![' + filename + '](' + obj.qiniuDomain + '/' + qiniuKey + ') \n\n',
@@ -1410,7 +1421,7 @@ var Validate = {
     /**
      * @description 提交时对数据进行统一验证。
      * @param {array} data 验证数据
-     * @returns 验证通过返回 true，否则为 false。 
+     * @returns 验证通过返回 true，否则为 false。
      */
     goValidate: function (obj) {
         var tipHTML = '<ul>';
@@ -1434,10 +1445,10 @@ var Validate = {
      * @description 数据验证。
      * @param {object} data 验证数据
      * @param {string} data.type 验证类型
-     * @param {object} data.target 验证对象 
-     * @param {number} [data.min] 最小值 
-     * @param {number} [data.max] 最大值 
-     * @returns 验证通过返回 true，否则为 false。 
+     * @param {object} data.target 验证对象
+     * @param {number} [data.min] 最小值
+     * @param {number} [data.max] 最大值
+     * @returns 验证通过返回 true，否则为 false。
      */
     validate: function (data) {
         var isValidate = true,

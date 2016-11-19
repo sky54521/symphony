@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.service;
 
@@ -21,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import javax.inject.Inject;
 import org.apache.commons.lang.ArrayUtils;
@@ -77,7 +80,7 @@ import org.jsoup.Jsoup;
  * Article management service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.14.25.29, Oct 19, 2016
+ * @version 2.14.26.29, Nov 3, 2016
  * @since 0.2.0
  */
 @Service
@@ -453,6 +456,8 @@ public class ArticleMgmtService {
             String articleContent = requestJSONObject.optString(Article.ARTICLE_CONTENT);
             articleContent = Emotions.toAliases(articleContent);
             articleContent = StringUtils.trim(articleContent);
+            articleContent = StringUtils.replace(articleContent, langPropsService.get("uploadingLabel", Locale.SIMPLIFIED_CHINESE), "");
+            articleContent = StringUtils.replace(articleContent, langPropsService.get("uploadingLabel", Locale.US), "");
             article.put(Article.ARTICLE_CONTENT, articleContent);
 
             article.put(Article.ARTICLE_REWARD_CONTENT, requestJSONObject.optString(Article.ARTICLE_REWARD_CONTENT));
@@ -583,6 +588,11 @@ public class ArticleMgmtService {
             }
 
             transaction.commit();
+
+            try {
+                Thread.sleep(50); // wait for db write to avoid artitle duplication
+            } catch (final Exception e) {
+            }
 
             // Grows the tag graph
             tagMgmtService.relateTags(article.optString(Article.ARTICLE_TAGS));
@@ -734,6 +744,8 @@ public class ArticleMgmtService {
 
             String articleContent = requestJSONObject.optString(Article.ARTICLE_CONTENT);
             articleContent = Emotions.toAliases(articleContent);
+            articleContent = articleContent.replace(langPropsService.get("uploadingLabel", Locale.SIMPLIFIED_CHINESE), "");
+            articleContent = articleContent.replace(langPropsService.get("uploadingLabel", Locale.US), "");
             oldArticle.put(Article.ARTICLE_CONTENT, articleContent);
 
             final long currentTimeMillis = System.currentTimeMillis();
@@ -780,6 +792,11 @@ public class ArticleMgmtService {
             }
 
             transaction.commit();
+
+            try {
+                Thread.sleep(50); // wait for db write to avoid artitle duplication
+            } catch (final Exception e) {
+            }
 
             if (!fromClient && Article.ARTICLE_ANONYMOUS_C_PUBLIC == articleAnonymous) {
                 if (currentTimeMillis - createTime > 1000 * 60 * 5) {
@@ -1250,7 +1267,7 @@ public class ArticleMgmtService {
                 newTag = new JSONObject();
                 newTag.put(Tag.TAG_TITLE, tagTitle);
             }
-            
+
             newTags.add(newTag);
         }
 

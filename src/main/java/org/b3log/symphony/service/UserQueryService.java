@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.service;
 
@@ -51,6 +53,7 @@ import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.FollowRepository;
 import org.b3log.symphony.repository.PointtransferRepository;
 import org.b3log.symphony.repository.UserRepository;
+import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Sessions;
 import org.b3log.symphony.util.Times;
 import org.json.JSONArray;
@@ -433,15 +436,16 @@ public class UserQueryService {
      */
     public Set<String> getUserNames(final String text) throws ServiceException {
         final Set<String> ret = new HashSet<>();
-
-        int idx = text.indexOf('@');
+        final String mdtext=Markdowns.linkToHtml(text);
+        int idx = mdtext.indexOf('@');
 
         if (-1 == idx) {
             return ret;
         }
 
-        String copy = text.trim();
+        String copy = mdtext.trim();
         copy = copy.replaceAll("\\n", " ");
+        //(?=\\pP)匹配标点符号-http://www.cnblogs.com/qixuejia/p/4211428.html
         copy = copy.replaceAll("(?=\\pP)[^@]", " ");
         String[] uNames = StringUtils.substringsBetween(copy, "@", " ");
         String tail = StringUtils.substringAfterLast(copy, "@");
@@ -633,14 +637,13 @@ public class UserQueryService {
         final String city = requestJSONObject.optString(UserExt.USER_CITY);
         final long latestTime = requestJSONObject.optLong(UserExt.USER_LATEST_LOGIN_TIME);
 
-        final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+        final Query query = new Query().addSort(UserExt.USER_LATEST_LOGIN_TIME, SortDirection.DESCENDING)
                 .setCurrentPageNum(currentPageNum).setPageSize(pageSize)
                 .setFilter(CompositeFilterOperator.and(
                         new PropertyFilter(UserExt.USER_CITY, FilterOperator.EQUAL, city),
                         new PropertyFilter(UserExt.USER_STATUS, FilterOperator.EQUAL, UserExt.USER_STATUS_C_VALID),
                         new PropertyFilter(UserExt.USER_LATEST_LOGIN_TIME, FilterOperator.GREATER_THAN_OR_EQUAL, latestTime)
                 ));
-
         JSONObject result = null;
         try {
             result = userRepository.get(query);
@@ -668,9 +671,7 @@ public class UserQueryService {
         } catch (final RepositoryException | JSONException e) {
             LOGGER.log(Level.ERROR, "Fills following failed", e);
         }
-
         ret.put(User.USERS, users);
-
         return ret;
     }
 

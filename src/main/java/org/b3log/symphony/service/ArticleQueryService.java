@@ -1,27 +1,31 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.service;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,9 +55,11 @@ import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.ServiceException;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.CollectionUtils;
+import org.b3log.latke.util.Locales;
 import org.b3log.latke.util.Paginator;
 import org.b3log.latke.util.Stopwatchs;
 import org.b3log.latke.util.Strings;
+import org.b3log.symphony.cache.ArticleCache;
 import org.b3log.symphony.model.Article;
 import org.b3log.symphony.model.Comment;
 import org.b3log.symphony.model.Common;
@@ -87,7 +93,7 @@ import org.jsoup.select.Elements;
  * Article query service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.24.15.30, Oct 26, 2016
+ * @version 2.25.19.37, Nov 18, 2016
  * @since 0.2.0
  */
 @Service
@@ -165,15 +171,147 @@ public class ArticleQueryService {
     private ShortLinkQueryService shortLinkQueryService;
 
     /**
+     * Follow query service.
+     */
+    @Inject
+    private FollowQueryService followQueryService;
+
+    /**
      * Language service.
      */
     @Inject
     private LangPropsService langPropsService;
 
     /**
+     * Article cache.
+     */
+    @Inject
+    private ArticleCache articleCache;
+
+    /**
      * Count to fetch article tags for relevant articles.
      */
     private static final int RELEVANT_ARTICLE_RANDOM_FETCH_TAG_CNT = 3;
+
+    /**
+     * Gets following user articles.
+     *
+     * @param avatarViewMode the specified avatar view mode
+     * @param userId the specified user id
+     * @param currentPageNum the specified page number
+     * @param pageSize the specified page size
+     * @return following tag articles, returns an empty list if not found
+     * @throws ServiceException service exception
+     */
+    public List<JSONObject> getFollowingUserArticles(final int avatarViewMode, final String userId,
+            final int currentPageNum, final int pageSize) throws ServiceException {
+        final List<JSONObject> users = (List<JSONObject>) followQueryService.getFollowingUsers(
+                avatarViewMode, userId, 1, Integer.MAX_VALUE).opt(Keys.RESULTS);
+        if (users.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Query query = new Query()
+                .addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                .setPageSize(pageSize).setCurrentPageNum(currentPageNum);
+
+        final List<String> followingUserIds = new ArrayList<>();
+        for (final JSONObject user : users) {
+            followingUserIds.add(user.optString(Keys.OBJECT_ID));
+        }
+
+        final List<Filter> filters = new ArrayList<>();
+        filters.add(new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID));
+        filters.add(new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION));
+        filters.add(new PropertyFilter(Article.ARTICLE_AUTHOR_ID, FilterOperator.IN, followingUserIds));
+        query.setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
+
+        query.addProjection(Keys.OBJECT_ID, String.class).
+                addProjection(Article.ARTICLE_STICK, Long.class).
+                addProjection(Article.ARTICLE_CREATE_TIME, Long.class).
+                addProjection(Article.ARTICLE_UPDATE_TIME, Long.class).
+                addProjection(Article.ARTICLE_LATEST_CMT_TIME, Long.class).
+                addProjection(Article.ARTICLE_AUTHOR_ID, String.class).
+                addProjection(Article.ARTICLE_TITLE, String.class).
+                addProjection(Article.ARTICLE_STATUS, Integer.class).
+                addProjection(Article.ARTICLE_VIEW_CNT, Integer.class).
+                addProjection(Article.ARTICLE_TYPE, Integer.class).
+                addProjection(Article.ARTICLE_PERMALINK, String.class).
+                addProjection(Article.ARTICLE_TAGS, String.class).
+                addProjection(Article.ARTICLE_LATEST_CMTER_NAME, String.class).
+                addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
+                addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
+                addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
+
+        JSONObject result = null;
+        try {
+            Stopwatchs.start("Query following user articles");
+
+            result = articleRepository.get(query);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Gets following user articles failed", e);
+
+            throw new ServiceException(e);
+        } finally {
+            Stopwatchs.end();
+        }
+
+        final JSONArray data = result.optJSONArray(Keys.RESULTS);
+        final List<JSONObject> ret = CollectionUtils.<JSONObject>jsonArrayToList(data);
+
+        try {
+            organizeArticles(avatarViewMode, ret);
+        } catch (final RepositoryException e) {
+            LOGGER.log(Level.ERROR, "Organizes articles failed", e);
+
+            throw new ServiceException(e);
+        }
+
+        return ret;
+    }
+
+    /**
+     * Gets following tag articles.
+     *
+     * @param avatarViewMode the specified avatar view mode
+     * @param userId the specified user id
+     * @param currentPageNum the specified page number
+     * @param pageSize the specified page size
+     * @return following tag articles, returns an empty list if not found
+     * @throws ServiceException service exception
+     */
+    public List<JSONObject> getFollowingTagArticles(final int avatarViewMode, final String userId,
+            final int currentPageNum, final int pageSize) throws ServiceException {
+        final List<JSONObject> tags = (List<JSONObject>) followQueryService.getFollowingTags(
+                userId, 1, Integer.MAX_VALUE).opt(Keys.RESULTS);
+        if (tags.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        final Map<String, Class<?>> articleFields = new HashMap<>();
+        articleFields.put(Keys.OBJECT_ID, String.class);
+        articleFields.put(Article.ARTICLE_STICK, Long.class);
+        articleFields.put(Article.ARTICLE_CREATE_TIME, Long.class);
+        articleFields.put(Article.ARTICLE_UPDATE_TIME, Long.class);
+        articleFields.put(Article.ARTICLE_LATEST_CMT_TIME, Long.class);
+        articleFields.put(Article.ARTICLE_AUTHOR_ID, String.class);
+        articleFields.put(Article.ARTICLE_TITLE, String.class);
+        articleFields.put(Article.ARTICLE_STATUS, Integer.class);
+        articleFields.put(Article.ARTICLE_VIEW_CNT, Integer.class);
+        articleFields.put(Article.ARTICLE_TYPE, Integer.class);
+        articleFields.put(Article.ARTICLE_PERMALINK, String.class);
+        articleFields.put(Article.ARTICLE_TAGS, String.class);
+        articleFields.put(Article.ARTICLE_LATEST_CMTER_NAME, String.class);
+        articleFields.put(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class);
+        articleFields.put(Article.ARTICLE_COMMENT_CNT, Integer.class);
+        articleFields.put(Article.ARTICLE_ANONYMOUS, Integer.class);
+        articleFields.put(Article.ARTICLE_PERFECT, Integer.class);
+        articleFields.put(Article.ARTICLE_CONTENT, String.class);
+
+        return getArticlesByTags(avatarViewMode, currentPageNum, pageSize, articleFields, tags.toArray(new JSONObject[0]));
+    }
 
     /**
      * Gets the next article.
@@ -575,42 +713,69 @@ public class ArticleQueryService {
 
             if (!tagList.isEmpty()) {
                 final List<JSONObject> tagArticles
-                        = getArticlesByTags(currentPageNum, pageSize, articleFields, tagList.toArray(new JSONObject[0]));
-                for (final JSONObject article : tagArticles) {
-                    article.remove(Article.ARTICLE_T_PARTICIPANTS);
-                    article.remove(Article.ARTICLE_T_PARTICIPANT_NAME);
-                    article.remove(Article.ARTICLE_T_PARTICIPANT_THUMBNAIL_URL);
-                    article.remove(Article.ARTICLE_LATEST_CMT_TIME);
-                    article.remove(Article.ARTICLE_LATEST_CMTER_NAME);
-                    article.remove(Article.ARTICLE_UPDATE_TIME);
-                    article.remove(Article.ARTICLE_T_HEAT);
-                    article.remove(Article.ARTICLE_T_TITLE_EMOJI);
-                    article.remove(Common.TIME_AGO);
-
-                    article.put(Article.ARTICLE_CREATE_TIME, ((Date) article.get(Article.ARTICLE_CREATE_TIME)).getTime());
-                }
+                        = getArticlesByTags(UserExt.USER_AVATAR_VIEW_MODE_C_STATIC,
+                                currentPageNum, pageSize, articleFields, tagList.toArray(new JSONObject[0]));
 
                 ret.addAll(tagArticles);
             }
 
-            final List<Filter> filters = new ArrayList<>();
-            filters.add(new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID));
-            filters.add(new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION));
+            if (ret.size() < pageSize) {
+                final List<Filter> filters = new ArrayList<>();
+                filters.add(new PropertyFilter(Article.ARTICLE_STATUS, FilterOperator.EQUAL, Article.ARTICLE_STATUS_C_VALID));
+                filters.add(new PropertyFilter(Article.ARTICLE_TYPE, FilterOperator.NOT_EQUAL, Article.ARTICLE_TYPE_C_DISCUSSION));
 
-            final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
-                    .setPageCount(currentPageNum).setPageSize(pageSize).setCurrentPageNum(1);
-            query.setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
-            for (final Map.Entry<String, Class<?>> articleField : articleFields.entrySet()) {
-                query.addProjection(articleField.getKey(), articleField.getValue());
+                final Query query = new Query().addSort(Keys.OBJECT_ID, SortDirection.DESCENDING)
+                        .setPageCount(currentPageNum).setPageSize(pageSize).setCurrentPageNum(1);
+                query.setFilter(new CompositeFilter(CompositeFilterOperator.AND, filters));
+                for (final Map.Entry<String, Class<?>> articleField : articleFields.entrySet()) {
+                    query.addProjection(articleField.getKey(), articleField.getValue());
+                }
+
+                final JSONObject result = articleRepository.get(query);
+
+                final List<JSONObject> recentArticles = CollectionUtils.<JSONObject>jsonArrayToList(result.optJSONArray(Keys.RESULTS));
+                ret.addAll(recentArticles);
             }
 
-            final JSONObject result = articleRepository.get(query);
-
-            final List<JSONObject> recentArticles = CollectionUtils.<JSONObject>jsonArrayToList(result.optJSONArray(Keys.RESULTS));
-            ret.addAll(recentArticles);
-
-            for (final JSONObject article : ret) {
+            final Iterator<JSONObject> iterator = ret.iterator();
+            int i = 0;
+            while (iterator.hasNext()) {
+                final JSONObject article = iterator.next();
                 article.put(Article.ARTICLE_PERMALINK, Latkes.getServePath() + article.optString(Article.ARTICLE_PERMALINK));
+
+                article.remove(Article.ARTICLE_T_AUTHOR);
+                article.remove(Article.ARTICLE_AUTHOR_ID);
+                article.remove(Article.ARTICLE_T_PARTICIPANTS);
+                article.remove(Article.ARTICLE_T_PARTICIPANT_NAME);
+                article.remove(Article.ARTICLE_T_PARTICIPANT_THUMBNAIL_URL);
+                article.remove(Article.ARTICLE_LATEST_CMT_TIME);
+                article.remove(Article.ARTICLE_LATEST_CMTER_NAME);
+                article.remove(Article.ARTICLE_UPDATE_TIME);
+                article.remove(Article.ARTICLE_T_HEAT);
+                article.remove(Article.ARTICLE_T_TITLE_EMOJI);
+                article.remove(Common.TIME_AGO);
+                article.remove(Common.CMT_TIME_AGO);
+                article.remove(Article.ARTICLE_T_TAG_OBJS);
+                article.remove(Article.ARTICLE_STICK);
+                article.remove(Article.ARTICLE_T_PREVIEW_CONTENT);
+                article.remove(Article.ARTICLE_T_AUTHOR_THUMBNAIL_URL + "20");
+                article.remove(Article.ARTICLE_T_AUTHOR_THUMBNAIL_URL + "48");
+                article.remove(Article.ARTICLE_T_AUTHOR_THUMBNAIL_URL + "210");
+                article.remove(Article.ARTICLE_T_STICK_REMAINS);
+
+                long createTime = 0;
+                final Object time = article.get(Article.ARTICLE_CREATE_TIME);
+                if (time instanceof Date) {
+                    createTime = ((Date) time).getTime();
+                } else {
+                    createTime = (Long) time;
+                }
+                article.put(Article.ARTICLE_CREATE_TIME, createTime);
+
+                i++;
+                if (i > pageSize) {
+                    iterator.remove();
+                }
             }
 
             return ret;
@@ -653,6 +818,7 @@ public class ArticleQueryService {
     /**
      * Gets articles by the specified tags (order by article create date desc).
      *
+     * @param avatarViewMode the specified avatar view mode
      * @param tags the specified tags
      * @param currentPageNum the specified page number
      * @param articleFields the specified article fields to return
@@ -660,7 +826,7 @@ public class ArticleQueryService {
      * @return articles, return an empty list if not found
      * @throws ServiceException service exception
      */
-    public List<JSONObject> getArticlesByTags(final int currentPageNum, final int pageSize,
+    public List<JSONObject> getArticlesByTags(final int avatarViewMode, final int currentPageNum, final int pageSize,
             final Map<String, Class<?>> articleFields, final JSONObject... tags) throws ServiceException {
         try {
             final List<Filter> filters = new ArrayList<>();
@@ -696,7 +862,7 @@ public class ArticleQueryService {
             result = articleRepository.get(query);
 
             final List<JSONObject> ret = CollectionUtils.<JSONObject>jsonArrayToList(result.optJSONArray(Keys.RESULTS));
-            organizeArticles(UserExt.USER_AVATAR_VIEW_MODE_C_STATIC, ret);
+            organizeArticles(avatarViewMode, ret);
 
             return ret;
         } catch (final RepositoryException e) {
@@ -820,7 +986,8 @@ public class ArticleQueryService {
                     addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                     addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                     addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                    addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                    addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                    addProjection(Article.ARTICLE_CONTENT, String.class);
 
             result = articleRepository.get(query);
 
@@ -1246,7 +1413,8 @@ public class ArticleQueryService {
                 addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                 addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                 addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
 
         return ret;
     }
@@ -1281,7 +1449,9 @@ public class ArticleQueryService {
                 addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                 addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                 addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
 
         return ret;
     }
@@ -1316,7 +1486,8 @@ public class ArticleQueryService {
                 addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                 addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                 addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
 
         return ret;
     }
@@ -1351,7 +1522,8 @@ public class ArticleQueryService {
                 addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                 addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                 addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
 
         return ret;
     }
@@ -1497,7 +1669,8 @@ public class ArticleQueryService {
                 addProjection(Article.ARTICLE_SYNC_TO_CLIENT, Boolean.class).
                 addProjection(Article.ARTICLE_COMMENT_CNT, Integer.class).
                 addProjection(Article.ARTICLE_ANONYMOUS, Integer.class).
-                addProjection(Article.ARTICLE_PERFECT, Integer.class);
+                addProjection(Article.ARTICLE_PERFECT, Integer.class).
+                addProjection(Article.ARTICLE_CONTENT, String.class);
 
         try {
             List<JSONObject> ret;
@@ -1864,22 +2037,10 @@ public class ArticleQueryService {
     /**
      * Organizes the specified articles.
      *
-     * <ul>
-     * <li>converts create/update/latest comment time (long) to date type</li>
-     * <li>generates author thumbnail URL</li>
-     * <li>generates author name</li>
-     * <li>escapes article title &lt; and &gt;</li>
-     * <li>generates article heat</li>
-     * <li>generates article view count display format(1k+/1.5k+...)</li>
-     * <li>generates time ago text</li>
-     * <li>generates stick remains minutes</li>
-     * <li>anonymous process</li>
-     * <li>builds tag objects</li>
-     * </ul>
-     *
      * @param avatarViewMode the specified avatarViewMode
      * @param articles the specified articles
      * @throws RepositoryException repository exception
+     * @see #organizeArticle(int, org.json.JSONObject)
      */
     public void organizeArticles(final int avatarViewMode, final List<JSONObject> articles) throws RepositoryException {
         Stopwatchs.start("Organize articles");
@@ -1903,9 +2064,11 @@ public class ArticleQueryService {
      * <li>generates article heat</li>
      * <li>generates article view count display format(1k+/1.5k+...)</li>
      * <li>generates time ago text</li>
+     * <li>generates comment time ago text</li>
      * <li>generates stick remains minutes</li>
      * <li>anonymous process</li>
      * <li>builds tag objects</li>
+     * <li>generates article preview content</li>
      * </ul>
      *
      * @param avatarViewMode the specified avatar view mode
@@ -1915,6 +2078,8 @@ public class ArticleQueryService {
     public void organizeArticle(final int avatarViewMode, final JSONObject article) throws RepositoryException {
         toArticleDate(article);
         genArticleAuthor(avatarViewMode, article);
+
+        article.put(Article.ARTICLE_T_PREVIEW_CONTENT, getArticleMetaDesc(article));
 
         String title = article.optString(Article.ARTICLE_TITLE).replace("<", "&lt;").replace(">", "&gt;");
         title = Markdowns.clean(title, "");
@@ -1961,6 +2126,17 @@ public class ArticleQueryService {
             article.put(Article.ARTICLE_LATEST_CMTER_NAME, articleLatestCmterName);
         }
 
+        final Query query = new Query()
+                .setPageCount(1).setCurrentPageNum(1).setPageSize(1)
+                .setFilter(new PropertyFilter(Comment.COMMENT_ON_ARTICLE_ID, FilterOperator.EQUAL, articleId)).
+                addSort(Keys.OBJECT_ID, SortDirection.DESCENDING);
+        final JSONArray cmts = commentRepository.get(query).optJSONArray(Keys.RESULTS);
+        if (cmts.length() > 0) {
+            final JSONObject latestCmt = cmts.optJSONObject(0);
+            latestCmt.put(Comment.COMMENT_CLIENT_COMMENT_ID, latestCmt.optString(Comment.COMMENT_CLIENT_COMMENT_ID));
+            article.put(Article.ARTICLE_T_LATEST_CMT, latestCmt);
+        }
+
         // builds tag objects
         final String tagsStr = article.optString(Article.ARTICLE_TAGS);
         final String[] tagTitles = tagsStr.split(",");
@@ -1990,7 +2166,10 @@ public class ArticleQueryService {
      * @param article the specified article
      */
     private void toArticleDate(final JSONObject article) {
-        article.put(Common.TIME_AGO, Times.getTimeAgo(article.optLong(Article.ARTICLE_CREATE_TIME), Latkes.getLocale()));
+        article.put(Common.TIME_AGO,
+                Times.getTimeAgo(article.optLong(Article.ARTICLE_CREATE_TIME), Locales.getLocale()));
+        article.put(Common.CMT_TIME_AGO,
+                Times.getTimeAgo(article.optLong(Article.ARTICLE_LATEST_CMT_TIME), Locales.getLocale()));
 
         article.put(Article.ARTICLE_CREATE_TIME, new Date(article.optLong(Article.ARTICLE_CREATE_TIME)));
         article.put(Article.ARTICLE_UPDATE_TIME, new Date(article.optLong(Article.ARTICLE_UPDATE_TIME)));
@@ -2432,21 +2611,94 @@ public class ArticleQueryService {
      * @param article the specified article
      * @return meta description
      */
-    private String getArticleMetaDesc(final JSONObject article) {
-        Stopwatchs.start("Meta Desc");
+    public String getArticleMetaDesc(final JSONObject article) {
+        final String articleId = article.optString(Keys.OBJECT_ID);
 
+        String articleAbstract = articleCache.getArticleAbstract(articleId);
+        if (StringUtils.isNotBlank(articleAbstract)) {
+            return articleAbstract;
+        }
+
+        Stopwatchs.start("Meta Desc");
         try {
+            final int articleType = article.optInt(Article.ARTICLE_TYPE);
+            if (Article.ARTICLE_TYPE_C_THOUGHT == articleType) {
+                return "....";
+            }
+
+            if (Article.ARTICLE_TYPE_C_DISCUSSION == articleType) {
+                return langPropsService.get("articleAbstractDiscussionLabel", Latkes.getLocale());
+            }
+
             final int length = Integer.valueOf("150");
 
             String ret = article.optString(Article.ARTICLE_CONTENT);
-            ret = Jsoup.clean(ret, Whitelist.none());
+
+            try {
+                ret = Markdowns.toHTML(ret);
+            } catch (final Exception e) {
+                LOGGER.log(Level.ERROR, "Parses article abstract failed [id=" + articleId + ", md=" + ret + "]");
+                throw e;
+            }
+
+            ret = Jsoup.clean(ret, Whitelist.basicWithImages());
+
+            final int threshold = 20;
+            String[] pics = StringUtils.substringsBetween(ret, "<img", "/>");
+            if (null != pics) {
+                if (pics.length > threshold) {
+                    pics = Arrays.copyOf(pics, threshold);
+                }
+
+                final String[] picsRepl = new String[pics.length];
+                for (int i = 0; i < picsRepl.length; i++) {
+                    picsRepl[i] = langPropsService.get("picTagLabel", Latkes.getLocale());
+                    pics[i] = "<img" + pics[i] + "/>";
+
+                    if (i > threshold) {
+                        break;
+                    }
+                }
+
+                ret = StringUtils.replaceEach(ret, pics, picsRepl);
+            }
+
+            if (ret.length() >= length && null != pics) {
+                ret = StringUtils.substring(ret, 0, length)
+                        + " ....";
+
+                ret = Jsoup.clean(Jsoup.parse(ret).text(), Whitelist.none());
+                ret = ret.replaceAll("\"", "'");
+
+                articleCache.putArticleAbstract(articleId, ret);
+
+                return ret;
+            }
+
+            String[] urls = StringUtils.substringsBetween(ret, "<a", "</a>");
+            if (null != urls) {
+                if (urls.length > threshold) {
+                    urls = Arrays.copyOf(urls, threshold);
+                }
+
+                final String[] urlsRepl = new String[urls.length];
+                for (int i = 0; i < urlsRepl.length; i++) {
+                    urlsRepl[i] = langPropsService.get("urlTagLabel", Latkes.getLocale());
+                    urls[i] = "<a" + urls[i] + "</a>";
+                }
+
+                ret = StringUtils.replaceEach(ret, urls, urlsRepl);
+            }
+
             if (ret.length() >= length) {
                 ret = StringUtils.substring(ret, 0, length)
                         + " ....";
             }
 
-            ret = Jsoup.parse(ret).text();
+            ret = Jsoup.clean(Jsoup.parse(ret).text(), Whitelist.none());
             ret = ret.replaceAll("\"", "'");
+
+            articleCache.putArticleAbstract(articleId, ret);
 
             return ret;
         } finally {

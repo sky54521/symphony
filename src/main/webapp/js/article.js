@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * @fileoverview article page and add comment.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.25.34.24, Oct 26, 2016
+ * @version 1.25.36.25, Nov 8, 2016
  */
 
 /**
@@ -91,7 +92,7 @@ var Comment = {
                 return false;
             }
             $('.footer').css('margin-bottom', $('.editor-panel').outerHeight() + 'px');
-            $('#replyUseName').html('<a href="javascript:void(0)" onclick="Util.goTop();Comment._bgFade($(\'.article-module\'))" class="ft-a-icon"><span class="icon-reply-to"></span>' 
+            $('#replyUseName').html('<a href="javascript:void(0)" onclick="Util.goTop();Comment._bgFade($(\'.article-module\'))" class="ft-a-title"><span class="icon-reply-to"></span>' 
                 + $('.article-title').text() + '</a>').removeData();
 
             // 如果 hide 初始化， focus 无效
@@ -176,7 +177,8 @@ var Comment = {
             return false;
         }).bind('keyup', 'a', function assets() {
             // x a 管理员编辑选中的回贴
-            if (Util.prevKey === 'x' && Label.isAdminLoggedIn) {
+            if (Util.prevKey === 'x' && Label.isAdminLoggedIn 
+                && $('#comments .list > ul > li.focus .icon-setting').parent().length === 1) {
                 window.location = $('#comments .list > ul > li.focus .icon-setting').parent().attr('href');
             }
             return false;
@@ -218,7 +220,7 @@ var Comment = {
             return false;
         }).bind('keyup', 'e', function assets() {
             // v e 编辑帖子
-            if (Util.prevKey === 'v') {
+            if (Util.prevKey === 'v' && $('.action-btns .icon-edit').parent().length === 1) {
                 window.location = $('.action-btns .icon-edit').parent().attr('href');
             }
             return false;
@@ -230,7 +232,7 @@ var Comment = {
             return false;
         }).bind('keyup', 'a', function assets() {
             // v a 管理员编辑帖子 
-            if (Util.prevKey === 'v') {
+            if (Util.prevKey === 'v' && $('.action-btns .icon-setting').parent().length === 1) {
                 window.location = $('.action-btns .icon-setting').parent().attr('href');
             }
             return false;
@@ -295,6 +297,7 @@ var Comment = {
                 element: document.getElementById('commentContent'),
                 dragDrop: false,
                 lineWrapping: true,
+                htmlURL: Label.servePath + "/markdown",
                 toolbar: [
                     {name: 'bold'},
                     {name: 'italic'},
@@ -309,7 +312,8 @@ var Comment = {
                     {name: 'redo'},
                     {name: 'undo'},
                     '|',
-                    {name: 'preview'}
+                    {name: 'preview'},
+                    {name: 'fullscreen'}
                 ],
                 extraKeys: {
                     "Alt-/": "autocompleteUserName",
@@ -370,6 +374,24 @@ var Comment = {
                 cm.showHint({hint: CodeMirror.hint.userName, completeSingle: false});
                 return CodeMirror.Pass;
             }
+
+            if ($('.article-comment-content .CodeMirror-preview').length === 0) {
+                return false;
+            }
+
+            $.ajax({
+                url: Label.servePath + "/markdown",
+                type: "POST",
+                cache: false,
+                data: {
+                    markdownText: cm.getValue()
+                },
+                success: function (result, textStatus) {
+                    $('.article-comment-content .CodeMirror-preview').html(result.html);
+                    hljs.initHighlighting.called = false;
+                    hljs.initHighlighting();
+                }
+            });
         });
 
         Comment.editor.on('keypress', function (cm, evt) {
@@ -407,16 +429,18 @@ var Comment = {
     _initMathJax: function () {
         var hasMathJax = false;
         $('.content-reset').each(function () {
-            if ($(this).text().indexOf('$/') > -1 || $(this).text().indexOf('$$') > -1) {
-                hasMathJax = true;
-                return false;
-            }
+            $(this).find('p').each(function () {
+                if ($(this).text().indexOf('$/') > -1 || $(this).text().indexOf('$$') > -1) {
+                    hasMathJax = true;
+                    return false;
+                }
+            });
         });
 
         if (hasMathJax) {
             $.ajax({
                 method: "GET",
-                url: "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&_=1473258780393",
+                url: "https://cdn.staticfile.org/MathJax/MathJax-2.6-latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML&_=1473258780393",
                 dataType: "script"
             }).done(function () {
                 MathJax.Hub.Config({
@@ -591,7 +615,7 @@ var Comment = {
 
                     template += ' ' + Util.getDeviceByUa(data.commentUA) + '</span>';
 
-                    template += '<a class="tooltipped tooltipped-nw ft-a-icon fn-right" aria-label="' + Label.referenceLabel + '" href="javascript:Comment.goComment(\''
+                    template += '<a class="tooltipped tooltipped-nw ft-a-title fn-right" aria-label="' + Label.referenceLabel + '" href="javascript:Comment.goComment(\''
                             + Label.servePath + '/article/' + Label.articleOId + '?p=' + data.paginationCurrentPageNum
                             + '&m=' + Label.userCommentViewMode + '#' + data.oId
                             + '\')"><span class="icon-quote"></span></a></div><div class="content-reset comment">'
@@ -729,11 +753,11 @@ var Comment = {
             $avatar = $('#' + id).find('>.fn-flex>.avatar').clone();
             $avatar.removeClass('avatar').addClass('avatar-small');
             replyUserHTML = '<a rel="nofollow" href="#' + id
-                    + '" class="ft-a-icon" onclick="Comment._bgFade($(\'#' + id
+                    + '" class="ft-a-title" onclick="Comment._bgFade($(\'#' + id
                     + '\'))"><span class="icon-reply-to"></span> '
                     + $avatar[0].outerHTML + ' ' + userName + '</a>';
         } else {
-            $avatar.addClass('ft-a-icon').attr('href', '#' + id).attr('onclick', 'Comment._bgFade($("#' + id + '"))');
+            $avatar.addClass('ft-a-title').attr('href', '#' + id).attr('onclick', 'Comment._bgFade($("#' + id + '"))');
             $avatar.find('div').removeClass('avatar').addClass('avatar-small').after(' ' + userName).before('<span class="icon-reply-to"></span> ');
             replyUserHTML = $avatar[0].outerHTML;
         }
@@ -1298,7 +1322,7 @@ var Article = {
             }
 
             // 当前目录样式
-            var scrollTop = $('body').scrollTop();
+            var scrollTop = $(window).scrollTop();
 
             for (var i = 0, iMax = toc.length; i < iMax; i++) {
                 if (scrollTop < toc[i].offsetTop - 5) {
@@ -1315,7 +1339,7 @@ var Article = {
             }
 
             // 位置是否固定
-            if ($('body').scrollTop() > top - 20) {
+            if ($(window).scrollTop() > top - 20) {
                 $articleToc.css('position', 'fixed');
                 $articleToc.next().css('position', 'fixed');
                 $articleToc.next().next().css('position', 'fixed');
@@ -1356,7 +1380,7 @@ var Article = {
         } else {
             $articleToc.show();
             $menu.addClass('ft-red');
-            if ($('body').scrollTop() > $('#articleToC').offset().top - 20) {
+            if ($(window).scrollTop() > $('#articleToC').offset().top - 20) {
                 $articleToc.css('position', 'fixed');
                 $articleToc.next().css('position', 'fixed');
                 $articleToc.next().next().css('position', 'fixed');

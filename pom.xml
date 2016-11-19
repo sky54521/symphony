@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
     Description: Symphony POM.
-    Version: 2.13.4.42, Oct 19, 2016
+    Version: 2.14.5.44, Nov 13, 2016
     Author: Liang Ding
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
@@ -21,7 +21,7 @@
 
     <!-- Properties -->
     <properties>
-        <latke.version>2.3.3</latke.version>
+        <latke.version>2.3.5</latke.version>
         
         <servlet.version>3.1.0</servlet.version>
         <jetty.version>9.2.7.v20150116</jetty.version>
@@ -53,8 +53,8 @@
 
     <licenses>
         <license>
-            <name>Apache License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>GNU GENERAL PUBLIC LICENSE</name>
+            <url>https://www.gnu.org/licenses/gpl.txt</url>
         </license>
     </licenses>
 
@@ -222,6 +222,14 @@
             <version>${commons-codec.version}</version>
         </dependency>
         
+        <dependency>
+            <groupId>org.patchca</groupId>
+            <artifactId>patchca</artifactId>
+            <version>0.5.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/src/main/resources/lib/net/pusuo/patchca-0.5.0.jar</systemPath>
+        </dependency>
+        
     </dependencies>
 
     <build>
@@ -296,8 +304,10 @@
                         <include>**/src/*/java/**/*.java</include>
                         <include>**/src/*/webapp/js/*.js</include>
                         <include>**/src/*/webapp/css/*.css</include>
+                        <include>**/src/*/webapp/scss/*.scss</include>
                         <include>**/src/*/resources/*.properties</include>
                         <include>**/src/*/webapp/WEB-INF/*.xml</include>
+                        <include>gulpfile.js</include>
                     </includes>
                     <excludes>
                         <exclude>**/src/main/java/**/package-info.java</exclude>
@@ -310,6 +320,7 @@
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <mapping>
                         <java>SLASHSTAR_STYLE</java>
+                        <scss>SLASHSTAR_STYLE</scss>
                     </mapping>
                     <useDefaultMapping>true</useDefaultMapping>
                     <properties>
@@ -330,6 +341,25 @@
                     -->
                 </executions>
             </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.0.0</version>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.basedir}/src/main/resources/lib/net/pusuo</directory>  
+                            <targetPath>WEB-INF/lib</targetPath>
+                            <filtering>false</filtering>
+                            <includes>
+                                <include>**/*.jar</include>  
+                            </includes>  
+                        </resource>  
+                    </webResources>  
+                </configuration>  
+            </plugin>
+            
         </plugins>
 
         <finalName>symphony</finalName>

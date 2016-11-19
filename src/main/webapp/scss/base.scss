@@ -1,17 +1,19 @@
-/**
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+/*
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -19,7 +21,7 @@
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.24.18.46, Oct 26, 2016
+ * @version 2.25.19.48, Nov 18, 2016
  */
 
 @import "variables";
@@ -42,7 +44,7 @@ body {
     background: rgba(65,131,196,0.4);
 }
 
-::selection { 
+::selection {
     text-shadow: none;
     background: rgba(66, 133, 244,0.4)
 }
@@ -235,11 +237,11 @@ blockquote {
         margin-bottom: 16px;
     }
 
-    h1, 
-    h2, 
-    h3, 
-    h4, 
-    h5, 
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
     h6 {
         margin-top: 24px;
         margin-bottom: 16px;
@@ -290,15 +292,15 @@ blockquote {
     }
 
     iframe {
-        border: 1px solid #ccc;
+        border: 1px solid $fade;
     }
 
     table {
-        width: 100%; 
-        border: 1px solid #dedede; 
+        width: 100%;
+        border: 1px solid #dedede;
         margin: 15px auto;
-        border-collapse: collapse; 
-        empty-cells: show; 
+        border-collapse: collapse;
+        empty-cells: show;
     }
 
     thead {
@@ -307,23 +309,23 @@ blockquote {
 
     td,
     th {
-        height: 35px; 
-        border: 1px solid #dedede; 
-        padding: 0 10px; 
+        height: 35px;
+        border: 1px solid #dedede;
+        padding: 0 10px;
     }
 
     th {
-        font-weight: bold; 
-        text-align: center !important; 
-        background: rgba(158,188,226,0.2); 
+        font-weight: bold;
+        text-align: center !important;
+        background: rgba(158,188,226,0.2);
     }
 
     tbody tr:nth-child(2n) {
-        background: rgba(158,188,226,0.12); 
+        background: rgba(158,188,226,0.12);
     }
 
     tr:hover {
-        background: #efefef; 
+        background: #efefef;
     }
 
     code {
@@ -354,13 +356,12 @@ blockquote {
         color: #555;
         vertical-align: middle;
         background-color: #fcfcfc;
-        border: solid 1px #ccc;
+        border: solid 1px $fade;
         border-bottom-color: #bbb;
         border-radius: 3px;
         box-shadow: inset 0 -1px 0 #bbb;
     }
 }
-
 /* end reset */
 
 /* start function */
@@ -435,20 +436,12 @@ blockquote {
     font-size: 12px;
 }
 
-.ft-gray,
-.ft-gray a {
-    color: #999;
+.ft-gray {
+    color: $gray;
 }
 
-.ft-fade,
-.ft-fade a,
-a[class^="icon-"].ft-fade {
-    color: #ccc;
-}
-
-.ft-fade a:hover,
-a[class^="icon-"].ft-fade:hover {
-    color: #999;
+.ft-fade {
+    color: $fade;
 }
 
 .ft-red {
@@ -460,17 +453,16 @@ a[class^="icon-"].ft-fade:hover {
 }
 
 .ft-green {
-    color: #569e3d;
+    color: $green;
 }
 
-.ft-a-icon {
-    color: #ccc;
+.ft-a-title {
+    color: #666;
     text-decoration: none;
-} 
+}
 
-.ft-a-icon:hover {
-    color: #999;
-    text-decoration: none;
+.ft-a-title:hover {
+    color: #333;
 }
 
 .ft-center {
@@ -486,25 +478,34 @@ a[class^="icon-"].ft-fade:hover {
     color: #666;
     background-color: #eee;
     border-radius: 20px;
+    display: inline-block;
 }
 
 .count:hover {
     text-decoration: none;
 }
 
-.count:visited {
-    color: #999;
-}
-
 .sub-head {
     padding: 5px 10px;
-    border-bottom: 1px solid #e5e5e5;  
+    border-bottom: 1px solid #e5e5e5;
     line-height: 31px;
 }
 /* end function */
 
 /* start common */
-.tag {   
+.timeline a {
+    color: #666;
+}
+
+.timeline a:hover {
+    color: #333;
+}
+
+.timeline li:last-child {
+    border-bottom: 0;
+}
+
+.tag {
     font-size: 12px;
     color: $fade;
     white-space: nowrap;
@@ -701,8 +702,8 @@ button,
 button:hover,
 .btn:hover {
     text-decoration: none;
-    border-color: #ccc;
-    background-color: #0ca6dd;
+    border-color: $fade;
+    background-color: #eee;
     background: linear-gradient(#eee, #ddd);
 }
 
@@ -718,18 +719,18 @@ button.green,
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
     background-color: #60b044;
-    background-image: linear-gradient(#8add6d, #60b044);
+    background-image: none;
     border-color: #5ca941;
 }
 
 button.green:hover,
 .btn.green:hover{
-    background-color: #569e3d;
-    background: linear-gradient(#79d858, #569e3d);
+    background-color: $green;
+    background-image: none;
 }
 
 button.green:active {
-    background-color: #569e3d;
+    background-color: $green;
     background-image: none;
     border-color: #418737;
     text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
@@ -790,12 +791,12 @@ button.mid,
     -moz-osx-font-smoothing: grayscale;
 }
 
-a[class^="icon-"], 
+a[class^="icon-"],
 a[class*=" icon-"] {
     color: #333;
 }
 
-a[class^="icon-"]:hover, 
+a[class^="icon-"]:hover,
 a[class*=" icon-"]:hover {
     text-decoration: none;
     color: $blue;
@@ -972,7 +973,7 @@ a[class*=" icon-"]:hover {
 .icon-wechat:before {
   content: "\e907";
 }
-.icon-upload2:before {
+.icon-upload:before {
   content: "\f0ee";
 }
 .icon-time:before {
@@ -989,7 +990,7 @@ a[class*=" icon-"]:hover {
 }
 
 .icon-search {
-    color: #999999;
+    color: $gray;
     left: 86px;
     position: absolute;
     top: 7px;
@@ -1001,7 +1002,7 @@ a[class*=" icon-"]:hover {
     background-color: #f9fafb;
     border-radius: 28px;
     bottom: 20px;
-    color: #999;
+    color: $gray;
     cursor: pointer;
     display: none;
     height: 56px;
@@ -1009,7 +1010,7 @@ a[class*=" icon-"]:hover {
     text-align: center;
     position: fixed;
     width: 56px;
-    z-index: 10;
+    z-index: 50;
     right: 20px;
     box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
     padding-top: 15px;
@@ -1084,7 +1085,7 @@ a[class*=" icon-"]:hover {
 
 /* start status */
 .status {
-    border-top: 1px dotted #CCCCCC;
+    border-top: 1px dotted $fade;
     list-style: none;
     margin-top: 20px;
     padding: 20px 0;
@@ -1093,7 +1094,7 @@ a[class*=" icon-"]:hover {
 .status > li {
     overflow: hidden;
     flex: 1;
-    -webkit-box-flex: 1;  
+    -webkit-box-flex: 1;
     text-align: center;
 }
 
@@ -1109,7 +1110,7 @@ a[class*=" icon-"]:hover {
 /* start editor */
 .grammar dd {
     font-size: 12px;
-    color: #999;
+    color: $gray;
 }
 
 .grammar dl {
@@ -1134,7 +1135,7 @@ a[class*=" icon-"]:hover {
 .form input[type=number],
 .form select,
 .form textarea {
-    border: 1px solid #CCCCCC;
+    border: 1px solid $fade;
     background-color: #FAFAFA;
     border-radius: 3px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
@@ -1230,13 +1231,13 @@ a[class*=" icon-"]:hover {
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 90;
+    z-index: 200;
 }
 
 .dialog-panel {
     display: none;
     position: fixed;
-    z-index: 100;
+    z-index: 201;
     background-color: #fff;
     background-clip: padding-box;
     border: 1px solid rgba(0,0,0,0.25);
@@ -1286,6 +1287,7 @@ a[class*=" icon-"]:hover {
     padding: 20px 0;
     background-image: url('../images/index-bg.svg');
     background-attachment: fixed;
+    min-height: 280px;
 }
 
 .side {
@@ -1310,190 +1312,179 @@ a[class*=" icon-"]:hover {
     height: 48px;
     width: 100%;
     background-color: $blue;
-    z-index: 10;
+    z-index: 70;
     position: relative;
     box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
     box-sizing: border-box;
     display: flex;
     line-height: 38px;
     padding: 0 10px;
-}
 
-.nav .nav-tabs > a,
-.nav .user-nav > a {
-    display: inline-block;
-    color: #fff;
-    text-decoration: none;
-    text-align: center;
-    padding: 5px 10px;
-}
+    .nav-tabs {
+        flex: 1;
+        text-align: center;
+        overflow: hidden;
+    }
 
-.nav .nav-tabs > a:hover,
-.nav .user-nav > a:hover {
-    color: #FFF;
-    text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.3)
-}
+    .nav-tabs a svg {
+        color: #eee;
+        visibility: hidden;
+    }
 
-.nav a.selected {
-    border-bottom: 2px solid $red;
-    padding-bottom: 3px;
-}
+    .nav-tabs a:hover svg,
+    .nav-tabs a.selected svg {
+        visibility: visible;
+    }
 
-.nav h1 {
-    margin-right: 20px;
-}
+    .nav-tabs > a,
+    .user-nav > a {
+        display: inline-block;
+        color: #fff;
+        text-decoration: none;
+        text-align: center;
+        padding: 5px 10px;
+    }
 
-.nav h1 a svg {
-    vertical-align: baseline;
-}
+    .nav-tabs > a:hover,
+    .user-nav > a:hover {
+        color: #FFF;
+        text-shadow: 0px 0px 2px rgba(255, 255, 255, 0.3)
+    }
 
-.nav-tabs {
-    flex: 1;
-    text-align: center;
-    overflow: hidden;
-}
+    a.selected {
+        border-bottom: 2px solid $red;
+        padding-bottom: 3px;
+    }
 
-.nav-tabs a svg {
-    color: #eee;
-    visibility: hidden;
-}
+    h1 {
+        margin-right: 20px;
+    }
 
-.nav-tabs a:hover svg,
-.nav-tabs a.selected svg {
-    visibility: visible;
-}
+    h1 a svg {
+        vertical-align: baseline;
+    }
 
-.nav input::-webkit-input-placeholder {
-    color: #ddd;
-}
 
-.nav input.search {
-    background-color: rgba(255,255,255,.15);
-    border: 0px;
-    border-radius: 3px 3px 3px 3px;
-    padding: 5px 8px;
-    width: 180px;
-    margin: 10px 10px 0 20px;
-    line-height: 28px;
-    height: 28px;
-    color: #eee;
-    box-sizing: border-box;
-}
+    input::-webkit-input-placeholder {
+        color: #ddd;
+    }
 
-.nav input.search:hover {
-    background: rgba(255,255,255,0.25);
-}
+    input.search {
+        background-color: rgba(255,255,255,.15);
+        border: 0px;
+        border-radius: 3px 3px 3px 3px;
+        padding: 5px 8px;
+        width: 180px;
+        margin: 10px 10px 0 20px;
+        line-height: 28px;
+        height: 28px;
+        color: #eee;
+        box-sizing: border-box;
+    }
 
-.nav input.search:focus {
-    background: #fff;
-    color: #222;
-}
+    input.search:hover {
+        background: rgba(255,255,255,0.25);
+    }
 
-.nav .user-nav > a{
-    font-size: 20px;
-}
+    input.search:focus {
+        background: #fff;
+        color: #222;
+    }
 
-.nav .user-nav > a {
-    float: left;
-}
+    .user-nav > a{
+        font-size: 20px;
+    }
 
-.nav .avatar-small {
-    display: inline-block;
-    margin-top: -6px;
-}
+    .user-nav > a {
+        float: left;
+    }
 
-.nav .user-nav .no-msg,
-.nav .user-nav .msg {
-    background-color: #777;
-    border-radius: 3px;
-    color: #FFFFFF;
-    font-size: 14px;
-    padding: 0px 6px;
-    margin: 14px 10px;
-    line-height: 20px;
-}
+    .avatar-small {
+        display: inline-block;
+        margin-top: -6px;
+    }
 
-.nav .user-nav .msg {
-    -webkit-animation:spaceboots 1s infinite;
-    -moz-animation:spaceboots 1s infinite;
-    -o-animation:spaceboots 1s infinite;
-    -ms-animation:spaceboots 1s infinite;
-    animation:spaceboots 1s infinite;
-    background-color: $red;
-    color: #FFFFFF;
-}
+    .user-nav .no-msg,
+    .user-nav .msg {
+        background-color: #777;
+        border-radius: 3px;
+        color: #FFFFFF;
+        font-size: 14px;
+        padding: 0px 6px;
+        margin: 14px 10px;
+        line-height: 20px;
+    }
 
-.nav .user-nav a.selected.no-msg,
-.nav .user-nav a.selected.msg {
-    animation: none;
-    background-color: $red;
-    border-bottom: 0;
-}
+    .user-nav .msg {
+        -webkit-animation:spaceboots 1s infinite;
+        -moz-animation:spaceboots 1s infinite;
+        -o-animation:spaceboots 1s infinite;
+        -ms-animation:spaceboots 1s infinite;
+        animation:spaceboots 1s infinite;
+        background-color: $red;
+        color: #FFFFFF;
+    }
 
-.nav .user-nav a.unlogin {
-    font-size: 14px;
-}
+    .user-nav a.selected.no-msg,
+    .user-nav a.selected.msg {
+        animation: none;
+        background-color: $red;
+        border-bottom: 0;
+    }
 
-.nav .form {
-    padding: 10px;
-    position: absolute;
-    right: 0;
-    top: 48px;
-    z-index: 20;
-    width: 232px;
-    font-size: 14px;
-    line-height: 1.6;   
-}
+    .user-nav a.unlogin {
+        font-size: 14px;
+    }
 
-.nav .form input[type="text"], 
-.nav .form input[type="password"] {
-    margin: 10px 0;
-}
+    .person-list {
+        position: absolute;
+        top: 48px;
+        right: 10px;
+        width: 154px;
+        background-color: #fff;
+        line-height: 21px;
+        display: none;
+    }
 
-.nav .person-list {
-    position: absolute;
-    top: 48px;
-    right: 1px;
-    width: 154px;
-    background-color: #fff;
-    line-height: 21px;
-    display: none;
-}
+    .person-list:after {
+        top: -14px;
+        right: 12px;
+        left: auto;
+        position: absolute;
+        border: 7px solid transparent;
+        border-bottom-color: #fff;
+        content: " ";
+    }
 
-.nav .person-list:after {
-    top: -14px;
-    right: 21px;
-    left: auto;
-    position: absolute;
-    border: 7px solid transparent;
-    border-bottom-color: #fff;
-    content: " ";
-}
+    .person-list li {
+        list-style: none;
+    }
 
-.nav .person-list li {
-    list-style: none;
-}
+    .person-list li:first-child a {
+        border-radius: 3px 3px 0 0;
+    }
 
-.nav .person-list li:first-child a {
-    border-radius: 3px 3px 0 0;
-}
+    .person-list li:last-child a {
+        border-bottom: 0;
+    }
 
-.nav .person-list li:last-child {
-    border-bottom: 0;
-}
+    .person-list a {
+        display: block;
+        text-shadow: 0 1px 0 #fff;
+        position: relative;
+        padding: 8px 10px;
+        border-bottom: 1px solid #eee;
+        color: #666;
+    }
 
-.nav .person-list a {
-    display: block;
-    text-shadow: 0 1px 0 #fff;
-    position: relative;
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;
-    color: #666;
-}
+    .person-list a:hover {
+        text-decoration: none;
+        background-color: #f9f9f9;
+    }
 
-.nav .person-list a:hover {
-    text-decoration: none;
-    background-color: #f9f9f9;
+    #notificationsPanel:after {
+    		right: 92px;
+    }
 }
 /* end header */
 
@@ -1505,7 +1496,7 @@ a[class*=" icon-"]:hover {
     line-height: 24px;
     padding: 10px 0;
     position: relative;
-    z-index: 1;
+    z-index: 40;
     background-color: #FFF;
 }
 
@@ -1542,19 +1533,13 @@ a[class*=" icon-"]:hover {
     text-align: center;
 }
 
-.list h2 {
-    font-size: 16px;
+.list > ul > li > h2,
+.list > ul > li .fn-flex > h2,
+.list > ul > li .fn-flex-1 > h2  {
     font-weight: normal;
     line-height: 20px;
     margin-bottom: 2px;
-}
-
-.list h2 > a {
-    color: #595959;
-}
-
-.list h2 > a:hover {
-    color: #333;
+    font-size: 16px;
 }
 
 .list > ul {
@@ -1567,9 +1552,17 @@ a[class*=" icon-"]:hover {
     white-space: normal;
     word-wrap: break-word;
     position: relative;
+
+    h2 > a {
+        color: #666;
+    }
+
+    h2 > a:hover {
+        color: #333;
+    }
 }
 
-.list li.last {
+.list > ul > li.last {
     border-bottom-width: 0;
 }
 
@@ -1600,7 +1593,7 @@ a[class*=" icon-"]:hover {
 .cm-s-default.CodeMirror {
     border-radius: 0 0 3px 3px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
-    border: 1px solid #CCCCCC;
+    border: 1px solid $fade;
     margin-bottom: 20px;
     border-top-width: 0;
     height: 100px;
@@ -1633,7 +1626,7 @@ ul.CodeMirror-hints {
 }
 
 .CodeMirror-hint {
-    padding-right: 18px;    
+    padding-right: 18px;
     max-width: none;
 }
 
@@ -1642,13 +1635,13 @@ ul.CodeMirror-hints {
     color: white;
 }
 
-.CodeMirror-scrollbar-filler, 
+.CodeMirror-scrollbar-filler,
 .CodeMirror-gutter-filler {
-    background-color: transparent;    
+    background-color: transparent;
 }
 
 .CodeMirror-empty.CodeMirror-focused { outline: none; }
-.CodeMirror pre.CodeMirror-placeholder { color: #999; }
+.CodeMirror pre.CodeMirror-placeholder { color: $gray; }
 /* end article */
 
 /* start side module */
@@ -1692,7 +1685,7 @@ ul.CodeMirror-hints {
 }
 
 .module-panel .module-list li {
-    border-bottom: 1px dotted #CCCCCC;
+    border-bottom: 1px dotted $fade;
     list-style: none outside none;
     padding: 5px 10px;
     position: relative;
@@ -1704,7 +1697,7 @@ ul.CodeMirror-hints {
 }
 
 .module .comment-content {
-    color: #999999;
+    color: $gray;
     float: left;
     margin-left: 5px;
     width: 210px;
@@ -1721,7 +1714,7 @@ ul.CodeMirror-hints {
 }
 
 .module-list .title {
-    color: #767676;
+    color: #666;
     margin: 5px 0 5px 30px;
     display: block;
     line-height: 20px;
@@ -1755,14 +1748,14 @@ ul.CodeMirror-hints {
 }
 
 .module-panel .tags {
-    padding: 0 0 10px 10px;    
+    padding: 0 0 10px 10px;
 }
 
 /* end side module */
 
 /* start side tags */
 .tag-desc.fn-clear {
-    margin: 10px 0 0px 10px;    
+    margin: 10px 0 0px 10px;
 }
 
 .tag-desc > li {
@@ -1779,7 +1772,7 @@ ul.CodeMirror-hints {
 
 .tag-desc > li > a {
     float: left;
-    color: #999;
+    color: $gray;
     padding: 2px 5px;
     border: 1px solid #DDDDDD;
     position: relative;
@@ -1804,7 +1797,7 @@ ul.CodeMirror-hints {
 
 .tag-desc > li > a > span {
     text-decoration: none;
-    color: #999;
+    color: $gray;
 }
 
 .tag-desc > li > a > img {
@@ -1879,7 +1872,7 @@ ul.CodeMirror-hints {
 
     .info button.red:hover {
         background-color: #c0372a;
-        background-image: none; 
+        background-image: none;
     }
 
     .info .fn-right {
@@ -1887,7 +1880,7 @@ ul.CodeMirror-hints {
     }
 
     .status {
-        border-bottom: 1px dotted #ccc;
+        border-bottom: 1px dotted $fade;
         border-top-width: 0;
         margin-top: 0;
         margin-bottom: 20px;

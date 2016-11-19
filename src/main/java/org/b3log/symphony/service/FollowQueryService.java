@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.service;
 
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import org.b3log.latke.Keys;
+import org.b3log.latke.ioc.Lifecycle;
 import org.b3log.latke.logging.Level;
 import org.b3log.latke.logging.Logger;
 import org.b3log.latke.model.Pagination;
@@ -45,7 +48,7 @@ import org.json.JSONObject;
  * Follow query service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.3.0.2, Jun 24, 2015
+ * @version 1.3.0.3, Nov 16, 2016
  * @since 0.2.5
  */
 @Service
@@ -79,12 +82,6 @@ public class FollowQueryService {
      */
     @Inject
     private ArticleRepository articleRepository;
-
-    /**
-     * Article query service.
-     */
-    @Inject
-    private ArticleQueryService articleQueryService;
 
     /**
      * Avatar query service.
@@ -134,7 +131,7 @@ public class FollowQueryService {
     public JSONObject getFollowingUsers(final int avatarViewMode,
             final String followerId, final int currentPageNum, final int pageSize) throws ServiceException {
         final JSONObject ret = new JSONObject();
-        final List<JSONObject> records = new ArrayList<JSONObject>();
+        final List<JSONObject> records = new ArrayList<>();
 
         ret.put(Keys.RESULTS, (Object) records);
         ret.put(Pagination.PAGINATION_RECORD_COUNT, 0);
@@ -186,7 +183,7 @@ public class FollowQueryService {
      */
     public JSONObject getFollowingTags(final String followerId, final int currentPageNum, final int pageSize) throws ServiceException {
         final JSONObject ret = new JSONObject();
-        final List<JSONObject> records = new ArrayList<JSONObject>();
+        final List<JSONObject> records = new ArrayList<>();
 
         ret.put(Keys.RESULTS, (Object) records);
         ret.put(Pagination.PAGINATION_RECORD_COUNT, 0);
@@ -238,7 +235,7 @@ public class FollowQueryService {
     public JSONObject getFollowingArticles(final int avatarViewMode,
             final String followerId, final int currentPageNum, final int pageSize) throws ServiceException {
         final JSONObject ret = new JSONObject();
-        final List<JSONObject> records = new ArrayList<JSONObject>();
+        final List<JSONObject> records = new ArrayList<>();
 
         ret.put(Keys.RESULTS, (Object) records);
         ret.put(Pagination.PAGINATION_RECORD_COUNT, 0);
@@ -247,6 +244,9 @@ public class FollowQueryService {
             final JSONObject result = getFollowings(followerId, Follow.FOLLOWING_TYPE_C_ARTICLE, currentPageNum, pageSize);
             @SuppressWarnings("unchecked")
             final List<JSONObject> followings = (List<JSONObject>) result.opt(Keys.RESULTS);
+
+            final ArticleQueryService articleQueryService
+                    = Lifecycle.getBeanManager().getReference(ArticleQueryService.class);
 
             for (final JSONObject follow : followings) {
                 final String followingId = follow.optString(Follow.FOLLOWING_ID);
@@ -293,7 +293,7 @@ public class FollowQueryService {
             final String followingUserId, final int currentPageNum, final int pageSize)
             throws ServiceException {
         final JSONObject ret = new JSONObject();
-        final List<JSONObject> records = new ArrayList<JSONObject>();
+        final List<JSONObject> records = new ArrayList<>();
 
         ret.put(Keys.RESULTS, (Object) records);
         ret.put(Pagination.PAGINATION_RECORD_COUNT, 0);
@@ -337,7 +337,7 @@ public class FollowQueryService {
     public long getFollowingCount(final String followerId, final int followingType) {
         Stopwatchs.start("Gets following count [" + followingType + "]");
         try {
-            final List<Filter> filters = new ArrayList<Filter>();
+            final List<Filter> filters = new ArrayList<>();
             filters.add(new PropertyFilter(Follow.FOLLOWER_ID, FilterOperator.EQUAL, followerId));
             filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
 
@@ -363,7 +363,7 @@ public class FollowQueryService {
      * @return count
      */
     public long getFollowerCount(final String followingId, final int followingType) {
-        final List<Filter> filters = new ArrayList<Filter>();
+        final List<Filter> filters = new ArrayList<>();
         filters.add(new PropertyFilter(Follow.FOLLOWING_ID, FilterOperator.EQUAL, followingId));
         filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
 
@@ -401,7 +401,7 @@ public class FollowQueryService {
      */
     private JSONObject getFollowings(final String followerId, final int followingType, final int currentPageNum, final int pageSize)
             throws RepositoryException {
-        final List<Filter> filters = new ArrayList<Filter>();
+        final List<Filter> filters = new ArrayList<>();
         filters.add(new PropertyFilter(Follow.FOLLOWER_ID, FilterOperator.EQUAL, followerId));
         filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
 
@@ -443,7 +443,7 @@ public class FollowQueryService {
      */
     private JSONObject getFollowers(final String followingId, final int followingType, final int currentPageNum, final int pageSize)
             throws RepositoryException {
-        final List<Filter> filters = new ArrayList<Filter>();
+        final List<Filter> filters = new ArrayList<>();
         filters.add(new PropertyFilter(Follow.FOLLOWING_ID, FilterOperator.EQUAL, followingId));
         filters.add(new PropertyFilter(Follow.FOLLOWING_TYPE, FilterOperator.EQUAL, followingType));
 
