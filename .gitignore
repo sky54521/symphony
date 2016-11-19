@@ -6,3 +6,12 @@ node_modules/
 qrcode.png
 
 nb-configuration.xml
+/bin/
+
+local.properties
+
+.classpath
+.settings/
+.project
+
+
