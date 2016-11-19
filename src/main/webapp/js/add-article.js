@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * @fileoverview add-article.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.17.12.10, Oct 20, 2016
+ * @version 2.18.14.11, Nov 8, 2016
  */
 
 /**
@@ -135,6 +136,7 @@ var AddArticle = {
                 element: document.getElementById('articleContent'),
                 dragDrop: false,
                 lineWrapping: true,
+                htmlURL: Label.servePath + "/markdown",
                 extraKeys: {
                     "Alt-/": "autocompleteUserName",
                     "Ctrl-/": "autocompleteEmoji",
@@ -156,7 +158,8 @@ var AddArticle = {
                     {name: 'redo'},
                     {name: 'undo'},
                     '|',
-                    {name: 'preview'}
+                    {name: 'preview'},
+                    {name: 'fullscreen'}
                 ],
                 status: false
             });
@@ -184,7 +187,7 @@ var AddArticle = {
             var username = Util.getParameterByName("at");
             $("#articleTitle").val("Hi, " + username);
 
-            var tagTitles = "小黑屋";
+            var tagTitles = Label.discussionLabel;
             var tags = Util.getParameterByName("tags");
             if ("" !== tags) {
                 tagTitles += "," + tags;
@@ -273,6 +276,24 @@ var AddArticle = {
                 }
 
                 window.localStorage.thoughtContent += change;
+
+                if ($('.article-content .CodeMirror-preview').length === 0) {
+                    return false;
+                }
+
+                $.ajax({
+                    url: Label.servePath + "/markdown",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        markdownText: cm.getValue()
+                    },
+                    success: function (result, textStatus) {
+                        $('.article-content .CodeMirror-preview').html(result.html);
+                        hljs.initHighlighting.called = false;
+                        hljs.initHighlighting();
+                    }
+                });
             });
         }
 
@@ -322,6 +343,7 @@ var AddArticle = {
                 element: document.getElementById('articleRewardContent'),
                 dragDrop: false,
                 lineWrapping: true,
+                htmlURL: Label.servePath + "/markdown",
                 toolbar: [
                     {name: 'bold'},
                     {name: 'italic'},
@@ -336,7 +358,8 @@ var AddArticle = {
                     {name: 'redo'},
                     {name: 'undo'},
                     '|',
-                    {name: 'preview'}
+                    {name: 'preview'},
+                    {name: 'fullscreen'}
                 ],
                 extraKeys: {
                     "Alt-/": "autocompleteUserName",
@@ -372,6 +395,24 @@ var AddArticle = {
                     cm.showHint({hint: CodeMirror.hint.userName, completeSingle: false});
                     return CodeMirror.Pass;
                 }
+
+                if ($('.article-reward-content .CodeMirror-preview').length === 0) {
+                    return false;
+                }
+
+                $.ajax({
+                    url: Label.servePath + "/markdown",
+                    type: "POST",
+                    cache: false,
+                    data: {
+                        markdownText: cm.getValue()
+                    },
+                    success: function (result, textStatus) {
+                        $('.article-reward-content .CodeMirror-preview').html(result.html);
+                        hljs.initHighlighting.called = false;
+                        hljs.initHighlighting();
+                    }
+                });
             });
         }
 
@@ -391,10 +432,8 @@ var AddArticle = {
                 return false;
             }
             var hasTag = false;
-
             text = text.replace(/\s/g, '');
-
-            $("#articleTags").val('').data('val', '');
+            $("#articleTags").val('');
 
             // 重复添加处理
             $('.tags-input .text').each(function () {
@@ -420,9 +459,6 @@ var AddArticle = {
 
             $('.post .tags-selected').append('<span class="tag"><span class="text">'
                     + text + '</span><span class="close">x</span></span>');
-            if ($.ua.device.type !== 'mobile') {
-                $('.post .domains-tags, #articleTagsSelectedPanel').css('left', $('.post .tags-selected').width() + 'px');
-            }
             $('#articleTags').width($('.tags-input').width() - $('.post .tags-selected').width() - 10);
 
             if ($('.tags-input .tag').length >= 4) {
@@ -432,8 +468,8 @@ var AddArticle = {
 
         // domains 切换
         $('.domains-tags .btn').click(function () {
-            $('.domains-tags .btn.current').removeClass('current');
-            $(this).addClass('current');
+            $('.domains-tags .btn.current').removeClass('current green');
+            $(this).addClass('current').addClass('green');
             $('.domains-tags .domain-tags').hide();
             $('#tags' + $(this).data('id')).show();
         });
@@ -452,9 +488,6 @@ var AddArticle = {
         // 移除 tag
         $('.tags-input').on('click', '.tag > span.close', function () {
             $(this).parent().remove();
-            if ($.ua.device.type !== 'mobile') {
-                $('.post .domains-tags, #articleTagsSelectedPanel').css('left', $('.post .tags-selected').width() + 'px');
-            }
             $('#articleTags').width($('.tags-input').width() - $('.post .tags-selected').width() - 10);
             $('#articleTags').prop('disabled', false);
         });
@@ -462,6 +495,9 @@ var AddArticle = {
         // 展现领域 tag 选择面板
         $('#articleTags').click(function () {
             $('.post .domains-tags').show();
+            if ($.ua.device.type !== 'mobile') {
+                $('.post .domains-tags').css('left', $('.post .tags-selected').width() + 'px');
+            }
             $('#articleTagsSelectedPanel').hide();
         }).blur(function () {
             $(this).val('').data('val', '');
@@ -512,17 +548,11 @@ var AddArticle = {
                 }
 
                 // 删除 tag
-                if (event.keyCode === 8 && ($("#articleTags").data('val') && $("#articleTags").data('val').length === 0 || !$("#articleTags").data('val'))) {
+                if (event.keyCode === 8 && event.data.settings.chinese === 8 
+                    && event.data.settings.keydownVal.replace(/\s/g, '') === '') {
                     $('.tags-input .tag .close:last').click();
                     return false;
                 }
-
-
-                if ($("#articleTags").data('val') === $("#articleTags").val()) {
-                    return false;
-                }
-                $("#articleTags").data('val', $("#articleTags").val());
-
 
                 if ($("#articleTags").val().replace(/\s/g, '') === '') {
                     return false;
@@ -535,6 +565,9 @@ var AddArticle = {
                     },
                     success: function (result, textStatus) {
                         if (result.sc) {
+                            if ($.ua.device.type !== 'mobile') {
+                                $('#articleTagsSelectedPanel').css('left', $('.post .tags-selected').width() + 'px');
+                            }
                             $("#articleTags").completed('updateData', result.tags);
                         } else {
                             console.log(result);

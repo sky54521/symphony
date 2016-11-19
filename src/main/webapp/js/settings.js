@@ -1,26 +1,27 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * @fileoverview settings.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Zephyr
- * @version 1.18.9.14, Oct 11, 2016
+ * @version 1.19.9.14, Oct 26, 2016
  */
 
 /**
@@ -364,12 +365,15 @@ var Settings = {
         switch (type) {
             case "profiles":
                 requestJSONObject = this._validateProfiles();
+
                 break;
             case "sync/b3":
                 requestJSONObject = this._validateSyncB3();
+
                 break;
             case "password":
                 requestJSONObject = this._validatePassword();
+
                 break;
             case "privacy":
                 requestJSONObject = {
@@ -387,6 +391,7 @@ var Settings = {
                     userTimelineStatus: $("#userTimelineStatus").prop("checked"),
                     userForgeLinkStatus: $("#userForgeLinkStatus").prop("checked")
                 };
+
                 break;
             case "function":
                 requestJSONObject = {
@@ -397,9 +402,18 @@ var Settings = {
                     userSubMailStatus: $('#userSubMailStatus').prop("checked"),
                     userKeyboardShortcutsStatus: $('#userKeyboardShortcutsStatus').prop("checked")
                 };
+
                 break;
             case "emotionList":
                 requestJSONObject = this._validateEmotionList();
+
+                break;
+            case "i18n":
+                requestJSONObject = {
+                    userLanguage: $("#userLanguage").val(),
+                    userTimezone: $("#userTimezone").val()
+                };
+
                 break;
             default:
                 console.log("update settings has no type");
@@ -429,14 +443,23 @@ var Settings = {
                         $('#userTagsDom').text(requestJSONObject.userTags);
                         $('#userURLDom').text(requestJSONObject.userURL).attr('href', requestJSONObject.userURL);
                         $('#userIntroDom').text(requestJSONObject.userIntro);
+                        
+                        return;
                     }
+
+
                 } else {
                     $("#" + type.replace(/\//g, "") + "Tip").addClass("error").removeClass("succ").html('<ul><li>' + result.msg + '</li></ul>');
                 }
+
                 $("#" + type.replace(/\//g, "") + "Tip").show();
 
                 setTimeout(function () {
                     $("#" + type.replace(/\//g, "") + "Tip").hide();
+
+                    if (type === 'i18n') {
+                        window.location.reload();
+                    }
                 }, 5000);
 
             }

@@ -3,7 +3,7 @@
 <@home "${type}">
 <div class="tabs-sub fn-clear">
     <a href="${servePath}/member/${user.userName}/following/users"<#if type == "followingUsers"> class="current"</#if>>${followingUsersLabel}</a>
-    <a href="${servePath}/member/${user.userName}/following/tags"<#if type == "followingTags"> class="current"</#if>>${followingTagsLabel}</a>
+    <a href="${servePath}/member/${user.userName}/following/tags"<#if type == "followingTags"> class="current"</#if>>${followingTagsLabel} &nbsp;<span class="count">${paginationRecordCount}</span></a>
     <a href="${servePath}/member/${user.userName}/following/articles"<#if type == "followingArticles"> class="current"</#if>>${followingArticlesLabel}</a>
     <a href="${servePath}/member/${user.userName}/followers"<#if type == "followers"> class="current"</#if>>${followersLabel}</a>
 </div>
@@ -23,7 +23,7 @@
                 </a>
                 <#else>
                 <a href="${servePath}/tag/${followingTag.tagURI}"
-                   class="tooltipped tooltipped-se fn-left ft-a-icon" aria-label="${followingTag.tagTitle}"><div class="icon-tags"  
+                   class="tooltipped tooltipped-se fn-left ft-a-title" aria-label="${followingTag.tagTitle}"><div class="icon-tags"  
                                                                                                               ></div></a>
                 </#if>
                 <div class="fn-flex-1">

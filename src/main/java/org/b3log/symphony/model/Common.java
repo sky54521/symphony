@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.model;
 
@@ -19,10 +21,75 @@ package org.b3log.symphony.model;
  * This class defines all common model relevant keys.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.44.1.11, Oct 11, 2016
+ * @version 1.50.1.11, Nov 16, 2016
  * @since 0.2.0
  */
 public final class Common {
+
+    /**
+     * Key of following user articles.
+     */
+    public static final String FOLLOWING_USER_ARTICLES = "followingUserArticles";
+
+    /**
+     * Key of following tag articles.
+     */
+    public static final String FOLLOWING_TAG_ARTICLES = "followingTagArticles";
+
+    /**
+     * Key of command.
+     */
+    public static final String COMMAND = "command";
+
+    /**
+     * Key of need captcha.
+     */
+    public static final String NEED_CAPTCHA = "needCaptcha";
+
+    /**
+     * Key of wrong count.
+     */
+    public static final String WRON_COUNT = "wrongCount";
+
+    /**
+     * Key of remember login.
+     */
+    public static final String REMEMBER_LOGIN = "rememberLogin";
+
+    /**
+     * Key of stick articles.
+     */
+    public static final String STICK_ARTICLES = "stickArticles";
+
+    /**
+     * Key of id.
+     */
+    public static final String ID = "id";
+
+    /**
+     * Key of name.
+     */
+    public static final String NAME = "name";
+
+    /**
+     * Key of language.
+     */
+    public static final String LANGUAGE = "language";
+
+    /**
+     * Key of languages.
+     */
+    public static final String LANGUAGES = "languages";
+
+    /**
+     * Key of timezone.
+     */
+    public static final String TIMEZONE = "timezone";
+
+    /**
+     * Key of timezones.
+     */
+    public static final String TIMEZONES = "timezones";
 
     /**
      * Key of forge.
@@ -118,6 +185,11 @@ public final class Common {
      * Key of time ago.
      */
     public static final String TIME_AGO = "timeAgo";
+
+    /**
+     * Key of comment time ago.
+     */
+    public static final String CMT_TIME_AGO = "cmtTimeAgo";
 
     /**
      * Key of time.
@@ -283,7 +355,7 @@ public final class Common {
      * Key of current user.
      */
     public static final String CURRENT_USER = "currentUser";
-    
+
     /**
      * Key of current.
      */

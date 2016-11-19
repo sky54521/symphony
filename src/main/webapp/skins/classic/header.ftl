@@ -1,4 +1,4 @@
-<div class="nav"> 
+<div class="nav">
     <h1>
         ${logoIcon}
     </h1>
@@ -35,7 +35,7 @@
         <a href="${servePath}/member/${currentUser.userName}">
             <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
         </a>
-        <div class="module person-list">
+        <div class="module person-list" id="personListPanel">
             <ul>
                 <li>
                     <a href="${servePath}/member/${currentUser.userName}">${goHomeLabel}</a>
@@ -52,37 +52,8 @@
             </ul>
         </div>
         <#else>
-        <a href="javascript: Util.showLogin();" class="unlogin">${loginLabel}</a>
-        <a id="aRegister" href="javascript:Util.goRegister()" class="last ft-blue unlogin">${registerLabel}</a>
-        <div class="form fn-none module">
-            <table cellspacing="0" cellpadding="0">
-                <tr>
-                    <td width="40">
-                        <label for="nameOrEmail">${accountLabel}</label>
-                    </td>
-                    <td>
-                        <input id="nameOrEmail" type="text" placeholder="${nameOrEmailLabel}" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <label for="loginPassword">${passwordLabel}</label>
-                    </td>
-                    <td>
-                        <input type="password" id="loginPassword" />
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" align="right">
-                        <div id="loginTip" class="tip"></div>
-                        <div class="fn-hr5"></div>
-                        <div class="fn-hr5"></div>
-                        <button class="info" onclick="window.location.href = '${servePath}/forget-pwd'">${forgetPwdLabel}</button>
-                        <button class="red" onclick="Util.login()">${loginLabel}</button>
-                    </td>
-                </tr>
-            </table>
-        </div>
+        <a href="javascript: Util.goLogin();" class="unlogin">${loginLabel}</a>
+        <a href="javascript:Util.goRegister()" class="unlogin">${registerLabel}</a>
         </#if>
     </div>
 </div>

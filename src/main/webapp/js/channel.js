@@ -1,25 +1,26 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * @fileoverview Message channel via WebSocket.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
- * @version 1.10.14.17, Oct 26, 2016
+ * @version 1.10.15.19, Nov 18, 2016
  */
 
 /**
@@ -68,6 +69,8 @@ var ArticleChannel = {
                         $('.comments-header > .fn-none').show();
                         // 移除没有评论的提示
                         $('#comments .list > ul > li.ft-center').remove();
+                        // 显示评论大图
+                        $('#comments').next().show();
                     }
 
                     // ua
@@ -106,7 +109,7 @@ var ArticleChannel = {
                             template += '</a>';
                         }
                     } else {
-                        template += '<span class="ft-gray">' + data.commentAuthorName + '</span> <span class="ft-fade"> • </span> <a rel="nofollow" href="https://hacpai.com/article/1457158841475">API</a>';
+                        template += '<span class="ft-gray">' + data.commentAuthorName + '</span> <span class="ft-fade"> • </span> <a rel="nofollow" class="ft-green" href="https://hacpai.com/article/1457158841475">API</a>';
                     }
                     template += ' <span class="ft-fade"> • ' + data.timeAgo + '</span> <span class="comment-reward"></span>';
 
@@ -121,7 +124,7 @@ var ArticleChannel = {
                                 + data.commentOriginalAuthorThumbnailURL + '\')"></div></span> ';
                     }
                     if (Label.isAdminLoggedIn) {
-                        template += '<a class="hover-show fn-hidden tooltipped tooltipped-n ft-a-icon" href="/admin/comment/' + data.commentId
+                        template += '<a class="hover-show fn-hidden tooltipped tooltipped-n ft-a-title" href="/admin/comment/' + data.commentId
                                 + '" aria-label="' + Label.adminLabel + '"><span class="icon-setting"></span></a> ';
                     }
                     template += '</span></div><div class="content-reset comment">'
@@ -148,9 +151,9 @@ var ArticleChannel = {
                     template += '</span></div><div class="comment-replies list"></div></div></li>';
 
                     if (0 === Label.userCommentViewMode) { // tranditional view mode
-                        $("#comments .list > ul").append(template);
+                        $("#comments > .list > ul").append(template);
                     } else {
-                        $("#comments .list > ul").prepend(template);
+                        $("#comments > .list > ul").prepend(template);
                     }
 
                     // 代码高亮
@@ -238,7 +241,7 @@ var ArticleListChannel = {
 
         ArticleListChannel.ws.onmessage = function (evt) {
             var data = JSON.parse(evt.data);
-            $(".article-list .has-view h2 > a[rel=bookmark]").each(function () {
+            $(".article-list h2 > a[rel=bookmark]").each(function () {
                 var id = $(this).data('id').toString();
 
                 if (data.articleId === id) {
@@ -308,12 +311,12 @@ var TimelineChannel = {
                 case 'activity':
                     var time = new Date().getTime();
                     var template = "<li class=\"fn-none\" id=" + time + ">" + data.content + "</li>";
-                    $("#ul").prepend(template);
-                    $("#" + time).fadeIn(2000);
+                    $(".timeline > ul").prepend(template);
+                    $(".timeline > ul > li:first").fadeIn(2000);
 
-                    var length = $("#ul > li").length;
+                    var length = $(".timeline > ul > li").length;
                     if (length > timelineCnt) {
-                        $("#ul > li:last").remove();
+                        $(".timeline > ul  > li:last").remove();
                     }
 
                     break;

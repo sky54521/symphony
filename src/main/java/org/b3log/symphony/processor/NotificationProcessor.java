@@ -1,22 +1,25 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.processor;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -60,12 +63,14 @@ import org.json.JSONObject;
  * <li>Displays comments of my articles (/notifications/commented), GET</li>
  * <li>Displays replies of my comments (/notifications/reply), GET</li>
  * <li>Displays at me (/notifications/at), GET</li>
- * <li>Displays following user's articles (/notifications/following-user), GET</li>
+ * <li>Displays following user's articles (/notifications/following-user),
+ * GET</li>
  * <li>Makes article/comment read (/notification/read), GET</li>
  * </ul>
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.7.1.5, Oct 13, 2016
+ * @author <a href="http://vanessa.b3log.org">Liyuan Lo</a>
+ * @version 1.8.1.6, Nov 3, 2016
  * @since 0.2.5
  */
 @RequestProcessor
@@ -115,7 +120,7 @@ public class NotificationProcessor {
             final HttpServletResponse response) throws Exception {
         final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/sys-announce.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -378,7 +383,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/point.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -478,7 +483,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/commented.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -540,7 +545,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/reply.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -602,7 +607,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/at.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -665,7 +670,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/following-user.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -728,7 +733,7 @@ public class NotificationProcessor {
             return;
         }
 
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
         renderer.setTemplateName("/home/notifications/broadcast.ftl");
         final Map<String, Object> dataModel = renderer.getDataModel();
@@ -789,8 +794,12 @@ public class NotificationProcessor {
             return;
         }
 
-        context.renderJSON(true).renderJSONValue(Notification.NOTIFICATION_T_UNREAD_COUNT,
-                notificationQueryService.getUnreadNotificationCount(currentUser.optString(Keys.OBJECT_ID))).
+        final String userId = currentUser.optString(Keys.OBJECT_ID);
+        final Map<String, Object> dataModel = new HashMap<>();
+
+        fillNotificationCount(userId, dataModel);
+
+        context.renderJSON(new JSONObject(dataModel)).renderTrueResult().
                 renderJSONValue(UserExt.USER_NOTIFY_STATUS, currentUser.optInt(UserExt.USER_NOTIFY_STATUS));
     }
 }

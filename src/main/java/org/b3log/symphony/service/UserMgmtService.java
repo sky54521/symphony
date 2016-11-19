@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.service;
 
@@ -27,6 +29,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.regex.Pattern;
 import javax.imageio.ImageIO;
@@ -35,6 +38,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.Latkes;
@@ -84,7 +88,7 @@ import org.json.JSONObject;
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Bill Ho
- * @version 1.14.19.17, Oct 19, 2016
+ * @version 1.14.19.18, Nov 1, 2016
  * @since 0.2.0
  */
 @Service
@@ -199,13 +203,15 @@ public class UserMgmtService {
                 }
 
                 final String userPassword = user.optString(User.USER_PASSWORD);
-                final String password = cookieJSONObject.optString(Common.TOKEN);
+                final String token = cookieJSONObject.optString(Common.TOKEN);
+                final String password = StringUtils.substringBeforeLast(token, ":");
+
                 if (userPassword.equals(password)) {
-                    Sessions.login(request, response, user);
+                    Sessions.login(request, response, user, cookieJSONObject.optBoolean(Common.REMEMBER_LOGIN));
 
                     updateOnlineStatus(userId, ip, true);
 
-                    LOGGER.log(Level.DEBUG, "Logged in with cookie[userId={0}]", userId);
+                    LOGGER.log(Level.TRACE, "Logged in with cookie[userId={0}]", userId);
 
                     return true;
                 }
@@ -426,10 +432,11 @@ public class UserMgmtService {
      * {
      *     "userName": "",
      *     "userEmail": "",
-     *     "userAppRole": int,
      *     "userPassword": "", // Hashed
-     *     "userRole": "", // optional, uses {@value Role#DEFAULT_ROLE} instead if not speciffied
-     *     "userStatus": int // optional, uses {@value UserExt#USER_STATUS_C_NOT_VERIFIED} instead if not specified
+     *     "userLanguage": "",
+     *     "userAppRole": int, // optional, default to 0
+     *     "userRole": "", // optional, uses {@value Role#DEFAULT_ROLE} instead if not specified
+     *     "userStatus": int, // optional, uses {@value UserExt#USER_STATUS_C_NOT_VERIFIED} instead if not specified
      * }
      * </pre>,see {@link User} for more details
      *
@@ -535,6 +542,17 @@ public class UserMgmtService {
             user.put(UserExt.USER_AVATAR_VIEW_MODE, UserExt.USER_AVATAR_VIEW_MODE_C_ORIGINAL);
             user.put(UserExt.USER_SUB_MAIL_SEND_TIME, System.currentTimeMillis());
             user.put(UserExt.USER_KEYBOARD_SHORTCUTS_STATUS, UserExt.USER_XXX_STATUS_C_DISABLED);
+
+            final JSONObject optionLanguage = optionRepository.get(Option.ID_C_MISC_LANGUAGE);
+            final String adminSpecifiedLang = optionLanguage.optString(Option.OPTION_VALUE);
+            if ("0".equals(adminSpecifiedLang)) {
+                user.put(UserExt.USER_LANGUAGE, requestJSONObject.optString(UserExt.USER_LANGUAGE, "zh_CN"));
+            } else {
+                user.put(UserExt.USER_LANGUAGE, adminSpecifiedLang);
+            }
+
+            user.put(UserExt.USER_TIMEZONE,
+                    requestJSONObject.optString(UserExt.USER_TIMEZONE, TimeZone.getDefault().getID()));
 
             if (toUpdate) {
                 user.put(UserExt.USER_NO, userNo);

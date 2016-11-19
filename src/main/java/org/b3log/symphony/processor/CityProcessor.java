@@ -1,17 +1,19 @@
 /*
- * Copyright (c) 2012-2016, b3log.org & hacpai.com
+ * Symphony - A modern community (forum/SNS/blog) platform written in Java.
+ * Copyright (C) 2012-2016,  b3log.org & hacpai.com
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.b3log.symphony.processor;
 
@@ -62,7 +64,7 @@ import org.json.JSONObject;
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author <a href="http://zephyrjung.github.io">Zephyr</a>
- * @version 1.3.1.5, Oct 25, 2016
+ * @version 1.3.1.7, Oct 28, 2016
  * @since 1.3.0
  */
 @RequestProcessor
@@ -118,7 +120,7 @@ public class CityProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showCityArticles(final HTTPRequestContext context,
             final HttpServletRequest request, final HttpServletResponse response, final String city) throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
 
         renderer.setTemplateName("city.ftl");
@@ -209,7 +211,7 @@ public class CityProcessor {
     @After(adviceClass = StopwatchEndAdvice.class)
     public void showCityUsers(final HTTPRequestContext context,
             final HttpServletRequest request, final HttpServletResponse response, final String city) throws Exception {
-        final AbstractFreeMarkerRenderer renderer = new SkinRenderer();
+        final AbstractFreeMarkerRenderer renderer = new SkinRenderer(request);
         context.setRenderer(renderer);
 
         renderer.setTemplateName("city.ftl");
@@ -260,29 +262,28 @@ public class CityProcessor {
         }
 
         final int pageNum = Integer.valueOf(pageNumStr);
-        final int pageSize = user.optInt(UserExt.USER_LIST_PAGE_SIZE);
+        final int pageSize = Symphonys.getInt("cityUuserPageSize");
         final int windowSize = Symphonys.getInt("cityUsersWindowSize");
 
         final JSONObject requestJSONObject = new JSONObject();
         requestJSONObject.put(Keys.OBJECT_ID, user.optString(Keys.OBJECT_ID));
-        requestJSONObject.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, 1);
-        requestJSONObject.put(Pagination.PAGINATION_PAGE_SIZE, Integer.MAX_VALUE);
-        requestJSONObject.put(Pagination.PAGINATION_WINDOW_SIZE, Integer.MAX_VALUE);
+        requestJSONObject.put(Pagination.PAGINATION_CURRENT_PAGE_NUM, pageNum);
+        requestJSONObject.put(Pagination.PAGINATION_PAGE_SIZE, pageSize);
+        requestJSONObject.put(Pagination.PAGINATION_WINDOW_SIZE, windowSize);
         final long latestLoginTime = DateUtils.addDays(new Date(), Integer.MIN_VALUE).getTime(); // all users
         requestJSONObject.put(UserExt.USER_LATEST_LOGIN_TIME, latestLoginTime);
         requestJSONObject.put(UserExt.USER_CITY, queryCity);
-        final JSONArray cityUsers = userQueryService.getUsersByCity(requestJSONObject).optJSONArray(User.USERS);
+        final JSONObject result = userQueryService.getUsersByCity(requestJSONObject);
+        final JSONArray cityUsers = result.optJSONArray(User.USERS);
+        final JSONObject pagination = result.optJSONObject(Pagination.PAGINATION);
         if (null != cityUsers && cityUsers.length() > 0) {
             for (int i = 0; i < cityUsers.length(); i++) {
-                if (!cityUsers.getJSONObject(i).optString(Keys.OBJECT_ID).equals(user.optString(Keys.OBJECT_ID))) {
-                    users.add(cityUsers.getJSONObject(i));
-                }
+                users.add(cityUsers.getJSONObject(i));
             }
-
             dataModel.put(User.USERS, users);
         }
 
-        final int pageCount = (int) Math.ceil(cityUsers.length() / (double) pageSize);
+        final int pageCount = pagination.optInt(Pagination.PAGINATION_PAGE_COUNT);
 
         final List<Integer> pageNums = Paginator.paginate(pageNum, pageSize, pageCount, windowSize);
         if (!pageNums.isEmpty()) {
