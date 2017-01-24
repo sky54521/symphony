@@ -4,7 +4,7 @@
     <head>
         <@head title="${characterLabel} - ${activityLabel} - ${symphonyLabel}">
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="canonical" href="${servePath}/activity/character">
     </head>
     <body>
@@ -12,7 +12,7 @@
         <div class="main">
             <div class="wrapper">
                 <div class="content">
-                    <div class="module">
+                    <div class="module article-module">
                         <h2 class="sub-head">
                             <div class="avatar-small tooltipped tooltipped-ne"
                                  aria-label="${characterLabel}" style="background-image:url('${staticServePath}/images/activities/char.png')"></div>
@@ -20,8 +20,7 @@
                             <span class="ft-13 ft-gray">${activityCharacterTitleLabel}</span>
                         </h2>
                         <div class="fn-clear fn-m10">   
-                            <div class="fn-hr5"></div>
-                            <div class="fn-hr5"></div>
+                            <br>
                             <div class="fn-left">
                                 <#if noCharacter??>
                                 ${activityCharacterNotCharacterLabel}
@@ -52,7 +51,7 @@
             </div>
         </div>
         <#include "../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
                                 Activity.charInit('charCanvas');
         </script>

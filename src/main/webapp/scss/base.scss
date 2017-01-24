@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * Base style.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.25.19.48, Nov 18, 2016
+ * @version 2.28.19.54, Jan 23, 2017
  */
 
 @import "variables";
@@ -227,14 +226,19 @@ blockquote {
 .content-reset {
     font-family: $font-family-base;
     word-wrap: break-word;
-    overflow: hidden;
+    overflow: auto;
     line-height: 1.5;
+    font-size: 16px;
 
     ul,
     ol {
         padding-left: 2em;
         margin-top: 0;
         margin-bottom: 16px;
+    }
+
+    li {
+        margin-top: 0.25em;
     }
 
     h1,
@@ -252,11 +256,13 @@ blockquote {
     h1 {
         padding-bottom: 0.3em;
         font-size: 2em;
+        border-bottom: 1px solid #eee;
     }
 
     h2 {
         padding-bottom: 0.3em;
         font-size: 1.5em;
+        border-bottom: 1px solid #eee;
     }
 
     h3 {
@@ -273,6 +279,15 @@ blockquote {
 
     h6 {
         font-size: 0.85em;
+    }
+
+
+    hr {
+        height: 0.25em;
+        padding: 0;
+        margin: 24px 0;
+        background-color: #e7e7e7;
+        border: 0;
     }
 
     p {
@@ -408,6 +423,10 @@ blockquote {
     visibility: hidden;
 }
 
+.fn-oh {
+    overflow: hidden;
+}
+
 .fn-ellipsis {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -486,11 +505,32 @@ blockquote {
 }
 
 .sub-head {
-    padding: 5px 10px;
+    padding: 0 15px 15px;
     border-bottom: 1px solid #e5e5e5;
     line-height: 31px;
+    /* margin: 15px; */
+    font-size: 24px;
+    color: #666;
 }
 /* end function */
+
+/* start common business */
+.article-list .cb-stick {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-width: 10px 15px 10px 15px;
+    border-color: #999 transparent transparent #999;
+    border-style: solid;
+
+    .icon-pin {
+        position: absolute;
+        top: -9px;
+        left: -14px;
+        color: #FFF;
+    }
+}
+/* end common business */
 
 /* start common */
 .timeline a {
@@ -499,10 +539,6 @@ blockquote {
 
 .timeline a:hover {
     color: #333;
-}
-
-.timeline li:last-child {
-    border-bottom: 0;
 }
 
 .tag {
@@ -689,8 +725,7 @@ button,
     color: #333;
     border-radius: 3px;
     padding: 6px 12px;
-    background-color: #fcfcfc;
-    background: linear-gradient(#fcfcfc, #eee);
+    background-color: #f2f2f2;
     border: 1px solid #D5D5D5;
     border-bottom-color: #E1E1E1;
     box-sizing: border-box;
@@ -704,14 +739,12 @@ button:hover,
     text-decoration: none;
     border-color: $fade;
     background-color: #eee;
-    background: linear-gradient(#eee, #ddd);
 }
 
 button:active,
 .btn:active {
-    border-color: #51a7e8;
-    background-color: #dcdcdc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset;
+    background-color: $fade;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) inset;
 }
 
 button.green,
@@ -719,21 +752,18 @@ button.green,
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
     background-color: #60b044;
-    background-image: none;
     border-color: #5ca941;
 }
 
 button.green:hover,
 .btn.green:hover{
     background-color: $green;
-    background-image: none;
 }
 
 button.green:active {
     background-color: $green;
-    background-image: none;
     border-color: #418737;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset;
 }
 
 button.red,
@@ -746,15 +776,15 @@ button.red:hover,
 .btn.red-hover {
     color: #FFF;
     background-color: $red;
-    background-image: linear-gradient(#c0372a, $red);
     border-color: #c0372a;
 }
 
 button.red:active,
 .btn.red:active {
     background-color: $red;
-    background-image: none;
-    border-color: #c9320c
+    border-color: #c9320c;
+    color: #FFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset;
 }
 
 button.small,
@@ -802,6 +832,24 @@ a[class*=" icon-"]:hover {
     color: $blue;
 }
 
+.icon-history:before {
+  content: "\f1db";
+}
+.icon-pin:before {
+  content: "\e90e";
+}
+.icon-upload:before {
+  content: "\f0ee";
+}
+.icon-time:before {
+  content: "\e906";
+}
+.icon-sortasc:before {
+  content: "\e905";
+}
+.icon-locked:before {
+  content: "\e61e";
+}
 .icon-weibo:before {
   content: "\e908";
 }
@@ -972,18 +1020,6 @@ a[class*=" icon-"]:hover {
 }
 .icon-wechat:before {
   content: "\e907";
-}
-.icon-upload:before {
-  content: "\f0ee";
-}
-.icon-time:before {
-  content: "\e906";
-}
-.icon-sortasc:before {
-  content: "\e905";
-}
-.icon-locked:before {
-  content: "\e61e";
 }
 .icon-close:before {
   content: "\e909";
@@ -1183,6 +1219,10 @@ a[class*=" icon-"]:hover {
 /* end form */
 
 /* start pagination & tabs-sub */
+.pagination {
+    border-top: 1px solid #eee;
+}
+
 .pagination,
 .tabs-sub {
     display: flex;
@@ -1200,7 +1240,7 @@ a[class*=" icon-"]:hover {
 .pagination a,
 .pagination span,
 .tabs-sub a {
-    line-height: 38px;
+    line-height: 48px;
     text-decoration: none;
     flex: 1;
     text-align: center;
@@ -1220,6 +1260,36 @@ a[class*=" icon-"]:hover {
     color: #fff;
 }
 /* end pagination & tabs-sub */
+
+/* start completed */
+.completed-panel {
+    padding: 0;
+    overflow: auto;
+    left: 0;
+    display: none;
+    position: absolute;
+    background-color: #FFF;
+    border: 1px solid #e5e5e5;
+    z-index: 82;
+    border-radius: 0 0 3px 3px;
+    width: 50%;
+    top: 35px;
+    box-sizing: border-box;
+}
+
+.completed-panel a {
+    display: block;
+    padding: 3px;
+    text-decoration: none;
+    line-height: 18px;
+    height: 18px;
+}
+
+.completed-panel a.selected,
+.completed-panel a:hover {
+    background-color: #F7F7F7;
+}
+/* end completed */
 
 /* start dialog */
 .dialog-background {
@@ -1264,6 +1334,7 @@ a[class*=" icon-"]:hover {
 }
 
 .dialog-main {
+    min-width: 300px;
     padding: 10px;
     box-sizing: content-box;
 }
@@ -1271,7 +1342,7 @@ a[class*=" icon-"]:hover {
 
 /* start framework */
 .wrapper {
-    width: 75%;
+    width: 90%;
     margin: 0 auto;
     display: flex;
     min-width: 720px;
@@ -1284,8 +1355,7 @@ a[class*=" icon-"]:hover {
 
 .main {
     background-color: #f2f2f2;
-    padding: 20px 0;
-    background-image: url('../images/index-bg.svg');
+    padding: 40px 0;
     background-attachment: fixed;
     min-height: 280px;
 }
@@ -1312,7 +1382,7 @@ a[class*=" icon-"]:hover {
     height: 48px;
     width: 100%;
     background-color: $blue;
-    z-index: 70;
+    z-index: 83;
     position: relative;
     box-shadow: 0 0 4px rgba(0,0,0,.14),0 4px 8px rgba(0,0,0,.28);
     box-sizing: border-box;
@@ -1533,6 +1603,7 @@ a[class*=" icon-"]:hover {
     text-align: center;
 }
 
+
 .list > ul > li > h2,
 .list > ul > li .fn-flex > h2,
 .list > ul > li .fn-flex-1 > h2  {
@@ -1544,11 +1615,12 @@ a[class*=" icon-"]:hover {
 
 .list > ul {
     list-style: none;
+    padding: 15px 15px 0;
 }
 
 .list > ul > li {
     border-bottom: 1px solid #eee;
-    padding: 10px;
+    padding: 15px;
     white-space: normal;
     word-wrap: break-word;
     position: relative;
@@ -1562,7 +1634,8 @@ a[class*=" icon-"]:hover {
     }
 }
 
-.list > ul > li.last {
+.list > ul > li.last,
+.list > ul > li:last-child {
     border-bottom-width: 0;
 }
 
@@ -1586,14 +1659,13 @@ a[class*=" icon-"]:hover {
 /* start article */
 .cmts {
     position: absolute;
-    right: 10px;
+    right: 15px;
     top: 40%;
 }
 
 .cm-s-default.CodeMirror {
     border-radius: 0 0 3px 3px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
-    border: 1px solid $fade;
+    border: 1px solid #f2f2f2;
     margin-bottom: 20px;
     border-top-width: 0;
     height: 100px;
@@ -1602,7 +1674,6 @@ a[class*=" icon-"]:hover {
 .CodeMirror-scroll {
     background-color: #FAFAFA;
     font-family: $font-family-base;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
     line-height: 17px;
 }
 
@@ -1663,7 +1734,7 @@ ul.CodeMirror-hints {
     border-radius: 3px 3px 0 0;
     background-color: #f9fafb;
     border-bottom: 1px solid #e5e5e5;
-    padding: 9px 10px 10px;
+    padding: 15px;
     text-shadow: 0 1px 0 #FFFFFF;
     font-size: 14px;
     line-height: 18px;
@@ -1687,7 +1758,7 @@ ul.CodeMirror-hints {
 .module-panel .module-list li {
     border-bottom: 1px dotted $fade;
     list-style: none outside none;
-    padding: 5px 10px;
+    padding: 15px;
     position: relative;
 }
 
@@ -1704,7 +1775,7 @@ ul.CodeMirror-hints {
 }
 
 .module-panel.form {
-    padding: 10px 20px 20px;
+    padding: 15px;
 }
 
 .module-list .slogan {
@@ -1715,7 +1786,7 @@ ul.CodeMirror-hints {
 
 .module-list .title {
     color: #666;
-    margin: 5px 0 5px 30px;
+    margin: 0px 0 0px 30px;
     display: block;
     line-height: 20px;
 }
@@ -1729,7 +1800,7 @@ ul.CodeMirror-hints {
 }
 
 .module-panel.ad {
-    padding: 10px;
+    padding: 15px;
     text-align: center;
 }
 
@@ -1744,25 +1815,25 @@ ul.CodeMirror-hints {
     float: left;
     list-style: none;
     line-height: 14px;
-    margin: 10px 10px 0 0;
+    margin: 15px 15px 0 0;
 }
 
 .module-panel .tags {
-    padding: 0 0 10px 10px;
+    padding: 0 0 15px 15px;
 }
 
 /* end side module */
 
 /* start side tags */
 .tag-desc.fn-clear {
-    margin: 10px 0 0px 10px;
+    margin: 15px 0 0px 15px;
 }
 
 .tag-desc > li {
     float: left;
     position: relative;
     list-style: none;
-    margin: 0 10px 10px 0;
+    margin: 0 15px 15px 0;
     font-size: 12px;
 }
 
@@ -1848,13 +1919,19 @@ ul.CodeMirror-hints {
 /* end emoji */
 
 /* start person info */
+.small-tips .emoji {
+    margin-bottom: 0;
+    height: 17px;
+    width: 17px;
+}
+
 .person-info {
     position: relative;
 
     .info {
         position: relative;
         overflow: hidden;
-        height: 38px;
+        height: 48px;
     }
 
     .info button.red {
@@ -1863,20 +1940,19 @@ ul.CodeMirror-hints {
         min-width: 35%;
         color: #FFF;
         background-color: $red;
-        background-image: linear-gradient(#c0372a, $red);
+        background-image: none;
         border-color: #c0372a;
         letter-spacing: 1px;
         line-height: 18px;
-        padding: 10px;
+        padding: 15px;
     }
 
     .info button.red:hover {
         background-color: #c0372a;
-        background-image: none;
     }
 
     .info .fn-right {
-        margin: 10px 10px 0 0;
+        margin: 15px 15px 0 0;
     }
 
     .status {
@@ -1892,7 +1968,7 @@ ul.CodeMirror-hints {
     }
 
     .module-panel {
-        padding: 0 10px 10px 10px;
+        padding: 0 15px 15px 15px;
     }
 
     .activity-board {
@@ -1980,43 +2056,51 @@ ul.CodeMirror-hints {
 /* end responsive */
 
 /* algolia */
-.algolia-autocomplete .aa-dropdown-menu {
-    background-color: #FFF;
-    border-radius: 3px;
-    width: 100%;
-    word-wrap: break-word;
-    box-sizing: border-box;
-    box-shadow: 0 1px 2px rgba(0,0,0,.2);
-    line-height: 21px;
-    margin-top:10px;
-    margin-left: 20px;
-    width: 300px;
-    overflow:hidden;
-    color: #666;
-}
+.algolia-autocomplete {
 
-.algolia-autocomplete .aa-dropdown-menu img {
-    height: 20px;
-}
+    .aa-dropdown-menu {
+        background-color: #FFF;
+        border-radius: 3px;
+        width: 100%;
+        word-wrap: break-word;
+        box-sizing: border-box;
+        box-shadow: 0 1px 2px rgba(0,0,0,.2);
+        line-height: 21px;
+        margin-top:10px;
+        margin-left: 20px;
+        width: 300px;
+        overflow:hidden;
+        color: #666;
+    }
 
-.algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
-    cursor: pointer;
-    text-shadow: 0 1px 0 #fff;
-    padding: 8px 10px;
-    border-bottom: 1px solid #eee;
-}
+    .aa-dataset-0 {
+        max-height: 600px;
+        overflow: auto;
+    }
 
-.algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
-    background-color: #f9f9f9;
-}
+    .aa-dropdown-menu img {
+        height: 20px;
+    }
 
-.algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
-    font-weight: bold;
-    color: $red;
-    font-style: normal;
-}
+    .aa-dropdown-menu .aa-suggestion {
+        cursor: pointer;
+        text-shadow: 0 1px 0 #fff;
+        padding: 8px 10px;
+        border-bottom: 1px solid #eee;
+    }
 
-.algolia-autocomplete .aa-dropdown-menu .fn-right {
-    margin: 5px;
+    .aa-dropdown-menu .aa-suggestion.aa-cursor {
+        background-color: #f9f9f9;
+    }
+
+    .aa-dropdown-menu .aa-suggestion em {
+        font-weight: bold;
+        color: $red;
+        font-style: normal;
+    }
+
+    .aa-dropdown-menu .fn-right {
+        margin: 5px;
+    }
 }
 /* end algolia */

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import org.b3log.symphony.util.Symphonys;
  * This class defines all pointtransfer model relevant keys.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.19.1.0, Sep 19, 2016
+ * @version 1.20.1.0, Jan 9, 2017
  * @since 1.3.0
  */
 public final class Pointtransfer {
@@ -319,6 +319,11 @@ public final class Pointtransfer {
      * Transfer type - Activity - Eating Snake Income.
      */
     public static final int TRANSFER_TYPE_C_ACTIVITY_EATINGSNAKE_COLLECT = 27;
+
+    /**
+     * Transfer type - Invitation link Used.
+     */
+    public static final int TRANSFER_TYPE_C_INVITATION_LINK_USED = 28; // just a placeholder at present
 
     /**
      * Private constructor.

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  * Tag management service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.2.1.4, Nov 18, 2016
+ * @version 1.2.1.5, Nov 24, 2016
  * @since 1.1.0
  */
 @Service
@@ -208,7 +208,7 @@ public class TagMgmtService {
             transaction.commit();
 
             tagCache.loadTags();
-            
+
             domainCache.loadDomains();
         } catch (final RepositoryException e) {
             if (transaction.isActive()) {

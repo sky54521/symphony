@@ -9,9 +9,6 @@
             <label for="oId">Id</label>
             <input type="text" id="oId" name="oId" value="${article.oId}" readonly="readonly" />
 
-            <label for="articleAuthorEmail">${authorEmailLabel}</label>
-            <input type="text" id="articleAuthorEmail" name="articleAuthorEmail" value="${article.articleAuthorEmail}" readonly="readonly" />
-
             <label for="articleAuthorId">${authorIdLabel}</label>
             <input type="text" id="articleAuthorId" name="articleAuthorId" value="${article.articleAuthorId}" readonly="readonly" />
 
@@ -55,6 +52,8 @@
             </select>
         </div>
     </div>
+
+    <#if permissions["articleUpdateArticleBasic"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${modifiableLabel}</h2>
@@ -120,7 +119,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["articleStickArticle"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${stickLabel}</h2>
@@ -135,7 +136,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["articleCancelStickArticle"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${cancelStickLabel}</h2>
@@ -150,8 +153,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
-    <#if esEnabled || algoliaEnabled>
+    <#if (esEnabled || algoliaEnabled) && permissions["articleReindexArticle"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${searchIndexLabel}</h2>
@@ -168,6 +172,7 @@
     </div>
     </#if>
 
+    <#if permissions["articleRemoveArticle"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2 class="ft-red">${removeLabel}</h2>
@@ -182,5 +187,6 @@
             </form>
         </div>
     </div>
+    </#if>
 </div>
 </@admin>

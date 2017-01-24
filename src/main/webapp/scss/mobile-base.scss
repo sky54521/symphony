@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * Mobile base style.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.5.7.15, Nov 6, 2016
+ * @version 1.6.8.23, Jan 14, 2017
  */
 
 @import "variables";
@@ -129,7 +128,7 @@ audio:not([controls]) {
 a {
     outline: 0;
     text-decoration: none;
-    color: #4183C4;
+    color: $blue;
 }
 
 a:hover {
@@ -277,11 +276,13 @@ blockquote {
     h1 {
         padding-bottom: 0.3em;
         font-size: 2em;
+        border-bottom: 1px solid #eee;
     }
 
     h2 {
         padding-bottom: 0.3em;
         font-size: 1.5em;
+        border-bottom: 1px solid #eee;
     }
 
     h3 {
@@ -298,6 +299,14 @@ blockquote {
 
     h6 {
         font-size: 0.85em;
+    }
+
+    hr {
+        height: 0.25em;
+        padding: 0;
+        margin: 24px 0;
+        background-color: #e7e7e7;
+        border: 0;
     }
 
     p {
@@ -464,12 +473,10 @@ blockquote {
 }
 
 .ft-fade,
-.ft-fade a,
 a[class^="icon-"].ft-fade {
     color: #ccc;
 }
 
-.ft-fade a:hover,
 a[class^="icon-"].ft-fade:hover {
     color: #999;
 }
@@ -479,7 +486,7 @@ a[class^="icon-"].ft-fade:hover {
 }
 
 .ft-blue {
-    color: #4183C4;
+    color: $blue;
 }
 
 .ft-green {
@@ -541,49 +548,46 @@ button,
     cursor: pointer;
     color: #333;
     border-radius: 3px;
-    padding: 2px 6px;
-    background-color: #fcfcfc;
-    background: linear-gradient(#fcfcfc, #eee);
+    padding: 6px 12px;
+    background-color: #f2f2f2;
     border: 1px solid #D5D5D5;
     border-bottom-color: #E1E1E1;
     box-sizing: border-box;
-    line-height: 21px;
+    line-height: 19px;
     white-space: nowrap;
 }
+
 
 button:hover,
 .btn:hover {
     text-decoration: none;
-    border-color: #ccc;
-    background-color: #0ca6dd;
-    background: linear-gradient(#eee, #ddd);
+    border-color: $fade;
+    background-color: #eee;
 }
 
 button:active,
 .btn:active {
-    border-color: #51a7e8;
-    background-color: #dcdcdc;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15) inset;
+    background-color: $fade;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) inset;
 }
 
-button.green {
+button.green,
+.btn.green {
     color: #fff;
     text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
     background-color: #60b044;
-    background-image: linear-gradient(#8add6d, #60b044);
     border-color: #5ca941;
 }
 
-button.green:hover {
-    background-color: #69d344;
-    background: linear-gradient(#79d858, #569e3d);
+button.green:hover,
+.btn.green:hover{
+    background-color: $green;
 }
 
 button.green:active {
-    background-color: #569e3d;
-    background-image: none;
+    background-color: $green;
     border-color: #418737;
-    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset;
 }
 
 button.red,
@@ -592,18 +596,19 @@ button.red,
 }
 
 button.red:hover,
-.btn.red:hover {
+.btn.red:hover,
+.btn.red-hover {
     color: #FFF;
-    background-color: #b33630;
-    background-image: linear-gradient(#dc5f59, #b33630);
-    border-color: #cd504a;
+    background-color: $red;
+    border-color: #c0372a;
 }
 
 button.red:active,
 .btn.red:active {
-    background-color: #b33630;
-    background-image: none;
-    border-color: #9f312c;
+    background-color: $red;
+    border-color: #c9320c;
+    color: #FFF;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25) inset;
 }
 
 button.small,
@@ -640,7 +645,7 @@ a[class*=" icon-"] {
 a[class^="icon-"]:hover, 
 a[class*=" icon-"]:hover {
     text-decoration: none;
-    color: #4183c4;
+    color: $blue;
 }
 
 .icon-weibo:before {
@@ -1041,7 +1046,7 @@ a[class*=" icon-"]:hover {
 }
 
 .pagination a:hover {
-    color:#4183c4;
+    color:$blue;
     border-bottom-color:#CFDCE8;
     background-color: #fafbfd;
     background: linear-gradient(#fafbfd, #dce6ef);
@@ -1082,37 +1087,78 @@ a[class*=" icon-"]:hover {
     display: none;
     height: 100%;
     left: 0;
-    opacity: .3;
+    opacity: .5;
     position: absolute;
     top: 0;
     width: 100%;
-    z-index: 90;
+    z-index: 200;
 }
 
 .dialog-panel {
     display: none;
     position: fixed;
-    z-index: 100;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 201;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,0.25);
+    border-radius: 5px;
+    box-shadow: 0 0 18px rgba(0,0,0,0.4);
 }
 
-.dialog-close-icon {
-    background: url("../images/close.png") no-repeat scroll -2px -3px transparent;
-    cursor: pointer;
+.dialog-header-bg {
+    padding: 10px;
+    font-size: 18px;
+    font-weight: normal;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.dialog-header-bg .icon-close {
+    color: rgba(0, 0, 0, 0.25);
+    font-size: 12px;
     float: right;
-    height: 25px;
-    margin-right: -13px;
-    margin-top: -12px;
-    padding: 3px;
-    width: 25px;
+    font-weight: bold;
+}
+
+.dialog-header-bg .icon-close:hover {
+    color: #333;
 }
 
 .dialog-main {
-    background-color: #FFFFFF;
-    border: 1px solid #777;
-    padding: 12px;
+    min-width: 200px;
+    padding: 10px;
+    box-sizing: content-box;
 }
 /* end dialog */
+
+/* start completed */
+.completed-panel {
+    padding: 0;
+    overflow: auto;
+    left: 0;
+    display: none;
+    position: absolute;
+    background-color: #FFF;
+    border: 1px solid #e5e5e5;
+    z-index: 72;
+    border-radius: 0 0 3px 3px;
+    width: 50%;
+    top: 32px;
+    box-sizing: border-box;
+}
+
+.completed-panel a {
+    display: block;
+    padding: 3px;
+    text-decoration: none;
+    line-height: 18px;
+    height: 18px;
+}
+
+.completed-panel a.selected,
+.completed-panel a:hover {
+    background-color: #F7F7F7;
+}
+/* end completed */
 
 /* start framework */
 .wrapper {
@@ -1166,7 +1212,7 @@ a[class*=" icon-"]:hover {
 }
 
 .nav div > a:hover {
-    color: #4183C4;
+    color: $blue;
 }
 
 .nav div > a.current {
@@ -1628,7 +1674,7 @@ ul.CodeMirror-hints {
     color: #767676;
     margin: 5px 0 5px 30px;
     display: block;
-    line-height: 19px;
+    line-height: 20px;
 }
 
 .module-list.open-source .title {
@@ -1668,8 +1714,8 @@ ul.CodeMirror-hints {
 /* end module */
 
 /* start article */
-.article-action .fn-right > a,
-.article-action .fn-right > span {
+.article-actions .fn-right > a,
+.article-actions .fn-right > span {
     padding: 4px 8px;
     border-radius: 2px;
     display: inline-block;
@@ -1700,18 +1746,18 @@ ul.CodeMirror-hints {
     width: 100%;
 }
 
-h2.article-title {
+h1.article-title {
     word-break: break-all;
     font-size: 16px;
     font-weight: normal;
     margin: 10px 0;
 }
 
-h2.article-title > a {
+h1.article-title > a {
     color: #595959;
 }
 
-h2.article-title > a:hover {
+h1.article-title > a:hover {
     color: #333;
 }
 
@@ -1719,6 +1765,7 @@ h2.article-title > a:hover {
     height: 2px;
     position: relative;
     margin-bottom: 6px;
+    left: -7px;
 }
 
 #thoughtProgress .bar {
@@ -1744,27 +1791,27 @@ label.cmt-anonymous {
 }
 
 #shareClipboard.tooltipped-hover {
-    color: #4183C4;
+    color: $blue;
 }
 
-.comments > .comment-header {
-    padding-bottom: 5px;
+.comments > .comments-header {
     border-bottom: 1px solid #CCCCCC;
     margin: 20px 0 0;
+    padding: 10px 5px 5px 10px;
 }
 
-.comments > div.comment-header .icon-chevron-down {
+.comments > div.comments-header .icon-chevron-down {
     margin: 0px 10px 0 0;
     font-size: 24px;
 }
 
-.comments > div.comment-header a {
+.comments > div.comments-header a {
     text-decoration: none;
     color: #333;
 }
 
-.comments > div.comment-header .icon-sortasc,
-.comments > div.comment-header .icon-time {
+.comments > div.comments-header .icon-sortasc,
+.comments > div.comments-header .icon-time {
     font-size: 16px;
     font-weight: bold;
     margin: 4px 10px 0 0;
@@ -1834,24 +1881,13 @@ label.cmt-anonymous {
     border-bottom-width: 0;
 }
 
-#comments > .comment-header {
-    border-bottom: 1px solid #CCCCCC;
-    margin: 10px 0 0;
-    padding: 10px 5px 5px 10px
-}
-
-#comments .comment-header > h2 {
-    margin-top: 5px;
-}
-
 .comment-login {
     border: 1px solid #D9D9D9;
     border-top-color: #C0C0C0;
     border-left-color: #C0C0C0;
-    margin: 10px 0;
-    padding: 3px;
-    background-color: #FAFAFA;
     box-sizing: border-box;
+    margin: 10px;
+    background-color: #fafafa;
 }
 
 .comment-login > a {
@@ -1923,7 +1959,7 @@ label.cmt-anonymous {
 }
 
 .share [class^="icon-"]:hover {
-    color: #4183c4;
+    color: $blue;
 }
 
 .cm-s-default.CodeMirror {
@@ -1963,17 +1999,17 @@ label.cmt-anonymous {
 }
 
 .article-toc li a:hover {
-    border-left: 1px solid #4183c4;
+    border-left: 1px solid $blue;
     background-color: #F7F7F7;
     padding-left: 21px;
-    color: #4183C4;
+    color: $blue;
     text-decoration: none;
 }
 
 .article-toc li.current a {
-    border-left: 2px solid #4183c4;
+    border-left: 2px solid $blue;
     background-color: #f0f0f0;
-    color: #4183c4;
+    color: $blue;
 }
 
 .article-toc li.toc-h2 a,
@@ -2055,7 +2091,7 @@ label.cmt-anonymous {
 
 /* start article list */
 .article-list li.stick {
-    background-color: #F7F7F7;
+    background-color: #f9f6f6;
 }
 
 .article-list li.stick .stick-remains {
@@ -2082,7 +2118,7 @@ label.cmt-anonymous {
 }
 
 .article-list li .commenters > a:hover {
-    color: #4183c4;
+    color: $blue;
 }
 
 .article-list li:hover .cmts {
@@ -2218,6 +2254,63 @@ label.cmt-anonymous {
     color: $red;
 }
 /* end article list */
+/* start guide */
+.guide {
+    .intro.content-reset {
+        padding: 10px;
+        line-height: 24px;
+    }
+
+    .guide-tab,
+    .step-btn {
+        margin: 10px;
+    }
+
+    .form {
+        margin: 0;
+        width: auto;
+    }
+
+    #avatarUpload label {
+        margin-top: 0;
+    }
+
+    .tag-desc > li:hover > a {
+        border-bottom-style: solid;
+        border-radius: 3px;
+    }
+
+    .tag-desc li.current > a {
+        background-color: $fade;
+        color: #fff;
+        border-color: #bbb;
+    }
+
+    .intro dt.current {
+        color: #ffac45;
+    }
+}
+
+
+/* start guide md */
+.guide {
+    .fn-flex > div {
+        padding: 10px;
+        box-sizing: border-content;
+        width: 50%;
+    }
+
+    .md {
+        background-color: #f1f7fe;
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    }
+}
+/* end guide md */
+/* end guide */
 /* start verify */
 .verify {
 
@@ -2376,7 +2469,7 @@ label.cmt-anonymous {
     vertical-align: super;
 }
 
-.tag-articles .article-action .fn-right {
+.tag-articles .article-actions .fn-right {
     margin-top: -8px;
 }
 /* end side tags */
@@ -2467,7 +2560,7 @@ code .dec { color: initial; } /* decimal - blue */
 }
 
 .index > .slogan a:hover svg {
-    color: #4183C4;
+    color: $blue;
 }
 
 .index .item {
@@ -2526,13 +2619,42 @@ code .dec { color: initial; } /* decimal - blue */
     margin-right: 13px;
 }
 /* end index */
-
 /* start home side */
 .user-name {
-    border-bottom: 1px dotted #CCCCCC;
-    font-size: 25px;
-    margin: 10px 0 10px;
-    padding-bottom: 10px;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 26px;
+    border-bottom: 1px dotted #CCC;
+    margin-bottom: 20px;
+    padding: 20px 10px 25px 10px;
+
+    #userNicknameDom {
+        font-size: 26px;
+        line-height: 30px;
+    }
+
+    .online,
+    .offline {
+        background-color: $red;
+        color: #fff;
+        font-size: 12px;
+        line-height: 20px;
+        border-radius: 3px;
+        height: 20px;
+        display: inline-block;
+        padding: 0 5px 0 3px;
+        vertical-align: middle;
+    }
+
+    .offline {
+        background-color: $gray;
+    }
+
+    button.follow {
+        font-size: 14px;
+        width: 100%;
+        margin: 10px 0;
+    }
 }
 
 .user-info {
@@ -2565,7 +2687,7 @@ code .dec { color: initial; } /* decimal - blue */
 
 .pre-post a:hover {
     text-decoration: none;
-    color: #4183C4;
+    color: $blue;
 }
 
 .pre-post a div {
@@ -2630,7 +2752,7 @@ code .dec { color: initial; } /* decimal - blue */
 
 .post .tags-input span.tag {
     margin: 2px 5px 0 0px;
-    color: #4183C4;
+    color: $blue;
 }
 
 .post .tags-input .tag > span.close {
@@ -2676,7 +2798,7 @@ code .dec { color: initial; } /* decimal - blue */
 
 .post .domains-tags .tag {
     cursor: pointer;
-    color: #4183C4;
+    color: $blue;
 }
 
 .post .domains-tags > span.current {
@@ -2717,6 +2839,10 @@ code .dec { color: initial; } /* decimal - blue */
 
 .tab-current > span {
     color: #767676;
+}
+
+.tab {
+    list-style: none;
 }
 
 .tab > li a {
@@ -2784,8 +2910,9 @@ code .dec { color: initial; } /* decimal - blue */
     vertical-align: bottom;
 }
 
-.admin .form input[type=text] {
-    width: 50%;
+.admin .form input[type=text],
+.admin .form input[type=number] {
+    width: 30%;
     margin-right: 10px;
 }
 /* end admin */
@@ -2892,3 +3019,21 @@ code .dec { color: initial; } /* decimal - blue */
     display: none;
 }
 /* end editor */
+
+/* start other */
+.link-forge {
+    .link-forge-upload {
+        margin: 10px 0;
+
+        input[type=text] {
+            width: 80%;
+            height: 27px;
+        }
+    }
+
+    .module-panel {
+        max-height: 409px;
+        overflow: hidden;
+    }
+}
+/* end other */

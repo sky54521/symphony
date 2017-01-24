@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ import org.json.JSONObject;
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Bill Ho
- * @version 1.15.6.6, Oct 23, 2016
+ * @version 1.15.6.7, Dec 17, 2016
  * @since 0.2.0
  */
 public final class Tag {
@@ -236,7 +236,7 @@ public final class Tag {
      */
     public static final int TAG_TYPE_C_USER_SELF = 2;
 
-    //// Status constants
+    // Status constants
     /**
      * Tag status - valid.
      */
@@ -247,7 +247,13 @@ public final class Tag {
      */
     public static final int TAG_STATUS_C_INVALID = 1;
 
-    /// Validation
+    // Tag title constants
+    /**
+     * Title - Sandbox.
+     */
+    public static final String TAG_TITLE_C_SANDBOX = "Sandbox";
+
+    // Validation
     /**
      * Max tag title length.
      */

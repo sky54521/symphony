@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,6 +49,7 @@ import org.b3log.symphony.service.UserQueryService;
 import org.b3log.symphony.util.Emotions;
 import org.b3log.symphony.util.Markdowns;
 import org.b3log.symphony.util.Networks;
+import org.b3log.symphony.util.Symphonys;
 import org.json.JSONObject;
 
 /**
@@ -129,7 +130,7 @@ public final class CommentSender extends AbstractEventListener<JSONObject> {
             final HTTPRequest httpRequest = new HTTPRequest();
             httpRequest.setURL(new URL(clientURL));
             httpRequest.setRequestMethod(HTTPRequestMethod.POST);
-            httpRequest.addHeader(new HTTPHeader("User-Agent", "B3log Symphony/" + SymphonyServletListener.VERSION));
+            httpRequest.addHeader(new HTTPHeader("User-Agent", Symphonys.USER_AGENT_BOT));
             final JSONObject requestJSONObject = new JSONObject();
             final JSONObject comment = new JSONObject();
 

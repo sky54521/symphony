@@ -1110,13 +1110,10 @@
     function toggleFullScreen(editor) {
         var cm = editor.codemirror,
         wrap = editor.codemirror.getWrapperElement();
-        
+
+        $(editor.element.parentElement).css('z-index', 'inherit');
         if ('icon-fullscreen' === editor.toolbar.fullscreen.className) {
             editor.toolbar.fullscreen.className = 'icon-contract';
-            editor.toolbar.preview.style.display = 'none';
-            if (editor.toolbar.preview.className.indexOf('active') > -1) {
-                editor.toolbar.preview.click();
-            }
 
             $(editor.element.parentElement).css({
                 'position': 'fixed',
@@ -1128,7 +1125,6 @@
 
             cm.state.fullScreenRestore = {scrollTop: window.pageYOffset, scrollLeft: window.pageXOffset,
                                           width: wrap.style.width, height: wrap.style.height};
-            wrap.style.width = "50%";
             wrap.style.height = ($(window).height() - $('.editor-toolbar').outerHeight()) + 'px';
             cm.refresh();
             
@@ -1140,8 +1136,7 @@
                     markdownText: cm.getValue()
                 },
                 success: function (result, textStatus) {
-                    $(editor.element.parentElement).prepend('<div class="CodeMirror-preview content-reset" style="height:' 
-                + ($(window).height() - $('.editor-toolbar').outerHeight()) + 'px">' + result.html + '</div>');
+                    $(editor.element.parentElement).find('.editor-preview').html(result.html);
                     hljs.initHighlighting.called = false;
                     hljs.initHighlighting();
                 }
@@ -1151,12 +1146,9 @@
         }
 
         editor.toolbar.fullscreen.className = 'icon-fullscreen';
-        editor.toolbar.preview.style.display = 'inline';
         $(editor.element.parentElement).css({
             'position': 'inherit'
         });
-
-        $(editor.element.parentElement).find('.CodeMirror-preview').remove();    
 
         var info = cm.state.fullScreenRestore;
         wrap.style.width = info.width; 
@@ -1319,6 +1311,8 @@
                     /\s*editor-preview-active\s*/g, ''
                     );
             toolbar.className = toolbar.className.replace(/\s*active\s*/g, '');
+            cm.display.scroller.style.width = '100%';
+            return false;
         } else {
             /* When the preview button is clicked for the first time,
              * give some time for the transition from editor.css to fire and the view to slide from right to left,
@@ -1328,6 +1322,8 @@
                 preview.className += ' editor-preview-active'
             }, 1);
             toolbar.className += ' active';
+
+            cm.display.scroller.style.width = '50%';
         }
         var text = cm.getValue();
 
@@ -1512,6 +1508,7 @@
             autofocus: options.autofocus,
             lineWrapping: options.lineWrapping,
             extraKeys: keyMaps,
+            readOnly: options.readOnly,
             inputStyle: 'textarea'
         });
 
@@ -1588,7 +1585,9 @@
                             el.className += ' active';
                         }
                     } else {
-                        el.className = el.className.replace(/\s*active\s*/g, '');
+                        if (el.className.indexOf('icon-preview') === -1) {
+                            el.className = el.className.replace(/\s*active\s*/g, '');
+                        }
                     }
                 })(key);
             }

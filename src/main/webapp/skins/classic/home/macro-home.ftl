@@ -10,7 +10,7 @@
         <#elseif type == "comments">
         <@head title="${cmtLabel} - ${user.userName} - ${symphonyLabel}">
         <meta name="description" content="${user.userName}${deLabel}${cmtLabel}"/>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
+        <link rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
         </@head>
         <#elseif type == "followingUsers">
         <@head title="${followingUsersLabel} - ${user.userName} - ${symphonyLabel}">
@@ -23,6 +23,10 @@
         <#elseif type == "followingArticles">
         <@head title="${followingArticlesLabel} - ${user.userName} - ${symphonyLabel}">
         <meta name="description" content="${user.userName}${deLabel}${followingArticlesLabel}"/>
+        </@head>
+        <#elseif type == "watchingArticles">
+            <@head title="${watchingArticlesLabel} - ${user.userName} - ${symphonyLabel}">
+            <meta name="description" content="${user.userName}${deLabel}${watchingArticlesLabel}"/>
         </@head>
         <#elseif type == "followers">
         <@head title="${followersLabel} - ${user.userName} - ${symphonyLabel}">
@@ -43,14 +47,14 @@
         <#elseif type == "commentsAnonymous">
         <@head title="${anonymousCommentLabel} - ${user.userName} - ${symphonyLabel}">
         <meta name="description" content="${user.userName}${deLabel}${anonymousCommentLabel}"/>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
+        <link rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
         </@head>
         <#elseif type == "linkForge">
         <@head title="${linkForgeLabel} - ${user.userName} - ${symphonyLabel}">
         <meta name="description" content="${user.userName}${deLabel}${linkForgeLabel}"/>
         </@head>
         </#if>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../header.ftl">
@@ -62,20 +66,16 @@
                     </div>
                 </div>
                 <div class="side">
-                    <#if currentUser?? && currentUser.userName == user.userName>
-                    <#include "../common/person-info.ftl">
-                    <#else>
                     <#include "home-side.ftl">
-                    </#if>
                     <div class="module">
                         <div class="module-header"><h2>${goHomeLabel}</h2></div> 
-                        <div class="module-panel">
+                        <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a <#if type == "home" || type == "comments" || type == "articlesAnonymous" || type == "commentsAnonymous">
                                     class="current"</#if>
                                     href="${servePath}/member/${user.userName}"><svg height="18" viewBox="0 1 16 16" width="16">${boolIcon}</svg> ${postLabel}</a>
                                 <a <#if type == "followingUsers" || type == "followingTags" || type == "followingArticles" || type == "followers"> class="current"</#if>
-                                    href="${servePath}/member/${user.userName}/following/users"><svg height="18" viewBox="0 1 14 16" width="14">${starIcon}</svg> ${followLabel}</a>
+                                    href="${servePath}/member/${user.userName}/watching/articles"><svg height="18" viewBox="0 1 14 16" width="14">${starIcon}</svg> ${followLabel}</a>
                                 <a <#if type == "points"> class="current"</#if> href="${servePath}/member/${user.userName}/points">
                                     <svg height="18" viewBox="0 1 14 16" width="14">${giftIcon}</svg> ${pointLabel}</a>
                                 <a <#if type == "linkForge"> class="current"</#if> href="${servePath}/member/${user.userName}/forge/link">
@@ -91,7 +91,7 @@
         </div>
             </div>
         <#include "../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
             Label.followLabel = "${followLabel}";
             Label.unfollowLabel = "${unfollowLabel}";

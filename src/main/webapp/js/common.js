@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Zephyr
- * @version 1.38.25.38, Nov 13, 2016
+ * @version 1.41.29.43, Jan 18, 2017
  */
 
 /**
@@ -29,7 +29,56 @@
  * @static
  */
 var Util = {
-    prevKey: undefined,
+    /**
+     * @description 前置快捷键
+     */
+     prevKey: undefined,
+    /**
+     * @description 关闭 alert
+     */
+    closeAlert: function () {
+        var $alert = $('#alertDialogPanel');
+        $alert.prev().remove();
+        $alert.remove();
+    },
+    /**
+     * @description alert
+     * @param {String} content alert 内容
+     */
+    alert: function (content) {
+        var alertHTML = '',
+         alertBgHTML = '<div onclick="Util.closeAlert(this)" style="height: ' +  document.documentElement.scrollHeight
+         + 'px;display: block;" class="dialog-background"></div>',
+         alertContentHTML = '<div class="dialog-panel" id="alertDialogPanel" tabindex="0" onkeyup="Util.closeAlert()">'
+         + '<div class="fn-clear dialog-header-bg"><a href="javascript:void(0);" onclick="Util.closeAlert()" class="icon-close"></a></div>'
+         + '<div class="dialog-main" style="text-align:center;padding: 30px 10px 40px">' + content + '</div></div>';
+
+         alertHTML = alertBgHTML + alertContentHTML;
+
+        $('body').append(alertHTML);
+
+        $('#alertDialogPanel').css({
+            "top": ($(window).height() - $('#alertDialogPanel').height()) / 2 + "px",
+            "left": ($(window).width() - $('#alertDialogPanel').width()) / 2 + "px",
+            "outline": 'none'
+        }).show().focus();
+    },
+    /**
+     * @description 标记指定类型的消息通知为已读状态.
+     * @param {String} type 指定类型："commented"/"at"/"following"/"reply"
+     */
+    makeNotificationRead: function (type) {
+        $.ajax({
+            url: Label.servePath + "/notification/read/" + type,
+            type: "GET",
+            cache: false,
+            success: function (result, textStatus) {
+                if (result.sc) {
+                    window.location.reload();
+                }
+            }
+        });
+    },
     /**
      * 初始化全局快捷键
      * @returns {undefined}
@@ -190,6 +239,12 @@ var Util = {
                 return false;
             }
             var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href');
+            if (!href) {
+                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').attr('href');
+            }
+            if (!href) {
+               href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').attr('href');
+            }
             if (href) {
                 window.location = href;
             }
@@ -200,6 +255,12 @@ var Util = {
                 return false;
             }
             var href = $('.content .list:last > ul > li.focus > h2 > a').attr('href');
+            if (!href) {
+                href = $('.content .list:last > ul > li.focus .fn-flex-1 > h2 > a').attr('href');
+            }
+            if (!href) {
+               href = $('.content .list:last > ul > li.focus h2.fn-flex-1 > a').attr('href');
+            }
             if (href) {
                 window.location = href;
             }
@@ -442,6 +503,9 @@ var Util = {
             },
             focus: function () {
                 this.$it.focus();
+            },
+            setCursor: function () {
+                this.$it[0].setSelectionRange(0, 0)
             }
         };
 
@@ -454,7 +518,7 @@ var Util = {
         return editor;
     },
     initCodeMirror: function () {
-        var allEmoj = "+1,-1,100,1234,8ball,a,ab,abc,abcd,accept,aerial_tramway,airplane,alarm_clock,alien,ambulance,anchor,angel,anger,angry,anguished,ant,apple,aquarius,aries,arrow_backward,arrow_double_down,arrow_double_up,arrow_down,arrow_down_small,arrow_forward,arrow_heading_down,arrow_heading_up,arrow_left,arrow_lower_left,arrow_lower_right,arrow_right,arrow_right_hook,arrow_up,arrow_up_down,arrow_up_small,arrow_upper_left,arrow_upper_right,arrows_clockwise,arrows_counterclockwise,art,articulated_lorry,astonished,atm,b,baby,baby_bottle,baby_chick,baby_symbol,back,baggage_claim,balloon,ballot_box_with_check,bamboo,banana,bangbang,bank,bar_chart,barber,baseball,basketball,bath,bathtub,battery,bear,bee,beer,beers,beetle,beginner,bell,bento,bicyclist,bike,bikini,bird,birthday,black_circle,black_joker,black_medium_small_square,black_medium_square,black_nib,black_small_square,black_square,black_square_button,blossom,blowfish,blue_book,blue_car,blue_heart,blush,boar,boat,bomb,book,bookmark,bookmark_tabs,books,boom,boot,bouquet,bow,bowling,bowtie,boy,bread,bride_with_veil,bridge_at_night,briefcase,broken_heart,bug,bulb,bullettrain_front,bullettrain_side,bus,busstop,bust_in_silhouette,busts_in_silhouette,cactus,cake,calendar,calling,camel,camera,cancer,candy,capital_abcd,capricorn,car,card_index,carousel_horse,cat,cat2,cd,chart,chart_with_downwards_trend,chart_with_upwards_trend,checkered_flag,cherries,cherry_blossom,chestnut,chicken,children_crossing,chocolate_bar,christmas_tree,church,cinema,circus_tent,city_sunrise,city_sunset,cl,clap,clapper,clipboard,clock1,clock10,clock1030,clock11,clock1130,clock12,clock1230,clock130,clock2,clock230,clock3,clock330,clock4,clock430,clock5,clock530,clock6,clock630,clock7,clock730,clock8,clock830,clock9,clock930,closed_book,closed_lock_with_key,closed_umbrella,cloud,clubs,cn,cocktail,coffee,cold_sweat,collision,computer,confetti_ball,confounded,confused,congratulations,construction,construction_worker,convenience_store,cookie,cool,cop,copyright,corn,couple,couple_with_heart,couplekiss,cow,cow2,credit_card,crescent_moon,crocodile,crossed_flags,crown,cry,crying_cat_face,crystal_ball,cupid,curly_loop,currency_exchange,curry,custard,customs,cyclone,dancer,dancers,dango,dart,dash,date,de,deciduous_tree,department_store,diamond_shape_with_a_dot_inside,diamonds,disappointed,disappointed_relieved,dizzy,dizzy_face,do_not_litter,dog,dog2,dollar,dolls,dolphin,donut,door,doughnut,dragon,dragon_face,dress,dromedary_camel,droplet,dvd,e-mail,ear,ear_of_rice,earth_africa,earth_americas,earth_asia,egg,eggplant,eight,eight_pointed_black_star,eight_spoked_asterisk,electric_plug,elephant,email,end,envelope,es,euro,european_castle,european_post_office,evergreen_tree,exclamation,expressionless,eyeglasses,eyes,facepunch,factory,fallen_leaf,family,fast_forward,fax,fearful,feelsgood,feet,ferris_wheel,file_folder,finnadie,fire,fire_engine,fireworks,first_quarter_moon,first_quarter_moon_with_face,fish,fish_cake,fishing_pole_and_fish,fist,five,flags,flashlight,floppy_disk,flower_playing_cards,flushed,foggy,football,fork_and_knife,fountain,four,four_leaf_clover,fr,free,fried_shrimp,fries,frog,frowning,fu,fuelpump,full_moon,full_moon_with_face,game_die,gb,gem,gemini,ghost,gift,gift_heart,girl,globe_with_meridians,goat,goberserk,godmode,golf,grapes,green_apple,green_book,green_heart,grey_exclamation,grey_question,grimacing,grin,grinning,guardsman,guitar,gun,haircut,hamburger,hammer,hamster,hand,handbag,hankey,hash,hatched_chick,hatching_chick,headphones,hear_no_evil,heart,heart_decoration,heart_eyes,heart_eyes_cat,heartbeat,heartpulse,hearts,heavy_check_mark,heavy_division_sign,heavy_dollar_sign,heavy_exclamation_mark,heavy_minus_sign,heavy_multiplication_x,heavy_plus_sign,helicopter,herb,hibiscus,high_brightness,high_heel,hocho,honey_pot,honeybee,horse,horse_racing,hospital,hotel,hotsprings,hourglass,hourglass_flowing_sand,house,house_with_garden,hurtrealbad,hushed,ice_cream,icecream,id,ideograph_advantage,imp,inbox_tray,incoming_envelope,information_desk_person,information_source,innocent,interrobang,iphone,it,izakaya_lantern,jack_o_lantern,japan,japanese_castle,japanese_goblin,japanese_ogre,jeans,joy,joy_cat,jp,key,keycap_ten,kimono,kiss,kissing,kissing_cat,kissing_closed_eyes,kissing_face,kissing_heart,kissing_smiling_eyes,koala,koko,kr,large_blue_circle,large_blue_diamond,large_orange_diamond,last_quarter_moon,last_quarter_moon_with_face,laughing,leaves,ledger,left_luggage,left_right_arrow,leftwards_arrow_with_hook,lemon,leo,leopard,libra,light_rail,link,lips,lipstick,lock,lock_with_ink_pen,lollipop,loop,loudspeaker,love_hotel,love_letter,low_brightness,m,mag,mag_right,mahjong,mailbox,mailbox_closed,mailbox_with_mail,mailbox_with_no_mail,man,man_with_gua_pi_mao,man_with_turban,mans_shoe,maple_leaf,mask,massage,meat_on_bone,mega,melon,memo,mens,metal,metro,microphone,microscope,milky_way,minibus,minidisc,mobile_phone_off,money_with_wings,moneybag,monkey,monkey_face,monorail,mortar_board,mount_fuji,mountain_bicyclist,mountain_cableway,mountain_railway,mouse,mouse2,movie_camera,moyai,muscle,mushroom,musical_keyboard,musical_note,musical_score,mute,nail_care,name_badge,neckbeard,necktie,negative_squared_cross_mark,neutral_face,new,new_moon,new_moon_with_face,newspaper,ng,nine,no_bell,no_bicycles,no_entry,no_entry_sign,no_good,no_mobile_phones,no_mouth,no_pedestrians,no_smoking,non-potable_water,nose,notebook,notebook_with_decorative_cover,notes,nut_and_bolt,o,o2,ocean,octocat,octopus,oden,office,ok,ok_hand,ok_woman,older_man,older_woman,on,oncoming_automobile,oncoming_bus,oncoming_police_car,oncoming_taxi,one,open_file_folder,open_hands,open_mouth,ophiuchus,orange_book,outbox_tray,ox,package,page_facing_up,page_with_curl,pager,palm_tree,panda_face,paperclip,parking,part_alternation_mark,partly_sunny,passport_control,paw_prints,peach,pear,pencil,pencil2,penguin,pensive,performing_arts,persevere,person_frowning,person_with_blond_hair,person_with_pouting_face,phone,pig,pig2,pig_nose,pill,pineapple,pisces,pizza,plus1,point_down,point_left,point_right,point_up,point_up_2,police_car,poodle,poop,post_office,postal_horn,postbox,potable_water,pouch,poultry_leg,pound,pouting_cat,pray,princess,punch,purple_heart,purse,pushpin,put_litter_in_its_place,question,rabbit,rabbit2,racehorse,radio,radio_button,rage,rage1,rage2,rage3,rage4,railway_car,rainbow,raised_hand,raised_hands,raising_hand,ram,ramen,rat,recycle,red_car,red_circle,registered,relaxed,relieved,repeat,repeat_one,restroom,revolving_hearts,rewind,ribbon,rice,rice_ball,rice_cracker,rice_scene,ring,rocket,roller_coaster,rooster,rose,rotating_light,round_pushpin,rowboat,ru,rugby_football,runner,running,running_shirt_with_sash,sa,sagittarius,sailboat,sake,sandal,santa,satellite,satisfied,saxophone,school,school_satchel,scissors,scorpius,scream,scream_cat,scroll,seat,secret,see_no_evil,seedling,seven,shaved_ice,sheep,shell,ship,shipit,shirt,shit,shoe,shower,signal_strength,six,six_pointed_star,ski,skull,sleeping,sleepy,slot_machine,small_blue_diamond,small_orange_diamond,small_red_triangle,small_red_triangle_down,smile,smile_cat,smiley,smiley_cat,smiling_imp,smirk,smirk_cat,smoking,snail,snake,snowboarder,snowflake,snowman,sob,soccer,soon,sos,sound,space_invader,spades,spaghetti,sparkle,sparkler,sparkles,sparkling_heart,speak_no_evil,speaker,speech_balloon,speedboat,squirrel,star,star2,stars,station,statue_of_liberty,steam_locomotive,stew,straight_ruler,strawberry,stuck_out_tongue,stuck_out_tongue_closed_eyes,stuck_out_tongue_winking_eye,sun_with_face,sunflower,sunglasses,sunny,sunrise,sunrise_over_mountains,surfer,sushi,suspect,suspension_railway,sweat,sweat_drops,sweat_smile,sweet_potato,swimmer,symbols,syringe,tada,tanabata_tree,tangerine,taurus,taxi,tea,telephone,telephone_receiver,telescope,tennis,tent,thought_balloon,three,thumbsdown,thumbsup,ticket,tiger,tiger2,tired_face,tm,toilet,tokyo_tower,tomato,tongue,top,tophat,tractor,traffic_light,train,train2,tram,triangular_flag_on_post,triangular_ruler,trident,triumph,trolleybus,trollface,trophy,tropical_drink,tropical_fish,truck,trumpet,tshirt,tulip,turtle,tv,twisted_rightwards_arrows,two,two_hearts,two_men_holding_hands,two_women_holding_hands,u5272,u5408,u55b6,u6307,u6708,u6709,u6e80,u7121,u7533,u7981,u7a7a,uk,umbrella,unamused,underage,unlock,up,us,v,vertical_traffic_light,vhs,vibration_mode,video_camera,video_game,violin,virgo,volcano,vs,walking,waning_crescent_moon,waning_gibbous_moon,warning,watch,water_buffalo,watermelon,wave,wavy_dash,waxing_crescent_moon,waxing_gibbous_moon,wc,weary,wedding,whale,whale2,wheelchair,white_check_mark,white_circle,white_flower,white_large_square,white_medium_small_square,white_medium_square,white_small_square,white_square_button,wind_chime,wine_glass,wink,wolf,woman,womans_clothes,womans_hat,womens,worried,wrench,x,yellow_heart,yen,yum,zap,zero,zzz";
+        var allEmoj = "+1,-1,100,1234,8ball,a,ab,abc,abcd,accept,aerial_tramway,airplane,alarm_clock,alien,ambulance,anchor,angel,anger,angry,anguished,ant,apple,aquarius,aries,arrows_clockwise,arrows_counterclockwise,arrow_backward,arrow_double_down,arrow_double_up,arrow_down,arrow_down_small,arrow_forward,arrow_heading_down,arrow_heading_up,arrow_left,arrow_lower_left,arrow_lower_right,arrow_right,arrow_right_hook,arrow_up,arrow_upper_left,arrow_upper_right,arrow_up_down,arrow_up_small,art,articulated_lorry,astonished,atm,b,baby,baby_bottle,baby_chick,baby_symbol,back,baggage_claim,balloon,ballot_box_with_check,bamboo,banana,bangbang,bank,barber,bar_chart,baseball,basketball,bath,bathtub,battery,bear,bee,beer,beers,beetle,beginner,bell,bento,bicyclist,bike,bikini,bird,birthday,black_circle,black_joker,black_large_square,black_medium_small_square,black_medium_square,black_nib,black_small_square,black_square_button,blossom,blowfish,blue_book,blue_car,blue_heart,blush,boar,boat,bomb,book,bookmark,bookmark_tabs,books,boom,boot,bouquet,bow,bowling,boy,bread,bride_with_veil,bridge_at_night,briefcase,broken_heart,bug,bulb,bullettrain_front,bullettrain_side,bus,busstop,busts_in_silhouette,bust_in_silhouette,c,cactus,cake,calendar,calling,camel,camera,cancer,candy,capital_abcd,capricorn,car,card_index,carousel_horse,cat,cat2,cd,chart,chart_with_downwards_trend,chart_with_upwards_trend,checkered_flag,cherries,cherry_blossom,chestnut,chicken,children_crossing,chocolate_bar,christmas_tree,church,cinema,circus_tent,city_sunrise,city_sunset,cl,clap,clapper,clipboard,clock1,clock10,clock1030,clock11,clock1130,clock12,clock1230,clock130,clock2,clock230,clock3,clock330,clock4,clock430,clock5,clock530,clock6,clock630,clock7,clock730,clock8,clock830,clock9,clock930,closed_book,closed_lock_with_key,closed_umbrella,cloud,clubs,cn,cocktail,coffee,cold_sweat,collision,computer,confetti_ball,confounded,confused,congratulations,construction,construction_worker,convenience_store,cookie,cool,cop,copyright,corn,couple,couplekiss,couple_with_heart,cow,cow2,credit_card,crescent_moon,crocodile,crossed_flags,crown,cry,crying_cat_face,crystal_ball,cupid,curly_loop,currency_exchange,curry,custard,customs,cyclone,d,dancer,dancers,dango,dart,dash,date,de,deciduous_tree,department_store,diamonds,diamond_shape_with_a_dot_inside,disappointed,disappointed_relieved,dizzy,dizzy_face,dog,dog2,dollar,dolls,dolphin,door,doughnut,do_not_litter,dragon,dragon_face,dress,dromedary_camel,droplet,dvd,e-mail,e50a,ear,earth_africa,earth_americas,earth_asia,ear_of_rice,egg,eggplant,eight,eight_pointed_black_star,eight_spoked_asterisk,electric_plug,elephant,email,end,envelope,es,euro,european_castle,european_post_office,evergreen_tree,exclamation,expressionless,eyeglasses,eyes,f,facepunch,factory,fallen_leaf,family,fast_forward,fax,fearful,feet,ferris_wheel,file_folder,fire,fireworks,fire_engine,first_quarter_moon,first_quarter_moon_with_face,fish,fishing_pole_and_fish,fish_cake,fist,five,flags,flashlight,floppy_disk,flower_playing_cards,flushed,foggy,football,fork_and_knife,fountain,four,four_leaf_clover,fr,free,fried_shrimp,fries,frog,frowning,fuelpump,full_moon,full_moon_with_face,g,game_die,gb,gem,gemini,ghost,gift,gift_heart,girl,globe_with_meridians,goat,golf,grapes,green_apple,green_book,green_heart,grey_exclamation,grey_question,grimacing,grin,grinning,guardsman,guitar,gun,haircut,hamburger,hammer,hamster,hand,handbag,hankey,hash,hatched_chick,hatching_chick,headphones,heart,heartbeat,heartpulse,hearts,heart_decoration,heart_eyes,heart_eyes_cat,hear_no_evil,heavy_check_mark,heavy_division_sign,heavy_dollar_sign,heavy_exclamation_mark,heavy_minus_sign,heavy_multiplication_x,heavy_plus_sign,helicopter,herb,hibiscus,high_brightness,high_heel,hocho,honeybee,honey_pot,horse,horse_racing,hospital,hotel,hotsprings,hourglass,hourglass_flowing_sand,house,house_with_garden,hushed,i,icecream,ice_cream,id,ideograph_advantage,imp,inbox_tray,incoming_envelope,information_desk_person,information_source,innocent,interrobang,iphone,it,izakaya_lantern,j,jack_o_lantern,japan,japanese_castle,japanese_goblin,japanese_ogre,jeans,joy,joy_cat,jp,k,key,keycap_ten,kimono,kiss,kissing,kissing_cat,kissing_closed_eyes,kissing_heart,kissing_smiling_eyes,koala,koko,kr,large_blue_circle,large_blue_diamond,large_orange_diamond,last_quarter_moon,last_quarter_moon_with_face,laughing,leaves,ledger,leftwards_arrow_with_hook,left_luggage,left_right_arrow,lemon,leo,leopard,libra,light_rail,link,lips,lipstick,lock,lock_with_ink_pen,lollipop,loop,loudspeaker,love_hotel,love_letter,low_brightness,m,mag,mag_right,mahjong,mailbox,mailbox_closed,mailbox_with_mail,mailbox_with_no_mail,man,mans_shoe,man_with_gua_pi_mao,man_with_turban,maple_leaf,mask,massage,meat_on_bone,mega,melon,memo,mens,metro,microphone,microscope,milky_way,minibus,minidisc,mobile_phone_off,moneybag,money_with_wings,monkey,monkey_face,monorail,mortar_board,mountain_bicyclist,mountain_cableway,mountain_railway,mount_fuji,mouse,mouse2,movie_camera,moyai,muscle,mushroom,musical_keyboard,musical_note,musical_score,mute,nail_care,name_badge,necktie,negative_squared_cross_mark,neutral_face,new,newspaper,new_moon,new_moon_with_face,ng,nine,non-potable_water,nose,notebook,notebook_with_decorative_cover,notes,no_bell,no_bicycles,no_entry,no_entry_sign,no_good,no_mobile_phones,no_mouth,no_pedestrians,no_smoking,nut_and_bolt,o,o2,ocean,octocat,octopus,oden,office,ok,ok_hand,ok_woman,older_man,older_woman,on,oncoming_automobile,oncoming_bus,oncoming_police_car,oncoming_taxi,one,open_file_folder,open_hands,open_mouth,ophiuchus,orange_book,outbox_tray,ox,package,pager,page_facing_up,page_with_curl,palm_tree,panda_face,paperclip,parking,partly_sunny,part_alternation_mark,passport_control,paw_prints,peach,pear,pencil,pencil2,penguin,pensive,performing_arts,persevere,person_frowning,person_with_blond_hair,person_with_pouting_face,phone,pig,pig2,pig_nose,pill,pineapple,pisces,pizza,point_down,point_left,point_right,point_up,point_up_2,police_car,poodle,poop,postal_horn,postbox,potable_water,pouch,poultry_leg,pound,pouting_cat,pray,princess,punch,purple_heart,purse,pushpin,put_litter_in_its_place,question,r,rabbit,rabbit2,racehorse,radio,radio_button,rage,railway_car,rainbow,raised_hand,raised_hands,raising_hand,ram,ramen,rat,recycle,red_car,red_circle,registered,relaxed,relieved,repeat,repeat_one,restroom,revolving_hearts,rewind,ribbon,rice,rice_ball,rice_cracker,rice_scene,ring,rocket,roller_coaster,rooster,rose,rotating_light,round_pushpin,rowboat,ru,rugby_football,running,running_shirt_with_sash,sa,sagittarius,sailboat,sake,sandal,santa,satellite,satisfied,saxophone,school,school_satchel,scissors,scorpius,scream,scream_cat,scroll,seat,secret,seedling,see_no_evil,seven,shaved_ice,sheep,shell,ship,shirt,shoe,shower,signal_strength,six,six_pointed_star,ski,skull,sleeping,sleepy,slot_machine,small_blue_diamond,small_orange_diamond,small_red_triangle,small_red_triangle_down,smile,smiley,smiley_cat,smile_cat,smiling_imp,smirk,smirk_cat,smoking,snail,snake,snowboarder,snowflake,snowman,sob,soccer,soon,sos,sound,space_invader,spades,spaghetti,sparkle,sparkler,sparkles,sparkling_heart,speaker,speak_no_evil,speech_balloon,speedboat,squirrel,star,star2,stars,station,statue_of_liberty,steam_locomotive,stew,straight_ruler,strawberry,stuck_out_tongue,stuck_out_tongue_closed_eyes,stuck_out_tongue_winking_eye,sunflower,sunglasses,sunny,sunrise,sunrise_over_mountains,sun_with_face,surfer,sushi,suspension_railway,sweat,sweat_drops,sweat_smile,sweet_potato,swimmer,symbols,syringe,tada,tanabata_tree,tangerine,taurus,taxi,tea,telephone,telephone_receiver,telescope,tennis,tent,thought_balloon,three,thumbsdown,thumbsup,ticket,tiger,tiger2,tired_face,tm,toilet,tokyo_tower,tomato,tongue,top,tophat,tractor,traffic_light,train,train2,tram,triangular_flag_on_post,triangular_ruler,trident,triumph,trolleybus,trollface,trophy,tropical_drink,tropical_fish,truck,trumpet,tshirt,tulip,turtle,tv,twisted_rightwards_arrows,two,two_hearts,two_men_holding_hands,two_women_holding_hands,u,u5272,u5408,u55b6,u6307,u6708,u6709,u6e80,u7121,u7533,u7981,u7a7a,umbrella,unamused,underage,unicorn_face,unlock,up,us,v,vertical_traffic_light,vhs,vibration_mode,video_camera,video_game,violin,virgo,volcano,vs,walking,waning_crescent_moon,waning_gibbous_moon,warning,watch,watermelon,water_buffalo,wave,wavy_dash,waxing_crescent_moon,waxing_gibbous_moon,wc,weary,wedding,whale,whale2,wheelchair,white_check_mark,white_circle,white_flower,white_large_square,white_medium_small_square,white_medium_square,white_small_square,white_square_button,wind_chime,wine_glass,wink,wolf,woman,womans_clothes,womans_hat,womens,worried,wrench,x,yellow_heart,yen,yum,zap,zero,zzz";
         var emojString = '';
 
         $.ajax({
@@ -484,61 +548,63 @@ var Util = {
             var text = emojis[i];
             emojiAutocompleteHints.push({
                 displayText: "<span>" + displayText +
-                        '&nbsp;<img style="width: 16px" src="' + Label.staticServePath + '/js/lib/emojify.js-1.1.0/images/basic/' + text + '.png"></span>',
+                        '&nbsp;<img style="width: 16px" src="' + Label.staticServePath + '/emoji/graphics/' + text + '.png"></span>',
                 text: text + ": "
             });
         }
 
-        CodeMirror.registerHelper("hint", "userName", function (cm) {
-            var word = /[\w$]+/;
-            var cur = cm.getCursor(), curLine = cm.getLine(cur.line);
-            var start = cur.ch, end = start;
-            while (end < curLine.length && word.test(curLine.charAt(end))) {
-                ++end;
-            }
-            while (start && word.test(curLine.charAt(start - 1))) {
-                --start;
-            }
-            var tok = cm.getTokenAt(cur);
-            var autocompleteHints = [];
-
-            if (tok.string.indexOf('@') !== 0) {
-                return false;
-            }
-
-            $.ajax({
-                async: false,
-                url: Label.servePath + "/users/names?name=" + tok.string.substring(1),
-                type: "GET",
-                success: function (result) {
-                    if (!result.sc || !result.userNames) {
-                        return;
-                    }
-
-                    for (var i = 0; i < result.userNames.length; i++) {
-                        var user = result.userNames[i];
-                        var name = user.userName;
-                        var avatar = user.userAvatarURL;
-
-                        autocompleteHints.push({
-                            displayText: "<span style='font-size: 1rem;line-height:22px'><img style='width: 1rem;height: 1rem;margin:3px 0;float:left' src='" + avatar
-                                    + "'> " + name + "</span>",
-                            text: name + " "
-                        });
-                    }
-
-                    if ('comment' === cm['for']) {
-                        autocompleteHints.push({
-                            displayText: "<span style='font-size: 1rem;line-height:22px'>"
-                                    + "<img style='width: 1rem;height: 1rem;margin:3px 0;float:left' src='/images/user-thumbnail.png'> @参与者</span>",
-                            text: "participants "
-                        });
-                    }
+        if (Label.commonAtUser && Label.commonAtUser === 'true') {
+            CodeMirror.registerHelper("hint", "userName", function (cm) {
+                var word = /[\w$]+/;
+                var cur = cm.getCursor(), curLine = cm.getLine(cur.line);
+                var start = cur.ch, end = start;
+                while (end < curLine.length && word.test(curLine.charAt(end))) {
+                    ++end;
                 }
-            });
+                while (start && word.test(curLine.charAt(start - 1))) {
+                    --start;
+                }
+                var tok = cm.getTokenAt(cur);
+                var autocompleteHints = [];
 
-            return {list: autocompleteHints, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)};
-        });
+                if (tok.string.indexOf('@') !== 0) {
+                    return false;
+                }
+
+                $.ajax({
+                    async: false,
+                    url: Label.servePath + "/users/names?name=" + tok.string.substring(1),
+                    type: "GET",
+                    success: function (result) {
+                        if (!result.sc || !result.userNames) {
+                            return;
+                        }
+
+                        for (var i = 0; i < result.userNames.length; i++) {
+                            var user = result.userNames[i];
+                            var name = user.userName;
+                            var avatar = user.userAvatarURL;
+
+                            autocompleteHints.push({
+                                displayText: "<span style='font-size: 1rem;line-height:22px'><img style='width: 1rem;height: 1rem;margin:3px 0;float:left' src='" + avatar
+                                        + "'> " + name + "</span>",
+                                text: name + " "
+                            });
+                        }
+
+                        if ('comment' === cm['for']) {
+                            autocompleteHints.push({
+                                displayText: "<span style='font-size: 1rem;line-height:22px'>"
+                                        + "<img style='width: 1rem;height: 1rem;margin:3px 0;float:left' src='/images/user-thumbnail.png'> @参与者</span>",
+                                text: "participants "
+                            });
+                        }
+                    }
+                });
+
+                return {list: autocompleteHints, from: CodeMirror.Pos(cur.line, start), to: CodeMirror.Pos(cur.line, end)};
+            });
+        }
 
         CodeMirror.registerHelper("hint", "emoji", function (cm) {
             var word = /[\w$]+/;
@@ -559,7 +625,7 @@ var Util = {
                 var text = emojis[i];
                 if (Util.startsWith(text, input)) {
                     autocompleteHints.push({
-                        displayText: '<span style="font-size: 1rem;line-height:22px"><img style="width: 1rem;margin:3px 0;float:left" src="' + Label.staticServePath + '/js/lib/emojify.js-1.1.0/images/basic/' + text + '.png"> ' +
+                        displayText: '<span style="font-size: 1rem;line-height:22px"><img style="width: 1rem;margin:3px 0;float:left" src="' + Label.staticServePath + '/emoji/graphics/' + text + '.png"> ' +
                                 displayText.toString() + '</span>',
                         text: ":" + text + ": "
                     });
@@ -586,14 +652,18 @@ var Util = {
 
         CodeMirror.commands.startAudioRecord = function (cm) {
             if (!Audio.availabel) {
-                Audio.init();
+                Audio.init(function () {
+                    var cursor = cm.getCursor();
+                    cm.replaceRange(Label.audioRecordingLabel, cursor);
+                    Audio.handleStartRecording();
+
+                });
             }
 
             if (Audio.availabel) {
-                Audio.handleStartRecording();
-
                 var cursor = cm.getCursor();
-                cm.replaceRange(Label.audioRecordingLabel, cursor, cursor);
+                cm.replaceRange(Label.audioRecordingLabel, cursor);
+                Audio.handleStartRecording();
             }
         };
 
@@ -613,9 +683,9 @@ var Util = {
 
             var reader = new FileReader();
             reader.onload = function (event) {
-                if ("" !== qiniuToken) {
+                if ("" !== Label.qiniuUploadToken) {
                     var fd = new FormData();
-                    fd.append('token', qiniuToken);
+                    fd.append('token', Label.qiniuUploadToken);
                     fd.append('file', blob);
                     fd.append('key', key);
 
@@ -628,7 +698,7 @@ var Util = {
                         paramName: "file",
                         success: function (data) {
                             var cursor = cm.getCursor();
-                            cm.replaceRange('<audio controls="controls" src="' + qiniuDomain + '/' + key + '"></audio>\n\n',
+                            cm.replaceRange('<audio controls="controls" src="' + Label.qiniuDomain + '/' + key + '"></audio>\n\n',
                                     CodeMirror.Pos(cursor.line, cursor.ch - Label.uploadingLabel.length), cursor);
                         },
                         error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -678,42 +748,72 @@ var Util = {
             success: function (result, textStatus) {
                 // 生成消息的 li 标签
                 var genLiHTML = function (data) {
-                    var notiHTML = '';
+                    var notiHTML = '',
+                    markReadHTML = '<span onclick="Util.makeNotificationRead(\'${markReadType}\');return false;" aria-label="'
+                        + Label.makeAsReadLabel + '" class="fn-right tooltipped tooltipped-nw">'
+                        + '<svg height="18" viewBox="0 0 12 16" width="12">' + Label.checkIcon + '</svg>' + '</span>';
+
                     // 收到的回帖 unreadCommentedNotificationCnt
                     if (data.unreadCommentedNotificationCnt > 0) {
-                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/commented">' + Label.notificationCommentedLabel +
-                                '<span class="count fn-right">' + data.unreadCommentedNotificationCnt + '</span></a></li>';
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/commented">'
+                            + Label.notificationCommentedLabel
+                            + ' <span class="count">' + data.unreadCommentedNotificationCnt + '</span>'
+                            + markReadHTML.replace('${markReadType}', 'commented')
+                            + '</a></li>';
                     }
+
                     // 收到的回复 unreadReplyNotificationCnt
                     if (data.unreadReplyNotificationCnt > 0) {
                         notiHTML += '<li><a href="' + Label.servePath + '/notifications/reply">' + Label.notificationReplyLabel +
-                                '<span class="count fn-right">' + data.unreadReplyNotificationCnt + '</span></a></li>';
+                            ' <span class="count">' + data.unreadReplyNotificationCnt + '</span>'
+                            + markReadHTML.replace('${markReadType}', 'reply')
+                            + '</a></li>';
                     }
+
                     // @ 我的 unreadAtNotificationCnt
                     if (data.unreadAtNotificationCnt > 0) {
                         notiHTML += '<li><a href="' + Label.servePath + '/notifications/at">' + Label.notificationAtLabel +
-                                '<span class="count fn-right">' + data.unreadAtNotificationCnt + '</span></a></li>';
+                            ' <span class="count">' + data.unreadAtNotificationCnt + '</span>'
+                            + markReadHTML.replace('${markReadType}', 'at')
+                            + '</a></li>';
                     }
-                    // 我关注的人 unreadFollowingUserNotificationCnt
-                    if (data.unreadFollowingUserNotificationCnt > 0) {
-                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/following-user">' + Label.notificationFollowingUserLabel +
-                                '<span class="count fn-right">' + data.unreadFollowingUserNotificationCnt + '</span></a></li>';
+
+                    // 我关注的 unreadFollowingNotificationCnt
+                    if (data.unreadFollowingNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/notifications/following">' + Label.notificationFollowingLabel +
+                            ' <span class="count">' + data.unreadFollowingNotificationCnt + '</span>'
+                            + markReadHTML.replace('${markReadType}', 'following')
+                            + '</a></li>';
                     }
+
                     // 积分 unreadPointNotificationCnt
                     if (data.unreadPointNotificationCnt > 0) {
                         notiHTML += '<li><a href="' + Label.servePath + '/notifications/point">' + Label.pointLabel +
-                                '<span class="count fn-right">' + data.unreadPointNotificationCnt + '</span></a></li>';
+                            ' <span class="count">' + data.unreadPointNotificationCnt + '</span>'
+                            + '</a></li>';
                     }
+
                     // 同城 unreadBroadcastNotificationCnt
                     if (data.unreadBroadcastNotificationCnt > 0) {
                         notiHTML += '<li><a href="' + Label.servePath + '/notifications/broadcast">' + Label.sameCityLabel +
-                                '<span class="count fn-right">' + data.unreadBroadcastNotificationCnt + '</span></a></li>';
+                            ' <span class="count">' + data.unreadBroadcastNotificationCnt + '</span>'
+                            + '</a></li>';
                     }
+
                     // 系统 unreadSysAnnounceNotificationCnt
                     if (data.unreadSysAnnounceNotificationCnt > 0) {
                         notiHTML += '<li><a href="' + Label.servePath + '/notifications/sys-announce">' + Label.systemLabel +
-                                '<span class="count fn-right">' + data.unreadSysAnnounceNotificationCnt + '</span></a></li>';
+                            ' <span class="count">' + data.unreadSysAnnounceNotificationCnt + '</span>'
+                            + '</a></li>';
                     }
+
+                    // 新关注者 unreadNewFollowerNotificationCnt
+                    if (data.unreadNewFollowerNotificationCnt > 0) {
+                        notiHTML += '<li><a href="' + Label.servePath + '/member/' + Label.currentUserName + '/followers">' +
+                            Label.newFollowerLabel + ' <span class="count">' + data.unreadNewFollowerNotificationCnt + '</span>'
+                            + '</a></li>';
+                    }
+
                     return notiHTML;
                 };
 
@@ -749,7 +849,7 @@ var Util = {
 
                 // browser
                 if (0 < count) {
-                    $("#aNotifications").removeClass("no-msg tooltipped tooltipped-w").addClass("msg").text(count);
+                    $("#aNotifications").removeClass("no-msg tooltipped tooltipped-w").addClass("msg").text(count).attr('href', 'javascript:void(0)');
                     if (0 === result.userNotifyStatus && window.localStorage.hadNotificate !== count.toString()) {
                         Util.notifyMsg(count);
                         window.localStorage.hadNotificate = count;
@@ -765,27 +865,20 @@ var Util = {
                     $("#aNotifications").after('<div id="notificationsPanel" class="module person-list"><ul>' +
                             notiHTML + '</ul></div>');
 
-					var hideTimeOut = undefined;
-                    $('#aNotifications').mouseover(function () {
+                    $('#aNotifications').click(function () {
                         $('#notificationsPanel').show();
-                        $('#personListPanel').hide();
-						clearTimeout(hideTimeOut);
-                    }).mouseout(function () {
-						hideTimeOut = setTimeout(function () {
-							$('#notificationsPanel').hide();
-						}, 600);
                     });
 
-                    $('#notificationsPanel').mouseover(function () {
-                        $('#notificationsPanel').show();
-												clearTimeout(hideTimeOut);
-                    }).mouseout(function () {
-                        $('#notificationsPanel').hide();
+                    $('body').click(function (event) {
+                        if (event.target.id !== 'aNotifications' &&
+                        $(event.target).closest('.module').attr('id') !== 'notificationsPanel') {
+                            $('#notificationsPanel').hide();
+                        }
                     });
                 } else {
                     window.localStorage.hadNotificate = 'false';
                     $("#notificationsPanel").remove();
-                    $("#aNotifications").removeClass("msg").addClass("no-msg tooltipped tooltipped-w").text(count);
+                    $("#aNotifications").removeClass("msg").addClass("no-msg tooltipped tooltipped-w").text(count).attr('href', Label.servePath + '/notifications');
                 }
             }
         });
@@ -820,9 +913,15 @@ var Util = {
                 if (result.sc) {
                     $(it).removeClass("disabled");
                     if (typeof (index) !== 'undefined') {
-                        $(it).html('<span class="icon-star"></span> ' + (index + 1)).
+                        if ('article' === type) {
+                            $(it).html('<span class="icon-star"></span> ' + (index + 1)).
                                 attr("onclick", "Util.unfollow(this, '" + id + "', '" + type + "', " + (index + 1) + ")")
                                 .attr("aria-label", Label.uncollectLabel).addClass('ft-red');
+                        } else if ('article-watch' === type) {
+                            $(it).html('<span class="icon-view"></span> ' + (index + 1)).
+                                attr("onclick", "Util.unfollow(this, '" + id + "', '" + type + "', " + (index + 1) + ")")
+                                .attr("aria-label", Label.unfollowLabel).addClass('ft-red');
+                        }
                     } else {
                         $(it).attr("onclick", "Util.unfollow(this, '" + id + "', '" + type + "')")
                                 .text("article" === type ? Label.uncollectLabel : Label.unfollowLabel);
@@ -858,9 +957,15 @@ var Util = {
             success: function (result, textStatus) {
                 if (result.sc) {
                     if (typeof (index) !== 'undefined') {
-                        $(it).removeClass('ft-red').html('<span class="icon-star"></span> ' + (index - 1))
+                        if ('article' === type) {
+                            $(it).removeClass('ft-red').html('<span class="icon-star"></span> ' + (index - 1))
                                 .attr("onclick", "Util.follow(this, '" + id + "', '" + type + "'," + (index - 1) + ")")
                                 .attr("aria-label", Label.collectLabel);
+                        } else if ('article-watch' === type) {
+                            $(it).removeClass('ft-red').html('<span class="icon-view"></span> ' + (index - 1))
+                                .attr("onclick", "Util.follow(this, '" + id + "', '" + type + "'," + (index - 1) + ")")
+                                .attr("aria-label", Label.followLabel);
+                        }
                     } else {
                         $(it).attr("onclick", "Util.follow(this, '" + id + "', '" + type + "')")
                                 .text("article" === type ? Label.collectLabel : Label.followLabel);
@@ -1027,9 +1132,10 @@ var Util = {
             Util.setUnreadNotificationCount();
 
             // 定时获取并设置未读提醒计数
-            setInterval(function () {
-                Util.setUnreadNotificationCount();
-            }, 1000 * 60 * 10);
+            // NOTE: 有了 userChannel，停了观察一下
+//            setInterval(function () {
+//                Util.setUnreadNotificationCount();
+//            }, 1000 * 60 * 10);
         }
 
         this._initCommonHotKey();
@@ -1070,7 +1176,6 @@ var Util = {
             switch (data.command) {
                 case "refreshNotification":
                     Util.setUnreadNotificationCount();
-
                     break;
             }
         };
@@ -1097,31 +1202,25 @@ var Util = {
             } else if (location.pathname === "/login") {
                 // 登录没有使用 href，对其进行特殊处理
                 $(".user-nav a:first").addClass("selected");
-            } else if (href.indexOf(Label.servePath + '/settings') === 0) {
-                $(".user-nav .nav-avatar").addClass("selected");
+            } else if (href.indexOf(Label.servePath + '/settings') === 0 ||
+             href.indexOf($("#aPersonListPanel").data('url')) === 0) {
+                $("#aPersonListPanel").addClass("selected");
             }
         });
 
-				var hideTimeOut = undefined;
-        $('.nav .avatar-small').parent().mouseover(function () {
+        $('.nav .avatar-small').parent().click(function () {
             $('#personListPanel').show();
-            $('#notificationsPanel').hide();
-			clearTimeout(hideTimeOut);
-        }).mouseout(function () {
-			hideTimeOut = setTimeout(function () {
-				  $('#personListPanel').hide();
-			}, 600);
         });
 
-        $('#personListPanel').mouseover(function () {
-            $('#personListPanel').show();
-			clearTimeout(hideTimeOut);
-        }).mouseout(function () {
-            $('#personListPanel').hide();
+        $('body').click(function (event) {
+            if ($(event.target).closest('a').attr('id') !== 'aPersonListPanel' &&
+                $(event.target).closest('.module').attr('id') !== 'personListPanel') {
+                $('#personListPanel').hide();
+           }
         });
 
         // 导航过长处理
-        if ($('.nav-tabs a:last').length === 1 && $('.nav-tabs a:last').offset().top > 0) {
+        if ($('.nav-tabs a:last').length === 1 &&  $('.nav-tabs a:last')[0].offsetTop > 0) {
             $('.nav-tabs').mouseover(function () {
                 $('.user-nav').hide();
             }).mouseout(function () {
@@ -1681,25 +1780,16 @@ var Audio = {
     /**
      * @description 初识化音频
      */
-    init: function () {
+    init: function (succCB) {
         var detectGetUserMedia = new BrowserGetUserMediaDetection();
 
         //First, check to see if get user media is supported:
-        console.log("Get user media supported: " + detectGetUserMedia.getUserMediaSupported());
 
         if (detectGetUserMedia.getUserMediaSupported()) {
-            console.log("Get user media is supported!");
-            console.log("Supported get user media method: " + detectGetUserMedia.getUserMediaMethod());
-
-            console.log("Assigning get user media method.");
             navigator.getUserMedia = detectGetUserMedia.getUserMediaMethod();
-
-            console.log("Requesting microphone access from browser.");
             navigator.getUserMedia({audio: true}, success, failure);
         } else {
             console.log("ERROR: getUserMedia not supported by browser.");
-
-            alert('Your browser does not appear to support audio recording.');
         }
 
         //Get user media failure callback function:
@@ -1709,9 +1799,6 @@ var Audio = {
             var errorMessageToDisplay;
             var PERMISSION_DENIED_ERROR = "PermissionDeniedError";
             var DEVICES_NOT_FOUND_ERROR = "DevicesNotFoundError";
-
-            console.log(e);
-            console.log(e.name);
 
             switch (e.name) {
                 case PERMISSION_DENIED_ERROR:
@@ -1724,38 +1811,23 @@ var Audio = {
                     errorMessageToDisplay = 'ERROR: The following unexpected error occurred while attempting to connect to your microphone: ' + e.name;
                     break;
             }
-
-            console.log("getUserMedia->failure(): " + errorMessageToDisplay);
-            alert(errorMessageToDisplay);
         }
 
         //Get user media success callback function:
         function success(e) {
-            console.log("getUserMedia->success(): Microphone access request was successful!");
-
             var BUFFER_SIZE = 2048;
             var RECORDING_MODE = PredefinedRecordingModes.MONO_5_KHZ; // 单声道 5kHz 最低的采样率
             var SAMPLE_RATE = RECORDING_MODE.getSampleRate();
             var OUTPUT_CHANNEL_COUNT = RECORDING_MODE.getChannelCount();
 
-            console.log("getUserMedia->success(): Detecting window audio context.");
             var detectWindowAudioContext = new BrowserWindowAudioContextDetection();
 
             if (detectWindowAudioContext.windowAudioContextSupported()) {
-                console.log("getUserMedia->success(): Window audio context supported.");
-
                 var windowAudioContext = detectWindowAudioContext.getWindowAudioContextMethod();
-
-                console.log("getUserMedia->success(): Window audio context method: " + windowAudioContext);
-
-                console.log('getUserMedia->success(): Creating recorder object.');
 
                 Audio.recorderObj = new SoundRecorder(windowAudioContext, BUFFER_SIZE, SAMPLE_RATE, OUTPUT_CHANNEL_COUNT);
 
-                console.log('getUserMedia->success(): Initializing recorder object.');
                 Audio.recorderObj.init(e);
-
-                console.log('getUserMedia->success(): Assigning onaudioprocess event function.');
 
                 Audio.recorderObj.recorder.onaudioprocess = function (e)
                 {
@@ -1768,18 +1840,13 @@ var Audio = {
                     var left = e.inputBuffer.getChannelData(0);
                     var right = e.inputBuffer.getChannelData(1);
                     Audio.recorderObj.cloneChannelData(left, right);
-                    console.log('SoundRecorder.recorder.onaudioprocess: Saving audio data...');
                 };
 
-                console.log('getUserMedia->success(): Recorder object successfully created and initialized.');
-                console.log('getUserMedia->success(): Recorder object ready status: ' + Audio.recorderObj.isReady());
-
                 Audio.availabel = true;
+                succCB && succCB();
             } else {
                 var messageString = "Unable to detect window audio context, cannot continue.";
                 console.log("getUserMedia->success(): " + messageString);
-                alert(messageString);
-
                 return;
             }
         }
@@ -1788,18 +1855,15 @@ var Audio = {
      * @description 开始录音
      */
     handleStartRecording: function () {
-        console.log("Starting new recording...");
         Audio.recorderObj.startRecordingNewWavFile();
     },
     /**
      * @description 结束录音
      */
     handleStopRecording: function () {
-        console.log("Stopping recording.");
         Audio.recorderObj.stopRecording();
 
         //Save the recording by building the wav file blob and send it to the client:
-        console.log("Building wav file.");
         Audio.wavFileBlob = Audio.recorderObj.buildWavFileBlob();
     }
 };

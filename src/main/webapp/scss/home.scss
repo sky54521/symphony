@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * 后台样式.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.9.11.21, Nov 8, 2016
+ * @version 2.11.12.29, Jan 23, 2017
  */
 
 @import "variables";
@@ -30,50 +29,50 @@
 .home-menu {
     list-style: none;
     background-color: #fff;
-}
 
-.home-menu a {
-    position: relative;
-    display: block;
-    padding: 8px 10px;
-    text-shadow: 0 1px 0 #fff;
-    border-bottom: 1px solid #eee;
-    color: #666;
-}
+    a {
+        position: relative;
+        display: block;
+        padding: 10px 15px;
+        text-shadow: 0 1px 0 #fff;
+        border-bottom: 1px solid #eee;
+        color: #666;
+    }
 
-.home-menu a:last-child {
-    border-bottom: 0;
-}
+    a:last-child {
+        border-bottom: 0;
+    }
 
-.home-menu a:hover {
-    text-decoration: none;
-    background-color: #f9f9f9;
-}
+    a:hover {
+        text-decoration: none;
+        background-color: #f9f9f9;
+    }
 
-.home-menu a.current {
-    font-weight: bold;
-    color: #222;
-    cursor: default;
-    background-color: #fff;
-}
+    a.current {
+        font-weight: bold;
+        color: #222;
+        cursor: default;
+        background-color: #fff;
+    }
 
-.home-menu a .todo {
-    position: absolute;
-    border-style: solid;
-    right: 0px;
-    top: 0px;
-    border-width: 10px 10px 10px 10px;
-    border-color: $red $red transparent transparent;
-}
+    a .todo {
+        position: absolute;
+        border-style: solid;
+        right: 0px;
+        top: 0px;
+        border-width: 10px 10px 10px 10px;
+        border-color: $red $red transparent transparent;
+    }
 
-.home-menu a.current::before {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    width: 2px;
-    content: "";
-    background-color: $red;
+    a.current::before {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 2px;
+        content: "";
+        background-color: $red;
+    }
 }
 
 .home-side-read {
@@ -88,20 +87,45 @@
 
 /* start home side */
 #avatarURLDom {
-    margin-top: 20px;
+    margin-top: 30px;
 }
 
 .user-name {
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 26px;
     border-bottom: 1px dotted #CCC;
-    font-size: 25px;
-    margin: 20px 0 20px;
-    padding: 20px 10px 20px 10px;
-}
+    margin-bottom: 20px;
+    padding: 20px 10px 25px 10px;
 
-.user-name button.follow {
-    font-size: 14px;
-    width: 100%;
-    margin-top: 20px;
+    #userNicknameDom {
+        font-size: 26px;
+        line-height: 30px;
+    }
+
+    .online,
+    .offline {
+        background-color: $red;
+        color: #fff;
+        font-size: 12px;
+        line-height: 20px;
+        border-radius: 3px;
+        height: 20px;
+        display: inline-block;
+        padding: 0 5px;
+        vertical-align: middle;
+        box-sizing: border-box;
+    }
+
+    .offline {
+        background-color: $gray;
+    }
+
+    button.follow {
+        font-size: 14px;
+        width: 100%;
+        margin-top: 20px;
+    }
 }
 
 .user-details {
@@ -121,6 +145,10 @@
 /* end home side */
 
 /* start add article */
+.pre-post-wrap {
+    background-color: #f1f7fe;
+}
+
 .pre-post > div {
     width: 25%;
     margin: 100px 0px;
@@ -150,35 +178,6 @@
     text-align: left;
 }
 
-#articleTitle {
-    margin-bottom: 20px;
-}
-
-#articleTitleTip {
-    position: absolute;
-    top: 32px;
-    padding: 10px;
-    z-index: 10;
-    color: #999;
-}
-
-#articleContent {
-    height: 332px;
-    margin: 30px 0 20px 0;
-    padding: 4px;
-}
-
-#articleRewardContent {
-    height: 102px;
-    margin: 30px 0 20px 0;
-    padding: 4px;
-}
-
-#tip {
-    position: inherit;
-    white-space: pre-wrap;
-}
-
 .tip-add-article {
     color: #777777;
     list-style: circle outside none;
@@ -191,31 +190,86 @@
     position: relative;
 }
 
-#showReward {
-    color: #999;
-    width: 100%;
-    display: block;
-}
-
 label.article-anonymous {
     margin: 7px 15px 0 0;
 }
 
 .post {
+    background-color: #FFF;
+    padding-top: 0;
+
+    .cm-s-default.CodeMirror {
+        border: 0;
+        margin-bottom: 0;
+    }
+
+    .wrapper {
+        display: block;
+    }
+
+    input[type=text],
+    input[type=text]:focus,
+    input[type=number],
+    input[type=number]:focus{
+        border: 0;
+        background-color: #FFF;
+        box-shadow: 0 0 0;
+        border-radius: 0;
+    }
+
+    #articleTitle {
+        font-size: 26px;
+        padding: 20px 10px 10px;
+    }
+
+    #articleTitleTip {
+            position: absolute;
+            top: 10px;
+            padding: 10px;
+            z-index: 10;
+            color: #999;
+            margin-bottom: 0;
+            width: auto;
+            right: 10px;
+            background-color: #f1f7fe;
+    }
+
+    #articleContent {
+        height: 332px;
+        margin: 30px 0 20px 0;
+        padding: 4px;
+    }
+
+    #articleRewardContent {
+        height: 102px;
+        margin: 30px 0 20px 0;
+        padding: 4px;
+    }
+
+    #showReward {
+        color: #999;
+        width: 75%;
+        margin: 20px auto 0;
+        display: block;
+    }
+
+    #tip {
+        position: inherit;
+        white-space: pre-wrap;
+    }
     .tags-wrap {
         position: relative;
     }
 
-    .tags-input {
-        border: 1px solid #CCCCCC;
-        background-color: #FAFAFA;
-        border-radius: 3px;
-        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.075) inset;
-        padding: 5px 5px 3px 5px;
+    .tags-input,
+     #articleRewardPoint {
+        background-color: #fff;
+        padding: 6px 15px;
         width: 100%;
-        line-height: 17px;
+        line-height: 20px;
+        border-bottom: 1px solid #f2f2f2;
+        border-top: 1px solid #f2f2f2;
         box-sizing: border-box;
-        height: 33px;
     }
 
     .tags-input span.tag {
@@ -251,18 +305,17 @@ label.article-anonymous {
         box-shadow: 0 0 0 transparent;
     }
 
-    .domains-tags,
-    .completed-panel {
+    .domains-tags {
         display: none;
         position: absolute;
         background-color: #FFF;
         border: 1px solid #e5e5e5;
-        z-index: 72;
-        padding: 10px;
+        z-index: 82;
         border-radius: 0 0 3px 3px;
         width: 50%;
-        top: 32px;
+        top: 35px;
         box-sizing: border-box;
+        padding: 10px;
     }
 
     .domain-tags {
@@ -283,25 +336,6 @@ label.article-anonymous {
 
     .domains-tags .tag:hover {
         opacity: 0.7;
-    }
-
-    .completed-panel {
-        padding: 0;
-        overflow: auto;
-        left: 0;
-    }
-
-    .completed-panel a {
-        display: block;
-        padding: 3px;
-        text-decoration: none;
-        line-height: 18px;
-        height: 18px;
-    }
-
-    .completed-panel a.selected,
-    .completed-panel a:hover {
-        background-color: #F7F7F7;
     }
 }
 /* end add article */
@@ -361,50 +395,57 @@ label.article-anonymous {
 }
 
 .follow .icon-tags {
-    font-size: 48px;
+    font-size: 37px;
     margin-right: 10px;
+    width: 38px;
+    line-height: 38px;
 }
 /* end follow */
 
 /* start admin */
-.admin .form {
-    padding: 10px;
-    border-bottom: 1px solid #eee;
+.admin-index .content-reset {
+    padding: 30px;
 }
 
-.admin .avatar {
-    height: 17px;
-    width: 17px;
-    vertical-align: top;
-    margin-right: 5px;
-}
+.admin {
+    .form {
+        padding: 8px 15px;
+        border-bottom: 1px solid #e5e5e5;
+        background: #f9fafb;
+        border-radius: 3px 3px 0 0;
+    }
 
-.admin .tags {
-    display: inline-block; 
-    width: 50%; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
-    overflow: hidden;
-    vertical-align: bottom;
-}
+    .tags {
+        display: inline-block;
+        width: 50%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
 
-.admin .domains {
-    display: inline-block; 
-    width: 50%; 
-    text-overflow: ellipsis; 
-    white-space: nowrap; 
-    overflow: hidden;
-    vertical-align: bottom;
-}
+    .domains {
+        display: inline-block;
+        width: 50%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        vertical-align: bottom;
+    }
 
-.admin .form input[type=text],
-.admin .form input[type=number] {
-    width: 50%;
-    margin-right: 10px;
-}
+    .form input[type=text],
+    .form input[type=number] {
+        width: 50%;
+        margin-right: 10px;
+    }
 
-.admin li > div.first {
-    margin-bottom: 6px;
+    #rolesTitle {
+        width: 150px;
+    }
+
+    #rolesDesc {
+        width: 250px;
+    }
 }
 /* end admin */
 
@@ -415,17 +456,21 @@ label.article-anonymous {
     width: 100%;
 }
 
+.points tr:last-child td {
+    border-bottom: 0;
+}
+
 .points td {
     border-bottom: 1px solid #eee;
 }
 
 .points .date {
     width: 75px;
-    padding: 10px;
+    padding: 15px 10px 15px 15px;
 }
 
 .points .name {
-    padding: 10px;
+    padding: 15px 10px;
     word-break: break-all;
 }
 
@@ -456,11 +501,7 @@ label.article-anonymous {
 
 .points .balance {
     width: 40px;
-    padding: 0 10px;
-}
-
-.points tr:last-child td {
-    border-bottom-width: 0;
+    padding: 15px 15px 15px 10px;
 }
 /* end points */
 
@@ -471,8 +512,8 @@ label.article-anonymous {
 
 #shareClipboard {
     position: absolute;
-    right: 20px;
-    bottom: 20px;
+    right: 15px;
+    bottom: 15px;
     border-radius: 0 3px 3px 0;
 }
 
@@ -482,16 +523,21 @@ label.article-anonymous {
 }
 
 #homeSidePanel {
-    width: 100%;
-    position: absolute;
-    top: 0;
-    background-color: #FFF;
+    margin-bottom: 20px;
 }
 
 #emojiGrid img {
     width: 25px;
     height: 25px;
     cursor: pointer;
+}
+
+#emotionList {
+    margin-bottom: 15px;
+}
+
+#pointBuyInvitecode {
+    padding: 0;
 }
 
 .point-pagination {

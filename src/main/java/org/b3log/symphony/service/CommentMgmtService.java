@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package org.b3log.symphony.service;
 
 import java.util.List;
+import java.util.Locale;
 import javax.inject.Inject;
 import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
@@ -26,7 +27,6 @@ import org.b3log.latke.event.EventException;
 import org.b3log.latke.event.EventManager;
 import org.b3log.latke.logging.Level;
 import org.b3log.latke.logging.Logger;
-import org.b3log.latke.model.Role;
 import org.b3log.latke.model.User;
 import org.b3log.latke.repository.RepositoryException;
 import org.b3log.latke.repository.Transaction;
@@ -44,6 +44,7 @@ import org.b3log.symphony.model.Notification;
 import org.b3log.symphony.model.Option;
 import org.b3log.symphony.model.Pointtransfer;
 import org.b3log.symphony.model.Reward;
+import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.Tag;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.ArticleRepository;
@@ -61,7 +62,7 @@ import org.json.JSONObject;
  * Comment management service.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.12.7.18, Oct 11, 2016
+ * @version 2.12.9.19, Jan 21, 2017
  * @since 0.2.0
  */
 @Service
@@ -172,6 +173,9 @@ public class CommentMgmtService {
             final String articleId = comment.optString(Comment.COMMENT_ON_ARTICLE_ID);
             final JSONObject article = articleRepository.get(articleId);
             article.put(Article.ARTICLE_COMMENT_CNT, article.optInt(Article.ARTICLE_COMMENT_CNT) - 1);
+            // Just clear latest time and commenter name, do not get the real latest comment to update
+            article.put(Article.ARTICLE_LATEST_CMT_TIME, 0);
+            article.put(Article.ARTICLE_LATEST_CMTER_NAME, "");
             articleRepository.update(articleId, article);
 
             final String commentAuthorId = comment.optString(Comment.COMMENT_AUTHOR_ID);
@@ -279,7 +283,6 @@ public class CommentMgmtService {
      * {
      *     "commentContent": "",
      *     "commentAuthorId": "",
-     *     "commentAuthorEmail": "",
      *     "commentOnArticleId": "",
      *     "commentOriginalCommentId": "", // optional
      *     "clientCommentId": "" // optional,
@@ -309,7 +312,7 @@ public class CommentMgmtService {
         final int commentViewMode = requestJSONObject.optInt(UserExt.USER_COMMENT_VIEW_MODE);
 
         if (currentTimeMillis - commenter.optLong(UserExt.USER_LATEST_CMT_TIME) < Symphonys.getLong("minStepCmtTime")
-                && !Role.ADMIN_ROLE.equals(commenter.optString(User.USER_ROLE))
+                && !Role.ROLE_ID_C_ADMIN.equals(commenter.optString(User.USER_ROLE))
                 && !UserExt.DEFAULT_CMTER_ROLE.equals(commenter.optString(User.USER_ROLE))) {
             LOGGER.log(Level.WARN, "Adds comment too frequent [userName={0}]", commenter.optString(User.USER_NAME));
             throw new ServiceException(langPropsService.get("tooFrequentCmtLabel"));
@@ -376,7 +379,6 @@ public class CommentMgmtService {
             String content = requestJSONObject.optString(Comment.COMMENT_CONTENT).
                     replace("_esc_enter_88250_", "<br/>"); // Solo client escape
 
-            comment.put(Comment.COMMENT_AUTHOR_EMAIL, requestJSONObject.optString(Comment.COMMENT_AUTHOR_EMAIL));
             comment.put(Comment.COMMENT_AUTHOR_ID, commentAuthorId);
             comment.put(Comment.COMMENT_ON_ARTICLE_ID, articleId);
             if (fromClient) {
@@ -398,6 +400,9 @@ public class CommentMgmtService {
             }
 
             content = Emotions.toAliases(content);
+            content = StringUtils.trim(content) + " ";
+            content = content.replace(langPropsService.get("uploadingLabel", Locale.SIMPLIFIED_CHINESE), "");
+            content = content.replace(langPropsService.get("uploadingLabel", Locale.US), "");
 
             comment.put(Comment.COMMENT_CONTENT, content);
             comment.put(Comment.COMMENT_CREATE_TIME, System.currentTimeMillis());
@@ -510,6 +515,9 @@ public class CommentMgmtService {
         try {
             String content = comment.optString(Comment.COMMENT_CONTENT);
             content = Emotions.toAliases(content);
+            content = StringUtils.trim(content) + " ";
+            content = content.replace(langPropsService.get("uploadingLabel", Locale.SIMPLIFIED_CHINESE), "");
+            content = content.replace(langPropsService.get("uploadingLabel", Locale.US), "");
             comment.put(Comment.COMMENT_CONTENT, content);
 
             commentRepository.update(commentId, comment);

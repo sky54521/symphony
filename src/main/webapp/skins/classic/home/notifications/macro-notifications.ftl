@@ -7,8 +7,8 @@
         <@head title="${messageLabel} - ${userName} - ${symphonyLabel}">
         <meta name="robots" content="none" />
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
+        <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
     </head>
     <body>
         <#include "../../header.ftl">
@@ -31,13 +31,13 @@
                             </span>
                             </#if>
                         </div>
-                        <div class="module-panel">
+                        <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a href="${servePath}/notifications/commented"<#if type == "commented"> class="current"</#if>>
                                    <span>${notificationCommentedLabel}</span>
                                     <#if unreadCommentedNotificationCnt &gt; 0>
                                     <span class="count">${unreadCommentedNotificationCnt}</span>
-                                    <span onclick="Settings.makeNotificationRead('commented')" 
+                                    <span onclick="Util.makeNotificationRead('commented')"
                                           aria-label="${makeAsReadLabel}" class="fn-right tooltipped tooltipped-nw">
                                         <svg height="18" viewBox="0 0 12 16" width="12">${checkIcon}</svg>
                                     </span>
@@ -47,7 +47,7 @@
                                    <span>${notificationReplyLabel}</span>
                                     <#if unreadReplyNotificationCnt &gt; 0>
                                     <span class="count">${unreadReplyNotificationCnt}</span>
-                                    <span onclick="Settings.makeNotificationRead('reply')" 
+                                    <span onclick="Util.makeNotificationRead('reply')"
                                           aria-label="${makeAsReadLabel}" class="fn-right tooltipped tooltipped-nw">
                                         <svg height="18" viewBox="0 0 12 16" width="12">${checkIcon}</svg>
                                     </span>
@@ -57,17 +57,17 @@
                                    <span>${notificationAtLabel}</span>
                                     <#if unreadAtNotificationCnt &gt; 0>
                                     <span class="count">${unreadAtNotificationCnt}</span>
-                                    <span onclick="Settings.makeNotificationRead('at')" 
+                                    <span onclick="Util.makeNotificationRead('at')"
                                           aria-label="${makeAsReadLabel}" class="fn-right tooltipped tooltipped-nw">
                                         <svg height="18" viewBox="0 0 12 16" width="12">${checkIcon}</svg>
                                     </span>
                                     </#if>
                                 </a>
-                                <a href="${servePath}/notifications/following-user"<#if type == "followingUser"> class="current"</#if>>
-                                   <span>${notificationFollowingUserLabel}</span>
-                                    <#if unreadFollowingUserNotificationCnt &gt; 0>
-                                    <span class="count">${unreadFollowingUserNotificationCnt}</span>
-                                    <span onclick="Settings.makeNotificationRead('followingUser')" 
+                                <a href="${servePath}/notifications/following"<#if type == "following"> class="current"</#if>>
+                                   <span>${notificationFollowingLabel}</span>
+                                    <#if unreadFollowingNotificationCnt &gt; 0>
+                                    <span class="count">${unreadFollowingNotificationCnt}</span>
+                                    <span onclick="Util.makeNotificationRead('following')"
                                           aria-label="${makeAsReadLabel}" class="fn-right tooltipped tooltipped-nw">
                                         <svg height="18" viewBox="0 0 12 16" width="12">${checkIcon}</svg>
                                     </span>
@@ -95,19 +95,20 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
         </div>
         <#include "../../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
-                                        Settings.initHljs();
-                                        $(document).bind('keyup', 'e', function assets() {
-                                            if (!Label.userKeyboardShortcutsStatus || Label.userKeyboardShortcutsStatus === '1') {
-                                                return false;
-                                            }
-                                            $('.home-menu .current .tooltipped').click();
-                                            return false;
-                                        });
+            Settings.initHljs();
+            $(document).bind('keyup', 'e', function assets() {
+                if (!Label.userKeyboardShortcutsStatus || Label.userKeyboardShortcutsStatus === '1') {
+                    return false;
+                }
+                $('.home-menu .current .tooltipped').click();
+                return false;
+            });
         </script>
     </body>
 </html>

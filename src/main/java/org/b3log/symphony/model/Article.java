@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package org.b3log.symphony.model;
  * This class defines all article model relevant keys.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.21.0.11, Oct 30, 2016
+ * @version 1.23.0.13, Jan 21, 2017
  * @since 0.2.0
  */
 public final class Article {
@@ -60,11 +60,6 @@ public final class Article {
      * Key of article tags.
      */
     public static final String ARTICLE_TAGS = "articleTags";
-
-    /**
-     * Key of article author email.
-     */
-    public static final String ARTICLE_AUTHOR_EMAIL = "articleAuthorEmail";
 
     /**
      * Key of article author id.
@@ -162,6 +157,11 @@ public final class Article {
     public static final String ARTICLE_COLLECT_CNT = "articleCollectCnt";
 
     /**
+     * Key of article watch count.
+     */
+    public static final String ARTICLE_WATCH_CNT = "articleWatchCnt";
+
+    /**
      * Key of reddit score.
      */
     public static final String REDDIT_SCORE = "redditScore";
@@ -226,11 +226,6 @@ public final class Article {
      * Key of article vote.
      */
     public static final String ARTICLE_T_VOTE = "articleVote";
-
-    /**
-     * Key of article stick check.
-     */
-    public static final String ARTICLE_T_STICK_CHECK = "articleStickCheck";
 
     /**
      * Key of article stick flag.
@@ -413,13 +408,18 @@ public final class Article {
     public static final int ARTICLE_TYPE_C_THOUGHT = 3;
 
     /**
+     * Article type - <a href="https://hacpai.com/article/1483240295087">book</a>。
+     */
+    public static final int ARTICLE_TYPE_C_BOOK = 4;
+
+    /**
      * Checks the specified article type is whether invalid.
      *
      * @param articleType the specified article type
      * @return {@code true} if it is invalid, otherwise returns {@code false}
      */
     public static boolean isInvalidArticleType(final int articleType) {
-        return articleType < 0 || articleType > Article.ARTICLE_TYPE_C_THOUGHT;
+        return articleType < 0 || articleType > Article.ARTICLE_TYPE_C_BOOK;
     }
 
     /**

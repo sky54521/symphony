@@ -6,10 +6,10 @@
         <@head title="${article.articleTitle} - ${symphonyLabel}">
         <meta name="description" content="${article.articleTitle}"/>
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index${miniPostfix}.css?${staticResourceVersion}" />
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/codemirror-5.3/codemirror.css" />
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/js/lib/codemirror-5.3/addon/hint/show-hint.css" />
+        <link rel="stylesheet" href="${staticServePath}/js/lib/highlight.js-9.6.0/styles/github.css">
+        <link rel="stylesheet" href="${staticServePath}/css/index${miniPostfix}.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/js/lib/codemirror-5.3/codemirror.css" />
+        <link rel="stylesheet" href="${staticServePath}/js/lib/codemirror-5.3/addon/hint/show-hint.css" />
     </head>
     <body>
         <#include "header.ftl">
@@ -131,39 +131,7 @@
                             <h2>${article.articleCommentCount} ${cmtLabel}</h2>
                             <ul>
                                 <#list article.articleComments as comment>
-                                <li id="${comment.oId}">
-                                    <div class="fn-flex">
-                                        <a class="responsive-hide" rel="nofollow" href="/member/${comment.commentAuthorName}">
-                                            <img class="avatar" 
-                                                 title="${comment.commentAuthorName}" src="${comment.commentAuthorThumbnailURL}?imageView2/1/w/64/h/64/interlace/0/q/80" />
-                                        </a>
-                                        <div class="fn-flex-1 comment-content">
-                                            <div class="fn-clear comment-info">
-                                                <span class="fn-left">
-                                                    <#if "adminRole" == comment.commenter.userRole>
-                                                    <span class="icon icon-userrole" title="${administratorLabel}"></span>
-                                                    </#if>
-                                                    <a rel="nofollow" href="/member/${comment.commentAuthorName}"
-                                                       title="${comment.commentAuthorName}">${comment.commentAuthorName}</a>
-                                                    &nbsp;<span class="icon icon-date ft-small"></span>
-                                                    <span class="ft-small">${comment.commentCreateTime?string('yyyy-MM-dd HH:mm')}</span> 
-                                                </span>
-                                                <span class="fn-right">
-                                                    <#if isAdminLoggedIn>
-                                                    <a class="icon icon-setting" href="/admin/comment/${comment.oId}" title="${adminLabel}"></a>
-                                                    </#if>
-                                                    <#if isLoggedIn> 
-                                                    <span class="icon icon-cmt" onclick="Comment.reply('@${comment.commentAuthorName} ')"></span>
-                                                    </#if>
-                                                    #<i>${article.articleCommentCount - ((paginationCurrentPageNum - 1) * articleCommentsPageSize + comment_index)}</i>
-                                                </span>    
-                                            </div>
-                                            <div class="content-reset comment">
-                                                ${comment.commentContent}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </li>
+                                    <#include 'common/comment.ftl' />
                                 </#list>  
                             </ul>
                         </div>
@@ -234,17 +202,17 @@
         <script src="${staticServePath}/js/lib/codemirror-5.3/mode/markdown/markdown.js"></script>
         <script src="${staticServePath}/js/lib/codemirror-5.3/addon/display/placeholder.js"></script>
         <script src="${staticServePath}/js/overwrite/codemirror/addon/hint/show-hint.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/highlight.js-9.6.0/highlight.pack.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/ws-flash/swfobject.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/ws-flash/web_socket.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/reconnecting-websocket.min.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/vendor/jquery.ui.widget.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.iframe-transport.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload-process.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload-validate.js"></script>
-        <script type="text/javascript" src="${staticServePath}/js/article${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script type="text/javascript" src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/lib/highlight.js-9.6.0/highlight.pack.js"></script>
+        <script src="${staticServePath}/js/lib/ws-flash/swfobject.js"></script>
+        <script src="${staticServePath}/js/lib/ws-flash/web_socket.js"></script>
+        <script src="${staticServePath}/js/lib/reconnecting-websocket.min.js"></script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/vendor/jquery.ui.widget.js"></script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.iframe-transport.js"></script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload.js"></script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload-process.js"></script>
+        <script src="${staticServePath}/js/lib/jquery/file-upload-9.10.1/jquery.fileupload-validate.js"></script>
+        <script src="${staticServePath}/js/article${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
                     WEB_SOCKET_SWF_LOCATION = "${staticServePath}/js/lib/ws-flash/WebSocketMain.swf";
                     // Init [Article] channel

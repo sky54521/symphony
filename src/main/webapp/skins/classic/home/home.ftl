@@ -6,8 +6,8 @@
     <a href="${servePath}/member/${user.userName}/comments"<#if type == "comments"> class="current"</#if>>${cmtLabel}</a>
     <#if currentUser?? && currentUser.userName == user.userName>
     <a<#if type == "articlesAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/articles/anonymous">${anonymousArticleLabel}<#if type == "articlesAnonymous"> &nbsp;<span class="count">${paginationRecordCount?c}</span></#if></a>
-    </#if>
     <a<#if type == "commentsAnonymous"> class="current"</#if> href="${servePath}/member/${user.userName}/comments/anonymous">${anonymousCommentLabel}</a>
+    </#if>
 </div>
 <#if 0 == user.userArticleStatus || (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName))>
 <div class="list">
@@ -16,7 +16,9 @@
     </#if>
     <ul> 
         <#list userHomeArticles as article>
-        <li>
+        <li<#if !(paginationPageCount?? && paginationPageCount!=0 && paginationPageCount!=1) && article_index == userHomeArticles?size - 1>
+            class="last"
+        </#if>>
             <div class="has-view fn-flex-1">
                 <h2>
                     <#if 1 == article.articlePerfect>
@@ -39,7 +41,7 @@
                     ${article.articleCreateTime?string('yyyy-MM-dd HH:mm')}
                 </span>
             </div>
-            <#if isMyArticle && 3 != article.articleType>
+            <#if isMyArticle && 3 != article.articleType && permissions["commonUpdateArticle"].permissionGrant>
             <div class="cmts">
                 <a class="ft-a-title tooltipped tooltipped-w" href="${servePath}/update?id=${article.oId}" aria-label="${editLabel}"><span class="icon-edit"></span></a>
             </div>

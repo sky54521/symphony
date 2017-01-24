@@ -4,7 +4,7 @@
     <head>
         <@head title="${activity1A0001Label} - ${activityLabel} - ${symphonyLabel}">
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="canonical" href="${servePath}/activity/1A0001">
     </head>
     <body>
@@ -12,15 +12,14 @@
         <div class="main">
             <div class="wrapper">
                 <div class="content">
-                    <div class="module">
+                    <div class="module article-module">
                         <h2 class="sub-head">
                             <div class="avatar-small tooltipped tooltipped-ne"
                                  aria-label="${activity1A0001Label}" style="background-image:url('${staticServePath}/images/activities/1A0001.png')"></div>
                             ${activity1A0001TitleLabel}
                         </h2>
                         <div class="content-reset fn-m10">
-                            <div class="fn-hr5"></div>
-                            <div class="fn-hr5"></div>
+                            <br>
                             ${activity1A0001GuideLabel}
 
                             <#if !closed && !closed1A0001 && !end && !collected && !participated>
@@ -64,6 +63,6 @@
             </div>
         </div>
         <#include "../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
     </body>
 </html>

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ import org.json.JSONObject;
  * Symphony utilities.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.6.0.5, Oct 29, 2016
+ * @version 1.7.0.7, Jan 8, 2017
  * @since 0.1.0
  */
 public final class Symphonys {
@@ -65,7 +65,7 @@ public final class Symphonys {
     /**
      * Configurations.
      */
-    private static final ResourceBundle CFG = ResourceBundle.getBundle("symphony");
+    public static final ResourceBundle CFG = ResourceBundle.getBundle("symphony");
 
     /**
      * HacPai bot User-Agent.
@@ -78,7 +78,7 @@ public final class Symphonys {
     public static final String[] RESERVED_TAGS;
 
     /**
-     * White list tags.
+     * White list - tags.
      */
     public static final String[] WHITE_LIST_TAGS;
 
@@ -105,7 +105,7 @@ public final class Symphonys {
         }
 
         // Loads white list tags
-        final String whiteListTags = CFG.getString("whiteListTags");
+        final String whiteListTags = CFG.getString("whitelist.tags");
         final String[] wlTags = whiteListTags.split(",");
         WHITE_LIST_TAGS = new String[wlTags.length];
 

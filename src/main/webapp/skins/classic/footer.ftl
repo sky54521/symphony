@@ -7,7 +7,7 @@
             <a href="http://weibo.com/u/2778228501" target="_blank" class="tooltipped tooltipped-n" aria-label="${followWeiboLabel}">
                 <svg class="ft-gray" width="18" height="18" viewBox="0 0 37 30">${weiboIcon}</svg></a>   &nbsp;
             <a target="_blank" class="tooltipped tooltipped-n" aria-label="${joinQQGroupLabel}"
-               href="http://shang.qq.com/wpa/qunwpa?idkey=f77a54e7d2bd53bed4043f70838da92fa49eccda53e706ef2124943cb0df4df5">
+               href="http://shang.qq.com/wpa/qunwpa?idkey=981d9282616274abb1752336e21b8036828f715a1c4d0628adcf208f2fd54f3a">
                 <svg class="ft-gray" width="16" height="16" viewBox="0 0 30 30">${qqIcon}</svg></a>
         </div>
         <div class="fn-flex-1">
@@ -17,8 +17,7 @@
                 <a href="${servePath}/tag/announcement">${symAnnouncementLabel}</a>
                 <a href="${servePath}/domains">${domainLabel}</a>
                 <a href="${servePath}/tags">${tagLabel}</a>
-                <a href="${servePath}/community">${communityDynamicLabel}</a>
-                <a href="https://hacpai.com/article/1460083956075">${adDeliveryLabel}</a>
+                <a href="${servePath}/forge/link">${forgeLabel}</a>
                 <a href="${servePath}/statistic">${dataStatLabel}</a>
 
                 <div class="fn-right">
@@ -41,8 +40,8 @@
 <div class="go-top tooltipped tooltipped-w" aria-label="${goTopLabel}" onclick="Util.goTop()">
     <span class="icon-go-top"></span>
 </div>
-<script type="text/javascript" src="${staticServePath}/js/lib/compress/libs.min.js"></script>
-<script type="text/javascript" src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
+<script src="${staticServePath}/js/lib/compress/libs.min.js"></script>
+<script src="${staticServePath}/js/common${miniPostfix}.js?${staticResourceVersion}"></script>
 <script>
     var Label = {
         invalidPasswordLabel: "${invalidPasswordLabel}",
@@ -62,11 +61,14 @@
 		notificationCommentedLabel: '${notificationCommentedLabel}',
 		notificationReplyLabel: '${notificationReplyLabel}',
 		notificationAtLabel: '${notificationAtLabel}',
-		notificationFollowingUserLabel: '${notificationFollowingUserLabel}',
+		notificationFollowingLabel: '${notificationFollowingLabel}',
 		pointLabel: '${pointLabel}',
 		sameCityLabel: '${sameCityLabel}',
-		systemLabel: '${systemLabel}'
-
+		systemLabel: '${systemLabel}',
+		newFollowerLabel: '${newFollowerLabel}',
+        makeAsReadLabel: '${makeAsReadLabel}',
+        checkIcon: '${checkIcon}'<#if isLoggedIn>,
+        currentUserName: '${currentUser.userName}'</#if>
     };
 
     <#if isLoggedIn>

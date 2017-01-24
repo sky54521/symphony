@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
  */
 package org.b3log.symphony.service;
 
-import java.util.List;
-import javax.inject.Inject;
 import org.b3log.latke.Keys;
 import org.b3log.latke.logging.Level;
 import org.b3log.latke.logging.Logger;
+import org.b3log.latke.repository.Query;
 import org.b3log.latke.repository.Transaction;
+import org.b3log.latke.repository.annotation.Transactional;
+import org.b3log.latke.repository.jdbc.JdbcRepository;
 import org.b3log.latke.service.annotation.Service;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.cache.TagCache;
@@ -32,20 +33,24 @@ import org.b3log.symphony.model.Tag;
 import org.b3log.symphony.model.UserExt;
 import org.b3log.symphony.repository.LinkRepository;
 import org.b3log.symphony.repository.OptionRepository;
-import org.b3log.symphony.repository.TagUserLinkRepository;
 import org.b3log.symphony.repository.TagRepository;
+import org.b3log.symphony.repository.TagUserLinkRepository;
 import org.b3log.symphony.util.Links;
 import org.b3log.symphony.util.Pangu;
 import org.b3log.symphony.util.Symphonys;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
+import javax.inject.Inject;
+import java.util.List;
 
 /**
  * Link utilities.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.0.0.3, Sep 11, 2016
+ * @version 1.1.0.5, Dec 24, 2016
  * @since 1.6.0
  */
 @Service
@@ -89,7 +94,7 @@ public class LinkForgeMgmtService {
     /**
      * Forges the specified URL.
      *
-     * @param url the specified URL
+     * @param url    the specified URL
      * @param userId the specified user id
      */
     public void forge(final String url, final String userId) {
@@ -116,6 +121,10 @@ public class LinkForgeMgmtService {
         try {
             for (final JSONObject lnk : links) {
                 final String addr = lnk.optString(Link.LINK_ADDR);
+                if (Link.inAddrBlacklist(addr)) {
+                    continue;
+                }
+
                 JSONObject link = linkRepository.getLink(addr);
 
                 if (null == link) {
@@ -193,5 +202,63 @@ public class LinkForgeMgmtService {
 
             LOGGER.log(Level.ERROR, "Saves links failed", e);
         }
+    }
+
+    /**
+     * Purges link forge.
+     */
+    @Transactional
+    public void purge() {
+        final Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(15 * 1000);
+
+                    final JSONObject linkCntOption = optionRepository.get(Option.ID_C_STATISTIC_LINK_COUNT);
+                    int linkCnt = linkCntOption.optInt(Option.OPTION_VALUE);
+
+                    int slags = 0;
+                    final JSONArray links = linkRepository.get(new Query()).optJSONArray(Keys.RESULTS);
+                    for (int i = 0; i < links.length(); i++) {
+                        final JSONObject link = links.getJSONObject(i);
+                        final String linkAddr = link.optString(Link.LINK_ADDR);
+
+                        if (!Link.inAddrBlacklist(linkAddr)) {
+                            continue;
+                        }
+
+                        final String linkId = link.optString(Keys.OBJECT_ID);
+
+                        // clean slags
+
+                        linkRepository.remove(linkId);
+                        ++slags;
+
+                        final List<String> tagIds = tagUserLinkRepository.getTagIdsByLinkId(linkId, Integer.MAX_VALUE);
+                        for (final String tagId : tagIds) {
+                            final JSONObject tag = tagRepository.get(tagId);
+
+                            tagUserLinkRepository.removeByLinkId(linkId);
+
+                            final int tagLinkCnt = tagUserLinkRepository.countTagLink(tagId);
+                            tag.put(Tag.TAG_LINK_CNT, tagLinkCnt);
+                            tagRepository.update(tagId, tag);
+                        }
+                    }
+
+                    linkCntOption.put(Option.OPTION_VALUE, linkCnt - slags);
+                    optionRepository.update(Option.ID_C_STATISTIC_LINK_COUNT, linkCntOption);
+
+                    LOGGER.info("Purged link forge [slags=" + slags + "]");
+                } catch (final Exception e) {
+                    LOGGER.log(Level.ERROR, "Purges link forge failed", e);
+                } finally {
+                    JdbcRepository.dispose();
+                }
+            }
+        };
+
+        new Thread(runnable).start();
     }
 }

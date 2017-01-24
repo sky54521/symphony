@@ -3,8 +3,8 @@ target/
 upload/*
 node_modules/
 **/.DS_store
-qrcode.png
-
+.idea/
+symphony.iml
 nb-configuration.xml
 /bin/
 

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,8 @@
  */
 package org.b3log.symphony.processor;
 
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.b3log.latke.Keys;
 import org.b3log.latke.logging.Logger;
-import org.b3log.latke.model.Role;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.servlet.HTTPRequestContext;
@@ -32,24 +28,31 @@ import org.b3log.latke.servlet.annotation.RequestProcessing;
 import org.b3log.latke.servlet.annotation.RequestProcessor;
 import org.b3log.latke.util.Requests;
 import org.b3log.symphony.model.Common;
+import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.Vote;
 import org.b3log.symphony.processor.advice.LoginCheck;
+import org.b3log.symphony.processor.advice.PermissionCheck;
 import org.b3log.symphony.service.VoteMgmtService;
 import org.b3log.symphony.service.VoteQueryService;
 import org.json.JSONObject;
 
+import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Vote processor.
- *
+ * <p>
  * <ul>
  * <li>Votes up an article (/vote/up/article), POST</li>
  * <li>Votes down an article (/vote/down/article), POST</li>
  * <li>Votes up a comment (/vote/up/comment), POST</li>
  * <li>Votes down a comment (/vote/down/comment), POST</li>
  * </ul>
+ * </p>
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.2.0.1, Jul 31, 2016
+ * @version 1.2.0.2, Dec 12, 2016
  * @since 1.3.0
  */
 @RequestProcessor
@@ -80,7 +83,6 @@ public class VoteProcessor {
 
     /**
      * Votes up a comment.
-     *
      * <p>
      * The request json object:
      * <pre>
@@ -90,15 +92,15 @@ public class VoteProcessor {
      * </pre>
      * </p>
      *
-     * @param context the specified context
-     * @param request the specified request
+     * @param context  the specified context
+     * @param request  the specified request
      * @param response the specified response
      * @throws Exception exception
      */
     @RequestProcessing(value = "/vote/up/comment", method = HTTPRequestMethod.POST)
-    @Before(adviceClass = LoginCheck.class)
+    @Before(adviceClass = {LoginCheck.class, PermissionCheck.class})
     public void voteUpComment(final HTTPRequestContext context, final HttpServletRequest request,
-            final HttpServletResponse response) throws Exception {
+                              final HttpServletResponse response) throws Exception {
         context.renderJSON();
 
         final JSONObject requestJSONObject = Requests.parseRequestJSONObject(request, context.getResponse());
@@ -107,7 +109,7 @@ public class VoteProcessor {
         final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
-        if (!Role.ADMIN_ROLE.equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                 && voteQueryService.isOwn(userId, dataId, Vote.DATA_TYPE_C_COMMENT)) {
             context.renderFalseResult().renderMsg(langPropsService.get("cantVoteSelfLabel"));
 
@@ -126,7 +128,6 @@ public class VoteProcessor {
 
     /**
      * Votes down a comment.
-     *
      * <p>
      * The request json object:
      * <pre>
@@ -136,15 +137,15 @@ public class VoteProcessor {
      * </pre>
      * </p>
      *
-     * @param context the specified context
-     * @param request the specified request
+     * @param context  the specified context
+     * @param request  the specified request
      * @param response the specified response
      * @throws Exception exception
      */
     @RequestProcessing(value = "/vote/down/comment", method = HTTPRequestMethod.POST)
-    @Before(adviceClass = LoginCheck.class)
+    @Before(adviceClass = {LoginCheck.class, PermissionCheck.class})
     public void voteDownComment(final HTTPRequestContext context, final HttpServletRequest request,
-            final HttpServletResponse response) throws Exception {
+                                final HttpServletResponse response) throws Exception {
         context.renderJSON();
 
         final JSONObject requestJSONObject = Requests.parseRequestJSONObject(request, context.getResponse());
@@ -153,7 +154,7 @@ public class VoteProcessor {
         final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
-        if (!Role.ADMIN_ROLE.equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                 && voteQueryService.isOwn(userId, dataId, Vote.DATA_TYPE_C_COMMENT)) {
             context.renderFalseResult().renderMsg(langPropsService.get("cantVoteSelfLabel"));
 
@@ -172,7 +173,6 @@ public class VoteProcessor {
 
     /**
      * Votes up an article.
-     *
      * <p>
      * The request json object:
      * <pre>
@@ -182,15 +182,15 @@ public class VoteProcessor {
      * </pre>
      * </p>
      *
-     * @param context the specified context
-     * @param request the specified request
+     * @param context  the specified context
+     * @param request  the specified request
      * @param response the specified response
      * @throws Exception exception
      */
     @RequestProcessing(value = "/vote/up/article", method = HTTPRequestMethod.POST)
-    @Before(adviceClass = LoginCheck.class)
+    @Before(adviceClass = {LoginCheck.class, PermissionCheck.class})
     public void voteUpArticle(final HTTPRequestContext context, final HttpServletRequest request,
-            final HttpServletResponse response) throws Exception {
+                              final HttpServletResponse response) throws Exception {
         context.renderJSON();
 
         final JSONObject requestJSONObject = Requests.parseRequestJSONObject(request, context.getResponse());
@@ -199,7 +199,7 @@ public class VoteProcessor {
         final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
-        if (!Role.ADMIN_ROLE.equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                 && voteQueryService.isOwn(userId, dataId, Vote.DATA_TYPE_C_ARTICLE)) {
             context.renderFalseResult().renderMsg(langPropsService.get("cantVoteSelfLabel"));
 
@@ -218,7 +218,6 @@ public class VoteProcessor {
 
     /**
      * Votes down an article.
-     *
      * <p>
      * The request json object:
      * <pre>
@@ -228,15 +227,15 @@ public class VoteProcessor {
      * </pre>
      * </p>
      *
-     * @param context the specified context
-     * @param request the specified request
+     * @param context  the specified context
+     * @param request  the specified request
      * @param response the specified response
      * @throws Exception exception
      */
     @RequestProcessing(value = "/vote/down/article", method = HTTPRequestMethod.POST)
-    @Before(adviceClass = LoginCheck.class)
+    @Before(adviceClass = {LoginCheck.class, PermissionCheck.class})
     public void voteDownArticle(final HTTPRequestContext context, final HttpServletRequest request,
-            final HttpServletResponse response) throws Exception {
+                                final HttpServletResponse response) throws Exception {
         context.renderJSON();
 
         final JSONObject requestJSONObject = Requests.parseRequestJSONObject(request, context.getResponse());
@@ -245,7 +244,7 @@ public class VoteProcessor {
         final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
         final String userId = currentUser.optString(Keys.OBJECT_ID);
 
-        if (!Role.ADMIN_ROLE.equals(currentUser.optString(User.USER_ROLE))
+        if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                 && voteQueryService.isOwn(userId, dataId, Vote.DATA_TYPE_C_ARTICLE)) {
             context.renderFalseResult().renderMsg(langPropsService.get("cantVoteSelfLabel"));
 

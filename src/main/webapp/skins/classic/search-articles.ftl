@@ -6,15 +6,23 @@
     <head>
         <@head title="${searchLabel} - ${articleLabel} - ${symphonyLabel}">
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
-                <div class="content module">
-                    <@list listData=articles/>
-                    <@pagination url="${servePath}/search" query="key=${key}" />
+                <div class="content">
+                    <#if 0 == articles?size>
+                        <div class="module article-module ft-center">
+                        ${searchEmptyLabel}
+                        </div>
+                    <#else>
+                        <div class="module">
+                        <@list listData=articles/>
+                        <@pagination url="${servePath}/search" query="key=${key}" />
+                        </div>
+                    </#if>
                 </div>
                 <div class="side">
                     <#include "side.ftl">

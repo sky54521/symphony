@@ -61,6 +61,8 @@
             <input type="text" value="${user.userLongestCheckinStreak}" readonly="readonly" />
         </div>
     </div>
+
+    <#if permissions["userUpdateUserBasic"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${modifiableLabel}</h2>
@@ -159,6 +161,12 @@
                     <option value="1"<#if 1 == user.userFollowingArticleStatus> selected</#if>>${privateLabel}</option>
                 </select>
 
+                <label>${userWatchingArticleStatusLabel}</label>
+                <select id="userWatchingArticleStatus" name="userWatchingArticleStatus">
+                    <option value="0"<#if 0 == user.userWatchingArticleStatus> selected</#if>>${publicLabel}</option>
+                    <option value="1"<#if 1 == user.userWatchingArticleStatus> selected</#if>>${privateLabel}</option>
+                </select>
+
                 <label>${userFollowerStatusLabel}</label>
                 <select id="userFollowerStatus" name="userFollowerStatus">
                     <option value="0"<#if 0 == user.userFollowerStatus> selected</#if>>${publicLabel}</option>
@@ -209,8 +217,9 @@
 
                 <label>${roleLabel}</label>
                 <select id="userRole" name="userRole">
-                    <option value="adminRole"<#if "adminRole" == user.userRole> selected</#if>>${administratorLabel}</option>
-                    <option value="defaultRole"<#if "defaultRole" == user.userRole> selected</#if>>${defaultUserLabel}</option>
+                    <#list roles as role>
+                        <option value=${role.oId}<#if role.oId == user.userRole> selected</#if>>${role.roleName}</option>
+                    </#list>
                 </select>
 
                 <label>${appRoleLabel}</label>
@@ -250,7 +259,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userUpdateUserAdvanced"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${advancedUpdateLabel}</h2>
@@ -274,7 +285,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userAddPoint"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${chargePointLabel}</h2>
@@ -295,7 +308,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userExchangePoint"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${exchangePointLabel}</h2>
@@ -313,7 +328,9 @@
             </form>
         </div>
     </div>
+    </#if>
 
+    <#if permissions["userDeductPoint"].permissionGrant>
     <div class="module">
         <div class="module-header">
             <h2>${abusePointLabel}</h2>
@@ -334,6 +351,7 @@
             </form>
         </div>
     </div>
+    </#if>
 
     <div class="module">
         <div class="module-header">

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ package org.b3log.symphony.model;
  * This class defines all notification model relevant keys.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.7.0.2, Sep 22, 2016
+ * @version 1.12.0.2, Jan 21, 2017
  * @since 0.2.5
  */
 public final class Notification {
@@ -78,7 +78,7 @@ public final class Notification {
     public static final int DATA_TYPE_C_COMMENTED = 3;
 
     /**
-     * Data type - followingUser.
+     * Data type - following - user.
      */
     public static final int DATA_TYPE_C_FOLLOWING_USER = 4;
 
@@ -142,6 +142,31 @@ public final class Notification {
      */
     public static final int DATA_TYPE_C_SYS_ANNOUNCE_NEW_USER = 16;
 
+    /**
+     * Data type - new follower.
+     */
+    public static final int DATA_TYPE_C_NEW_FOLLOWER = 17;
+
+    /**
+     * Data type - invitation link used.
+     */
+    public static final int DATA_TYPE_C_INVITATION_LINK_USED = 18;
+
+    /**
+     * Data type - system announcement - role changed.
+     */
+    public static final int DATA_TYPE_C_SYS_ANNOUNCE_ROLE_CHANGED = 19;
+
+    /**
+     * Data type - following - article update.
+     */
+    public static final int DATA_TYPE_C_FOLLOWING_ARTICLE_UPDATE = 20;
+
+    /**
+     * Data type - following - article comment.
+     */
+    public static final int DATA_TYPE_C_FOLLOWING_ARTICLE_COMMENT = 21;
+
     //// Transient ////
     /**
      * Key of unread notification count.
@@ -152,6 +177,11 @@ public final class Notification {
      * Key of at in article.
      */
     public static final String NOTIFICATION_T_AT_IN_ARTICLE = "atInArticle";
+
+    /**
+     * Key of is comment.
+     */
+    public static final String NOTIFICATION_T_IS_COMMENT = "isComment";
 
     /**
      * Private constructor.

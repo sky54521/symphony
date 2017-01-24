@@ -4,7 +4,7 @@
     <head>
         <@head title="${dataStatLabel} - ${symphonyLabel}">
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="canonical" href="${servePath}/statistic">
     </head>
     <body>
@@ -12,7 +12,7 @@
         <div class="main">
             <div class="wrapper">
                 <div class="content">
-                    <div class="module">
+                    <div class="module article-module">
                         <h2 class="sub-head">${dataStatLabel}
                             <span class="ft-gray ft-13">${dataStatSubLabel}</span>
                         </h2>
@@ -55,7 +55,7 @@
         </div>
         <#include "footer.ftl">
 
-        <script type="text/javascript" src="${staticServePath}/js/lib/echarts-2.2.7/echarts.js"></script>
+        <script src="${staticServePath}/js/lib/echarts-2.2.7/echarts.js"></script>
         <script type="text/javascript">
             require.config({
                 paths: {

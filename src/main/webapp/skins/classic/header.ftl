@@ -16,8 +16,8 @@
         </#if>
         <a href="${servePath}/timeline"<#if selected?? && 'timeline' == selected> class="selected"</#if>>
            <svg height="14" viewBox="0 0 16 14" width="16">${timelineIcon}</svg> ${timelineLabel}</a>
-        <a href="${servePath}/forge/link"<#if selected?? && 'forge' == selected> class="selected"</#if>>
-           <svg height="14" viewBox="0 1 16 14" width="16">${baguaIcon}</svg> ${forgeLabel}</a>
+        <a href="https://hacpai.com/tag/book_share"<#if selected?? && 'book' == selected> class="selected"</#if>>
+           <svg height="16" viewBox="0 -1 17 14" width="16">${bookIcon}</svg> ${bookShareLabel}</a>
     </div>
     <#if esEnabled || algoliaEnabled>
     <form class="responsive-hide fn-left" target="_blank" action="/search">
@@ -27,12 +27,13 @@
     </#if>
     <div class="user-nav">
         <#if isLoggedIn>
-        <#if "adminRole" == userRole>
+        <#if permissions["menuAdmin"].permissionGrant>
         <a href="${servePath}/admin" aria-label="${adminLabel}" class="tooltipped tooltipped-w"><span class="icon-userrole"></span></a>
         </#if>
         <a id="aNotifications" class="tooltipped tooltipped-w <#if unreadNotificationCount == 0>no-msg<#else>msg</#if>" href="${servePath}/notifications" aria-label="${messageLabel}">${unreadNotificationCount}</a>
         <a href="${servePath}/activities" aria-label="${activityLabel}" class="tooltipped tooltipped-w"><span class="icon-flag"></span></a>
-        <a href="${servePath}/member/${currentUser.userName}">
+        <a href="javascript:void(0)" id="aPersonListPanel" class="tooltipped tooltipped-w" aria-label="${viewHomeAndProfileLabel}"
+           data-url="${servePath}/member/${currentUser.userName}">
             <span class="avatar-small" style="background-image:url('${currentUser.userAvatarURL20}')"></span>
         </a>
         <div class="module person-list" id="personListPanel">
