@@ -1,11 +1,202 @@
 {
     "description": "Description of repository structures, for generation (DDL: http://en.wikipedia.org/wiki/Data_Definition_Language) of the relational database table and persistence validation.",
-    "version": "3.32.7.17, Oct 26, 2016",
+    "version": "4.36.7.22, Jan 21, 2017",
     "authors": [
-        "Liang Ding", "Zephyr", "Bill Ho"
+        "Liang Ding",
+        "Zephyr",
+        "Bill Ho"
     ],
     "since": "0.2.0",
     "repositories": [
+        {
+            "name": "user_book_article",
+            "keys": [
+                {
+                    "name": "oId",
+                    "type": "String",
+                    "length": 19
+                },
+                {
+                    "name": "userId",
+                    "type": "String",
+                    "length": 19
+                },
+                {
+                    "name": "bookId",
+                    "type": "String",
+                    "length": 19
+                },
+                {
+                    "name": "articleId",
+                    "type": "String",
+                    "length": 19
+                }
+            ]
+        },
+        {
+            "name": "book",
+            "keys": [
+                {
+                    "name": "oId",
+                    "type": "String",
+                    "length": 19
+                },
+                {
+                    "name": "bookTitle",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookSubTitle",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookOriginalTitle",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookAltTitle",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookDoubanURL",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookAuthor",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookAuthorIntro",
+                    "type": "String",
+                    "length": 1024
+                },
+                {
+                    "name": "bookBinding",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "bookCatalog",
+                    "type": "String",
+                    "length": 2048
+                },
+                {
+                    "name": "bookImgURL",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookISBN10",
+                    "type": "String",
+                    "length": 10
+                },
+                {
+                    "name": "bookISBN13",
+                    "type": "String",
+                    "length": 13
+                },
+                {
+                    "name": "bookPages",
+                    "type": "String",
+                    "length": 4
+                },
+                {
+                    "name": "bookPrice",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "bookPublishDate",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "bookPublisher",
+                    "type": "String",
+                    "length": 64
+                },
+                {
+                    "name": "bookSeries",
+                    "type": "String",
+                    "length": 64
+                },
+                {
+                    "name": "bookSummary",
+                    "type": "String",
+                    "length": 2048
+                },
+                {
+                    "name": "bookTags",
+                    "type": "String",
+                    "length": 128
+                },
+                {
+                    "name": "bookTranslator",
+                    "type": "String",
+                    "length": 128
+                }
+            ]
+        },
+        {
+            "name": "permission",
+            "keys": [
+                {
+                    "name": "oId",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "permissionCategory",
+                    "type": "int"
+                }
+            ]
+        },
+        {
+            "name": "role",
+            "keys": [
+                {
+                    "name": "oId",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "roleName",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "roleDescription",
+                    "type": "String",
+                    "length": 2048
+                }
+            ]
+        },
+        {
+            "name": "role_permission",
+            "keys": [
+                {
+                    "name": "oId",
+                    "type": "String",
+                    "length": 19
+                },
+                {
+                    "name": "roleId",
+                    "type": "String",
+                    "length": 32
+                },
+                {
+                    "name": "permissionId",
+                    "type": "String",
+                    "length": 32
+                }
+            ]
+        },
         {
             "name": "link",
             "keys": [
@@ -517,12 +708,11 @@
                 {
                     "name": "dataId",
                     "type": "String",
-                    "length": 19
+                    "length": 64
                 },
                 {
                     "name": "dataType",
-                    "type": "int",
-                    "description": "0: article, 1: comment, 2: at, 3: commented, 4: followingUseer"
+                    "type": "int"
                 },
                 {
                     "name": "hasRead",
@@ -552,7 +742,7 @@
                 {
                     "name": "followingType",
                     "type": "int",
-                    "description": "0: user, 1: tag"
+                    "description": "0: user, 1: tag, 2: article collect, 3: article watch"
                 }
             ]
         },
@@ -578,11 +768,6 @@
                 {
                     "name": "commentCreateTime",
                     "type": "long"
-                },
-                {
-                    "name": "commentAuthorEmail",
-                    "type": "String",
-                    "length": 255
                 },
                 {
                     "name": "commentAuthorId",
@@ -1084,6 +1269,11 @@
                     "description": "0: public, 1: private"
                 },
                 {
+                    "name": "userWatchingArticleStatus",
+                    "type": "int",
+                    "description": "0: public, 1: private"
+                },
+                {
                     "name": "userFollowingTagStatus",
                     "type": "int",
                     "description": "0: public, 1: private"
@@ -1150,6 +1340,10 @@
                     "name": "userTimezone",
                     "type": "String",
                     "length": 64
+                },
+                {
+                    "name": "userGuideStep",
+                    "type": "int"
                 }
             ]
         },
@@ -1168,11 +1362,6 @@
                 },
                 {
                     "name": "articleTags",
-                    "type": "String",
-                    "length": 255
-                },
-                {
-                    "name": "articleAuthorEmail",
                     "type": "String",
                     "length": 255
                 },
@@ -1276,6 +1465,10 @@
                 },
                 {
                     "name": "articleCollectCnt",
+                    "type": "int"
+                },
+                {
+                    "name": "articleWatchCnt",
                     "type": "int"
                 },
                 {

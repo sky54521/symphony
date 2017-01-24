@@ -5,11 +5,11 @@
         <@head title="${selectAddTypeLabel} - ${symphonyLabel}">
         <meta name="robots" content="none" />
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../header.ftl">
-        <div class="main">
+        <div class="main pre-post-wrap">
             <div class="wrapper pre-post">
                 <div>
                     <a href="${servePath}/post?type=0">
@@ -46,9 +46,15 @@
         </div>
         <#include "../footer.ftl">
         <script>
-            if ($.ua.device.type === 'mobile') {
-                $('.pre-post > div:last').hide();
-            }   
+            (function () {
+                var h = $(window).height() - $('.nav').outerHeight() - $('.footer').outerHeight();
+                if (h > 451) {
+                    $('.main').outerHeight(h).css({
+                        display: 'flex',
+                        'align-items': 'center'
+                    });
+                }
+            })();
         </script>
     </body>
 </html>

@@ -6,7 +6,7 @@
         <@head title="${settingsLabel} - ${user.userName} - ${symphonyLabel}">
         <meta name="description" content="${user.userName}${deLabel}${settingsLabel}"/>
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/home.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../../header.ftl">
@@ -16,9 +16,14 @@
                     <#nested>
                 </div>
                 <div class="side">
+                    <#if 'profile' == type || 'avatar' == type>
+                        <div id="homeSidePanel" class="fn-none">
+                            <#include "../home-side.ftl">
+                        </div>
+                    </#if>
                     <div class="module">
                         <div class="module-header"><h2>${goHomeLabel}</h2></div> 
-                        <div class="module-panel">
+                        <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a <#if type == "home" || type == "comments" || type == "articlesAnonymous" || type == "commentsAnonymous">
                                     class="current"</#if>
@@ -34,7 +39,7 @@
                     </div>
                     <div class="module">
                         <div class="module-header"><h2>${settingsLabel}</h2></div> 
-                        <div class="module-panel">
+                        <div class="module-panel fn-oh">
                             <nav class="home-menu">
                                 <a href="${servePath}/settings"<#if 'profile' == type> class="current"</#if>>${profilesLabel}</a>
                                 <a href="${servePath}/settings/avatar"<#if 'avatar' == type> class="current"</#if>>
@@ -57,16 +62,11 @@
                             </nav>
                         </div>
                     </div>
-                    <#if 'profile' == type || 'avatar' == type> 
-                    <div id="homeSidePanel" class="fn-none">
-                        <#include "../home-side.ftl">
-                    </div>
-                    </#if>
                 </div>
             </div>
         </div>
         <#include "../../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
         <script>
             Label.followLabel = "${followLabel}";
             Label.unfollowLabel = "${unfollowLabel}";

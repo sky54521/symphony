@@ -2,34 +2,41 @@
     <div id="avatarURLDom" class="avatar-big" title="${user.userName}" style="background-image:url('${user.userAvatarURL210}')"></div>
     <div>
         <div class="user-name">
-            <#if user.userNickname != "">
-            <div id="userNicknameDom">
-                ${user.userNickname}
+            <div id="userNicknameDom"><b>${user.userNickname}</b></div>
+            <div class="ft-gray">${user.userName}</div>
+
+            <div>
+                <#if isLoggedIn && (userName != user.userName)>
+                    <button class="green small" onclick="location.href = '/post?type=1&at=${user.userName}'">
+                        ${privateMessageLabel}
+                    </button>
+                </#if>
+                <#if (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName)) || 0 == user.userOnlineStatus>
+                    <span class="tooltipped tooltipped-n" aria-label="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>">
+                        <span class="<#if user.userOnlineFlag>online<#else>offline</#if>"><img src="${staticServePath}/images/H-20.png" /></span>
+                    </span>
+                </#if>
+                <span class="tooltipped tooltipped-n offline" aria-label="${roleLabel}"> ${user.roleName}</span>
+                <#if permissions["userAddPoint"].permissionGrant ||
+                        permissions["userAddUser"].permissionGrant ||
+                        permissions["userExchangePoint"].permissionGrant ||
+                        permissions["userDeductPoint"].permissionGrant ||
+                        permissions["userUpdateUserAdvanced"].permissionGrant ||
+                        permissions["userUpdateUserBasic"].permissionGrant>
+                    <a class="ft-13 ft-a-title" href="${servePath}/admin/user/${user.oId}"><span class="icon-setting"></span></a>
+                </#if>
             </div>
-            </#if>
-            <span class="ft-gray">${user.userName}</span>
-            <#if 0 == user.userOnlineStatus || (isLoggedIn && ("adminRole" == currentUser.userRole || currentUser.userName == user.userName))>
-            <img title="<#if user.userOnlineFlag>${onlineLabel}<#else>${offlineLabel}</#if>" src="${staticServePath}/images/<#if user.userOnlineFlag>on<#else>off</#if>line.png" />
-            </#if>
-            <#if "adminRole" == user.userRole>
-            <span class="ft-13 icon-userrole" title="${administratorLabel}"></span>
-            </#if>
-            <#if isAdminLoggedIn>
-            <a class="ft-13 icon-setting" href="${servePath}/admin/user/${user.oId}" title="${adminLabel}"></a>
-            </#if>
+
             <#if isLoggedIn && (userName != user.userName)>
-            <#if isFollowing>
-            <button class="red small" onclick="Util.unfollow(this, '${followingId}', 'user')"> 
-                ${unfollowLabel}
-            </button>
-            <#else>
-            <button class="green small" onclick="Util.follow(this, '${followingId}', 'user')"> 
-                ${followLabel}
-            </button>
-            </#if>
-            <button class="green small" onclick="location.href = '/post?type=1&at=${user.userName}'"> 
-                ${privateMessageLabel}
-            </button>
+                <#if isFollowing>
+                    <button class="follow" onclick="Util.unfollow(this, '${followingId}', 'user')">
+                        ${unfollowLabel}
+                    </button>
+                    <#else>
+                        <button class="follow" onclick="Util.follow(this, '${followingId}', 'user')">
+                            ${followLabel}
+                        </button>
+                </#if>
             </#if>
         </div>
 

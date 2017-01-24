@@ -2,6 +2,7 @@
 <#include "../macro-pagination.ftl">
 <@home "${type}">
 <div class="tabs-sub fn-clear">
+    <a href="${servePath}/member/${user.userName}/watching/articles"<#if type == "watchingUsers"> class="current"</#if>>${watchingArticlesLabel}</a>
     <a href="${servePath}/member/${user.userName}/following/users"<#if type == "followingUsers"> class="current"</#if>>${followingUsersLabel}</a>
     <a href="${servePath}/member/${user.userName}/following/tags"<#if type == "followingTags"> class="current"</#if>>${followingTagsLabel}</a>
     <a href="${servePath}/member/${user.userName}/following/articles"<#if type == "followingArticles"> class="current"</#if>>${followingArticlesLabel} &nbsp;<span class="count">${paginationRecordCount}</span></a>
@@ -14,7 +15,8 @@
     </#if>
     <ul class="fn-clear">
         <#list userHomeFollowingArticles as article>
-        <li class="fn-flex">
+        <li class="fn-flex<#if !(paginationPageCount?? && paginationPageCount!=0 && paginationPageCount!=1) && article_index == userHomeFollowingArticles?size - 1>
+             last</#if>">
             <#if "someone" != article.articleAuthorName>
             <a aria-label="${article.articleAuthorName}" class="tooltipped tooltipped-s"
                target="_blank" rel="nofollow" href="${servePath}/member/${article.articleAuthorName}"></#if>
@@ -53,7 +55,7 @@
         </#list>
     </ul>
 </div>
-<@pagination url="/member/${user.userName}/following/tags"/>
+<@pagination url="/member/${user.userName}/following/articles"/>
 <#else>
 <p class="ft-center ft-gray home-invisible">${setinvisibleLabel}</p>
 </#if>

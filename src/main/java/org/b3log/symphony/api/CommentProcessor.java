@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ import org.json.JSONObject;
  * </ul>
  *
  * @author <a href="http://wdx.me">DX</a>
- * @version 1.0.0.1, Sep 19, 2015
+ * @version 1.0.0.2, Jan 21, 2017
  * @since 1.3.0
  */
 @RequestProcessor
@@ -184,10 +184,6 @@ public class CommentProcessor {
             }
 
             comment.put(Comment.COMMENT_AUTHOR_ID, currentUser.optString(Keys.OBJECT_ID));
-
-            final String authorEmail = currentUser.optString(User.USER_EMAIL);
-            comment.put(Comment.COMMENT_AUTHOR_EMAIL, authorEmail);
-
             comment.put(Comment.COMMENT_T_COMMENTER, currentUser);
 
             final String newId = commentMgmtService.addComment(comment);

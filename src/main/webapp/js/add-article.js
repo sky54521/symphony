@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,8 @@
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.18.14.11, Nov 8, 2016
+ * @author <a href="http://zephyr.b3log.org">Zephyr</a>
+ * @version 2.20.15.16, Jan 16, 2017
  */
 
 /**
@@ -68,9 +69,10 @@ var AddArticle = {
                 articleType: $("input[type='radio'][name='articleType']:checked").val(),
                 articleRewardContent: this.rewardEditor.getValue(),
                 articleRewardPoint: $("#articleRewardPoint").val().replace(/(^\s*)|(\s*$)/g, ""),
-                articleAnonymous: $('#articleAnonymous').prop('checked')
+                articleAnonymous: $('#articleAnonymous').prop('checked'),
+                syncWithSymphonyClient: $('#syncWithSymphonyClient').prop('checked')
             },
-            url = Label.servePath + "/article", type = "POST";
+                    url = Label.servePath + "/article", type = "POST";
 
             if (3 === parseInt(requestJSONObject.articleType)) { // 如果是“思绪”
                 requestJSONObject.articleContent = window.localStorage.thoughtContent;
@@ -113,7 +115,7 @@ var AddArticle = {
         }
     },
     /**
-     * @description 初识化发文
+     * @description 初始化发文
      */
     init: function () {
         $.ua.set(navigator.userAgent);
@@ -137,6 +139,7 @@ var AddArticle = {
                 dragDrop: false,
                 lineWrapping: true,
                 htmlURL: Label.servePath + "/markdown",
+                readOnly: Label.requisite,
                 extraKeys: {
                     "Alt-/": "autocompleteUserName",
                     "Ctrl-/": "autocompleteEmoji",
@@ -171,6 +174,8 @@ var AddArticle = {
         if (window.localStorage && window.localStorage.articleContent && "" === AddArticle.editor.getValue()
                 && "" !== window.localStorage.articleContent.replace(/(^\s*)|(\s*$)/g, "")) {
             AddArticle.editor.setValue(window.localStorage.articleContent);
+            // 默认使用 preview
+            $('.editor-toolbar .icon-preview:eq(0)').click();
         }
 
         if (!window.localStorage.thoughtContent) {
@@ -277,7 +282,7 @@ var AddArticle = {
 
                 window.localStorage.thoughtContent += change;
 
-                if ($('.article-content .CodeMirror-preview').length === 0) {
+                if ($('.article-content .editor-preview-active').length === 0) {
                     return false;
                 }
 
@@ -289,7 +294,7 @@ var AddArticle = {
                         markdownText: cm.getValue()
                     },
                     success: function (result, textStatus) {
-                        $('.article-content .CodeMirror-preview').html(result.html);
+                        $('.article-content .editor-preview-active').html(result.html);
                         hljs.initHighlighting.called = false;
                         hljs.initHighlighting();
                     }
@@ -307,6 +312,11 @@ var AddArticle = {
             if ($.trim($(this).val()) === '') {
                 return false;
             }
+
+            if (1 === Label.articleType) { // 小黑屋不检查标题重复
+                return;
+            }
+
             $.ajax({
                 url: Label.servePath + "/article/check-title",
                 type: "POST",
@@ -345,7 +355,7 @@ var AddArticle = {
                 lineWrapping: true,
                 htmlURL: Label.servePath + "/markdown",
                 toolbar: [
-                    {name: 'bold'},
+                     {name: 'bold'},
                     {name: 'italic'},
                     '|',
                     {name: 'quote'},
@@ -353,7 +363,7 @@ var AddArticle = {
                     {name: 'ordered-list'},
                     '|',
                     {name: 'link'},
-                    {name: 'image', html: '<form id="rewardFileUpload" method="POST" enctype="multipart/form-data"><label class="icon-image"><input type="file"/></label></form>'},
+                    {name: 'image', html: '<form id="rewardFileUpload" method="POST" enctype="multipart/form-data"><label class="icon-upload"><input type="file"/></label></form>'},
                     '|',
                     {name: 'redo'},
                     {name: 'undo'},
@@ -396,7 +406,7 @@ var AddArticle = {
                     return CodeMirror.Pass;
                 }
 
-                if ($('.article-reward-content .CodeMirror-preview').length === 0) {
+                if ($('.article-reward-content .editor-preview-active').length === 0) {
                     return false;
                 }
 
@@ -408,7 +418,7 @@ var AddArticle = {
                         markdownText: cm.getValue()
                     },
                     success: function (result, textStatus) {
-                        $('.article-reward-content .CodeMirror-preview').html(result.html);
+                        $('.article-reward-content .editor-preview-active').html(result.html);
                         hljs.initHighlighting.called = false;
                         hljs.initHighlighting();
                     }
@@ -496,7 +506,7 @@ var AddArticle = {
         $('#articleTags').click(function () {
             $('.post .domains-tags').show();
             if ($.ua.device.type !== 'mobile') {
-                $('.post .domains-tags').css('left', $('.post .tags-selected').width() + 'px');
+                $('.post .domains-tags').css('left', ($('.post .tags-selected').width() + 10) + 'px');
             }
             $('#articleTagsSelectedPanel').hide();
         }).blur(function () {
@@ -535,7 +545,7 @@ var AddArticle = {
                     return false;
                 }
 
-                // 上线左右
+                // 上下左右
                 if (event.keyCode === 37 || event.keyCode === 39 ||
                         event.keyCode === 38 || event.keyCode === 40) {
                     return false;
@@ -548,8 +558,8 @@ var AddArticle = {
                 }
 
                 // 删除 tag
-                if (event.keyCode === 8 && event.data.settings.chinese === 8 
-                    && event.data.settings.keydownVal.replace(/\s/g, '') === '') {
+                if (event.keyCode === 8 && event.data.settings.chinese === 8
+                        && event.data.settings.keydownVal.replace(/\s/g, '') === '') {
                     $('.tags-input .tag .close:last').click();
                     return false;
                 }
@@ -566,7 +576,7 @@ var AddArticle = {
                     success: function (result, textStatus) {
                         if (result.sc) {
                             if ($.ua.device.type !== 'mobile') {
-                                $('#articleTagsSelectedPanel').css('left', $('.post .tags-selected').width() + 'px');
+                                $('#articleTagsSelectedPanel').css('left', ($('.post .tags-selected').width() + 10) + 'px');
                             }
                             $("#articleTags").completed('updateData', result.tags);
                         } else {

@@ -2,6 +2,7 @@
 <#include "../macro-pagination.ftl">
 <@home "${type}">
 <div class="tabs-sub fn-clear">
+    <a href="${servePath}/member/${user.userName}/watching/articles"<#if type == "watchingUsers"> class="current"</#if>>${watchingArticlesLabel}</a>
     <a href="${servePath}/member/${user.userName}/following/users"<#if type == "followingUsers"> class="current"</#if>>${followingUsersLabel} &nbsp;<span class="count">${paginationRecordCount}</span></a>
     <a href="${servePath}/member/${user.userName}/following/tags"<#if type == "followingTags"> class="current"</#if>>${followingTagsLabel}</a>
     <a href="${servePath}/member/${user.userName}/following/articles"<#if type == "followingArticles"> class="current"</#if>>${followingArticlesLabel}</a>
@@ -14,7 +15,8 @@
     </#if>
     <ul>
         <#list userHomeFollowingUsers as followingUser>
-        <li>
+        <li<#if !(paginationPageCount?? && paginationPageCount!=0 && paginationPageCount!=1) && followingUser_index == userHomeFollowingUsers?size - 1>
+            class="last"</#if>>
             <div class="fn-flex">
                 <a rel="nofollow ft-gray"  
                    href="${servePath}/member/${followingUser.userName}">

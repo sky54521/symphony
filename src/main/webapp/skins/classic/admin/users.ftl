@@ -6,12 +6,14 @@
         <form method="GET" action="${servePath}/admin/users" class="form">
             <input name="userNameOrEmail" type="text" placeholder="${userNameLabel}/${userEmailLabel}"/>
             <button type="submit" class="green">${searchLabel}</button> &nbsp;
+            <#if permissions["userAddUser"].permissionGrant>
             <button type="button" class="btn red" onclick="window.location = '${servePath}/admin/add-user'">${addUserLabel}</button>
+            </#if>
         </form>
         <ul>
             <#list users as item>
             <li>
-                <div class="fn-clear first">
+                <div class="fn-clear">
                     <div class="avatar-small tooltipped tooltipped-se" aria-label="${item.userName}" 
                          style="background-image:url('${item.userAvatarURL}')"></div> &nbsp;
                     <a href="${servePath}/member/${item.userName}">${item.userName}</a>
@@ -28,13 +30,7 @@
                     <span class="tooltipped tooltipped-n" aria-label="${emailLabel}"><span class="icon-email"></span></span>
                     ${item.userEmail} &nbsp;
                     <span class="tooltipped tooltipped-n" aria-label="${roleLabel}"><span class="icon-userrole"></span></span>
-                    <#if item.userRole == "adminRole">
-                    ${administratorLabel}
-                    <#elseif item.userRole == "defaultCommenterRole">
-                    ${defaultCommenterLabel}
-                    <#else>
-                    ${defaultUserLabel}
-                    </#if>
+                    ${item.roleName}
                     <span class="fn-right ft-gray">
                         <span class="tooltipped tooltipped-n" aria-label="${articleCountLabel}"><span class="icon-articles"></span></span>
                         ${item.userArticleCount} &nbsp;

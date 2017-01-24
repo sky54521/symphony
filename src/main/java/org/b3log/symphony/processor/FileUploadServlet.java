@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ import org.json.JSONObject;
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
- * @version 1.1.4.2, Nov 1, 2016
+ * @version 1.1.4.3, Dec 19, 2016
  * @since 1.4.0
  */
 @WebServlet(urlPatterns = {"/upload", "/upload/*"}, loadOnStartup = 2)
@@ -159,7 +159,7 @@ public class FileUploadServlet extends HttpServlet {
         if (StringUtils.isBlank(processName)) {
             fileName = uuid + "." + suffix;
         } else {
-            fileName = uuid + '-' + processName + "." + suffix;
+            fileName = uuid + '_' + processName + "." + suffix;
         }
 
         final OutputStream output = new FileOutputStream(UPLOAD_DIR + fileName);

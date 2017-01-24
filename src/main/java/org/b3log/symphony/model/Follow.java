@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -63,9 +63,14 @@ public final class Follow {
     public static final int FOLLOWING_TYPE_C_TAG = 1;
 
     /**
-     * Following type - article.
+     * Following type - article collect.
      */
     public static final int FOLLOWING_TYPE_C_ARTICLE = 2;
+
+    /**
+     * Following type - article watch.
+     */
+    public static final int FOLLOWING_TYPE_C_ARTICLE_WATCH = 3;
 
     /**
      * Private constructor.

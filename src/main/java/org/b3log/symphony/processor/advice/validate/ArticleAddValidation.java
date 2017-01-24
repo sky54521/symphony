@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,6 @@ import org.apache.commons.lang.StringUtils;
 import org.b3log.latke.Keys;
 import org.b3log.latke.ioc.LatkeBeanManager;
 import org.b3log.latke.ioc.Lifecycle;
-import org.b3log.latke.model.Role;
 import org.b3log.latke.model.User;
 import org.b3log.latke.service.LangPropsService;
 import org.b3log.latke.service.LangPropsServiceImpl;
@@ -39,6 +38,7 @@ import org.b3log.latke.servlet.advice.RequestProcessAdviceException;
 import org.b3log.latke.util.Requests;
 import org.b3log.latke.util.Strings;
 import org.b3log.symphony.model.Article;
+import org.b3log.symphony.model.Role;
 import org.b3log.symphony.model.Tag;
 import org.b3log.symphony.service.OptionQueryService;
 import org.b3log.symphony.service.TagQueryService;
@@ -49,7 +49,7 @@ import org.json.JSONObject;
  * Validates for article adding locally.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 1.3.4.9, Jul 28, 2016
+ * @version 1.3.4.10, Nov 27, 2016
  * @since 0.2.0
  */
 @Named
@@ -162,7 +162,7 @@ public class ArticleAddValidation extends BeforeRequestProcessAdvice {
                 }
 
                 final JSONObject currentUser = (JSONObject) request.getAttribute(User.USER);
-                if (!Role.ADMIN_ROLE.equals(currentUser.optString(User.USER_ROLE))
+                if (!Role.ROLE_ID_C_ADMIN.equals(currentUser.optString(User.USER_ROLE))
                         && ArrayUtils.contains(Symphonys.RESERVED_TAGS, tagTitle)) {
                     throw new RequestProcessAdviceException(new JSONObject().put(Keys.MSG, langPropsService.get("articleTagReservedLabel")
                             + " [" + tagTitle + "]"));
@@ -182,7 +182,7 @@ public class ArticleAddValidation extends BeforeRequestProcessAdvice {
         }
 
         String articleContent = requestJSONObject.optString(Article.ARTICLE_CONTENT);
-        articleContent = StringUtils.strip(articleContent);
+        articleContent = StringUtils.trim(articleContent);
         if (Strings.isEmptyOrNull(articleContent) || articleContent.length() > MAX_ARTICLE_CONTENT_LENGTH
                 || articleContent.length() < MIN_ARTICLE_CONTENT_LENGTH) {
             String msg = langPropsService.get("articleContentErrorLabel");

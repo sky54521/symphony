@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,17 +19,23 @@ package org.b3log.symphony.model;
 
 import org.apache.commons.lang.StringUtils;
 import org.b3log.symphony.util.Symphonys;
+import org.json.JSONObject;
 
 /**
  * This class defines ext of user model relevant keys.
  *
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Bill Ho
- * @version 2.4.1.12, Oct 26, 2016
- * @since 0.2.0
+ * @version 2.8.1.13, Jan 20, 2017
  * @see org.b3log.latke.model.User
+ * @since 0.2.0
  */
 public final class UserExt {
+
+    /**
+     * Key of user guide step.
+     */
+    public static final String USER_GUIDE_STEP = "userGuideStep";
 
     /**
      * Key of user language.
@@ -85,6 +91,11 @@ public final class UserExt {
      * Key of user following article status.
      */
     public static final String USER_FOLLOWING_ARTICLE_STATUS = "userFollowingArticleStatus";
+
+    /**
+     * Key of user watching article status.
+     */
+    public static final String USER_WATCHING_ARTICLE_STATUS = "userWatchingArticleStatus";
 
     /**
      * Key of user following tag status.
@@ -368,6 +379,32 @@ public final class UserExt {
      */
     public static final int USER_SUB_MAIL_STATUS_DISABLED = 1;
 
+    //// User guide step constants
+    /**
+     * User guide step - finish.
+     */
+    public static final int USER_GUIDE_STEP_FIN = 0;
+
+    /**
+     * User guide step - upload avatar.
+     */
+    public static final int USER_GUIDE_STEP_UPLOAD_AVATAR = 1;
+
+    /**
+     * User guide step - follow tags.
+     */
+    public static final int USER_GUIDE_STEP_FOLLOW_TAGS = 2;
+
+    /**
+     * User guide step - follow users.
+     */
+    public static final int USER_GUIDE_STEP_FOLLOW_USERS = 3;
+
+    /**
+     * User guide step - star project.
+     */
+    public static final int USER_GUIDE_STEP_STAR_PROJECT = 4;
+
     //// Default Commenter constants
     /**
      * Default commenter name.
@@ -450,7 +487,7 @@ public final class UserExt {
     public static final int USER_XXX_STATUS_C_PUBLIC = 0;
 
     /**
-     * User XXX (notify/point/follower/following article/following tag/following user/comment/article) status - private.
+     * User XXX (notify/point/follower/following article/watching article/following tag/following user/comment/article) status - private.
      */
     public static final int USER_XXX_STATUS_C_PRIVATE = 1;
 
@@ -529,6 +566,12 @@ public final class UserExt {
     public static final int USER_APP_ROLE_C_PAINTER = 1;
 
     /**
+     * Private constructor.
+     */
+    private UserExt() {
+    }
+
+    /**
      * Gets color code of the specified point.
      *
      * @param point the specified point
@@ -599,8 +642,22 @@ public final class UserExt {
     }
 
     /**
-     * Private constructor.
+     * Checks whether the specified user updated avatar.
+     *
+     * @param user the specified user
+     * @return {@code true} if the specified user updated avatar, returns {@code false} otherwise
      */
-    private UserExt() {
+    public static boolean updatedAvatar(final JSONObject user) {
+        return user.optString(UserExt.USER_AVATAR_URL).contains("_");
+    }
+
+    /**
+     * Checks whether the specified user finshed guide.
+     *
+     * @param user the specified user
+     * @return {@code true} if the specified user finshed guide, returns {@code false} otherwise
+     */
+    public static boolean finshedGuide(final JSONObject user) {
+        return UserExt.USER_GUIDE_STEP_FIN == user.optInt(UserExt.USER_GUIDE_STEP);
     }
 }

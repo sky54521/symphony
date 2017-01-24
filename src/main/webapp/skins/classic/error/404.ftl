@@ -4,14 +4,14 @@
     <head>
         <@head title="404 Not Found! - ${symphonyLabel}">
         <meta name="robots" content="none" />
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/error.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/error.css?${staticResourceVersion}" />
         </@head>
     </head>
     <body class="error">
         <#include "../header.ftl">
         <div class="main">
             <div class="wrapper">
-                <div class="module">
+                <div class="module article-module">
                 <h2 class="sub-head">404 Not Found!</h2>
                 <div class="ft-center"></div>
                 </div>

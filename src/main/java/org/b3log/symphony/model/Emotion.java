@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@ package org.b3log.symphony.model;
 /**
  * This class defines all emotion model relevant keys.
  *
- * @author Zephyr
- * @version 1.0.0.0, Aug 16, 2016
+ * @author <a href="http://zephyr.b3log.org">Zephyr</a>
+ * @version 1.0.0.1, Dec 13, 2016
  * @since 1.5.0
  */
 public final class Emotion {
@@ -61,6 +61,16 @@ public final class Emotion {
      * Emotion type - Emoji.
      */
     public static final int EMOTION_TYPE_C_EMOJI = 0;
+
+    /**
+     * Key of a short list of all emojis used in setting.
+     */
+    public static final String SHORT_T_LIST = "shortLists";
+
+    /**
+     * Key of end flag of emoji short list.
+     */
+    public static final String EOF_EMOJI = "endOfEmoji";
 
     private Emotion() {
     }

@@ -5,23 +5,24 @@
         <@head title="${symphonyLabel}">
         <meta name="description" content="${symDescriptionLabel}"/>
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
         <link rel="canonical" href="${servePath}">
     </head>
     <body class="index">
-        <#include "header.ftl">   
+        ${HeaderBannerLabel}
+        <#include "header.ftl">
         <div class="main">
             <div class="wrapper">
                 <div class="index-main">
                     <div class="index-tabs fn-flex" id="articles">
-                        <span class="current">
+                        <span class="current" data-index="0">
                             <span class="icon-clock"></span> ${latestLabel}
                         </span>
-                        <span class="tags">
+                        <span class="tags" data-index="1">
                             <span class="icon-tags"></span>
                             ${followingTagsLabel}
                         </span>
-                        <span class="users">
+                        <span class="users" data-index="2">
                             <span class="icon-userrole"></span>
                             ${followingUsersLabel}
                         </span>
@@ -36,6 +37,9 @@
                                 ${systemEmptyTipLabel}<br> 
                                 <img src="${staticServePath}/images/404/5.gif"/>          
                             </#if>
+                            <li>
+                                <a class="more" href="${servePath}/recent">${moreRecentArticleLabel}</a>
+                            </li>
                         </ul>
                         <ul class="fn-none">
                             <#list followingTagArticles as article>
@@ -55,6 +59,9 @@
                                     <img src="${staticServePath}/images/404/6.gif"/>     
                                 </li>  
                             </#if>
+                            <li>
+                                <a class="more" href="${servePath}/recent">${moreRecentArticleLabel}</a>
+                            </li>
                         </ul>
                         <ul class="fn-none">
                             <#list followingUserArticles as article>
@@ -74,6 +81,9 @@
                                     <img src="${staticServePath}/images/404/2.gif"/>     
                                 </li>   
                             </#if>
+                            <li>
+                                <a class="more" href="${servePath}/recent">${moreRecentArticleLabel}</a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -92,19 +102,22 @@
                             </a>
                             </#if>
                         </span>
-                        <span class="post"><a href="${servePath}/post?type=0">${postArticleLabel}</a></span>
+                        <span class="post"><a href="${servePath}/pre-post">${postArticleLabel}</a></span>
                     </div>
                     <div class="perfect-panel list">
                         <ul>
                             <#list perfectArticles as article>
                             <li>
                                 <a rel="nofollow" href="${servePath}/member/${article.articleAuthorName}">
-                                    <span class="avatar-small tooltipped tooltipped-se" aria-label="wulalala" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
+                                    <span class="avatar-small tooltipped tooltipped-se" aria-label="${article.articleAuthorName}" style="background-image:url('${article.articleAuthorThumbnailURL48}')"></span>
                                 </a>
                                 <a rel="nofollow" class="fn-ellipsis ft-a-title" href="${servePath}${article.articlePermalink}">${article.articleTitleEmoj}</a>
                                 <a class="fn-right count ft-gray ft-smaller" href="${servePath}${article.articlePermalink}">${article.articleViewCount}</a>
                             </li>
                             </#list>
+                            <#if perfectArticles?size == 0>
+                                <li>${chickenEggLabel}</li>
+                            </#if>
                         </ul>
                     </div>
                 </div>
@@ -176,8 +189,8 @@
                     </div>
                     <div class="metro-border fn-flex">
                         <div></div>
-                        <div class="red"></div>
                         <div class="green"></div>
+                        <div class="yellow"></div>
                     </div>
                 </div>
                 <div class="index-side down">
@@ -196,23 +209,29 @@
                     </ul>
                 </div>
                 <div class="metro-line fn-flex">
-                    <div class="metro-item"> ${ADLabel}</div>
+                    <div class="metro-item">
+                        <!-- ${ADLabel} -->
+                        <a class="preview" href="https://hacpai.com/man">
+                            <img width="44px" src="${staticServePath}/images/tags/shell.png" alt="${sponsorLabel}">
+                            <b>Hacker's Manual</b>
+                        </a>
+                    </div>
                     <div class="metro-item last">
                         <a class="preview" href="https://hacpai.com/article/1460083956075">
-                            <img width="44px" src="${staticServePath}/js/lib/emojify.js-1.1.0/images/basic/heart.png" alt="${sponsorLabel}">
-                            <b>${wantPutOnLabel}</b>
+                            <img width="44px" src="${staticServePath}/emoji/graphics/heart.png" alt="${sponsorLabel}">
+                            <b>${adDeliveryLabel}</b>
                         </a>
                     </div>
                 </div>
                 <div class="metro-border fn-flex">
                     <div></div>
-                    <div class="yellow"></div>
+                    <div class="purple"></div>
                 </div>
             </div>
         </div>
     </div>
     <#include "footer.ftl">   
-    <script type="text/javascript" src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script> 
+    <script src="${staticServePath}/js/channel${miniPostfix}.js?${staticResourceVersion}"></script>
     <script type="text/javascript">
         $('.metro-item').height($('.metro-item').width());
         $('.timeline ul').outerHeight($('.metro-item').width() * 2 + 2 - 30);
@@ -231,6 +250,8 @@
             } else {
                 $(".index-tabs-panels.article-list ul:eq(0)").show();
             }
+
+            localStorage.setItem('indexTab', $it.data('index'));
         });
 
         // tag click
@@ -239,12 +260,19 @@
             maxLen = Math.max($it.width(), $it.height());
             $it.prepend('<span class="ripple" style="top: ' + (event.offsetY - $it.height() / 2)
                 + 'px;left:' + (event.offsetX - $it.width() / 2) + 'px;height:' + maxLen + 'px;width:' + maxLen + 'px"></span>');
-            console.log(event)
 
             setTimeout(function () {
                 $it.find('.ripple').remove();
             }, 800);
         });
+
+        // set tab
+        if (typeof(localStorage.indexTab) === 'string') {
+            $('.index-tabs:first > span:eq(' + localStorage.indexTab + ')').click();
+        } else {
+            localStorage.setItem('indexTab', 0);
+        }
+        
 
         // Init [Timeline] channel
         TimelineChannel.init("${wsScheme}://${serverHost}:${serverPort}${contextPath}/timeline-channel", 20);

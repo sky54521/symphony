@@ -18,8 +18,8 @@
         <link rel="canonical" href="${servePath}/top/checkin">
         </@head>
         </#if>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/responsive.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../header.ftl">
@@ -28,7 +28,9 @@
                 <div class="content">
                     <div class="module">
                     <#nested>
-                    <#include "../common/ranking.ftl">
+                        <div class="top-ranking">
+                            <#include "../common/ranking.ftl">
+                        </div>
                     <br>    
                     </div>
                 </div>
@@ -38,7 +40,7 @@
             </div>
         </div>
         <#include "../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="${staticServePath}/js/settings${miniPostfix}.js?${staticResourceVersion}"></script>
     </body>
 </html>
 </#macro>

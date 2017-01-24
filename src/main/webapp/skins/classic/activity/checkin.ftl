@@ -4,14 +4,14 @@
     <head>
         <@head title="${activityDailyCheckinLabel} - ${activityLabel} - ${symphonyLabel}">
         </@head>
-        <link type="text/css" rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
+        <link rel="stylesheet" href="${staticServePath}/css/index.css?${staticResourceVersion}" />
     </head>
     <body>
         <#include "../header.ftl">
         <div class="main">
             <div class="wrapper">
                 <div class="content">
-                    <div class="module">
+                    <div class="module article-module">
                         <h2 class="sub-head">
                             <div class="avatar-small tooltipped tooltipped-ne"
                                  aria-label="${activityDailyCheckinLabel}" style="background-image:url('${staticServePath}/images/activities/checkin.png')"></div>
@@ -28,8 +28,8 @@
             </div>
         </div>
         <#include "../footer.ftl">
-        <script type="text/javascript" src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
-        <script src="https://static.geetest.com/static/tools/gt.js"></script>
+        <script src="${staticServePath}/js/activity${miniPostfix}.js?${staticResourceVersion}"></script>
+        <script src="//static.geetest.com/static/tools/gt.js"></script>
         <script>
             var handler = function (captchaObj) {
                 captchaObj.appendTo("#captcha");

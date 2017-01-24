@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
  * @author Zephyr
- * @version 1.19.9.14, Oct 26, 2016
+ * @version 1.19.11.17, Jan 23, 2017
  */
 
 /**
@@ -53,11 +53,14 @@ var Settings = {
     preview: function (it) {
         if ($('#homeSidePanel').css('display') === 'block') {
             $('#homeSidePanel').hide();
-            $('.home-list').show();
             $(it).text(Label.previewLabel);
         } else {
             $('#homeSidePanel').show();
-            $('.home-list').hide();
+            $('#userNicknameDom').text($('#userNickname').val());
+            $('#userTagsDom').text($('#userTags').val());
+            $('#userURLDom').text($('#userURL').val()).attr('href', $('#userURL').val());
+            $('#userIntroDom').text($('#userIntro').val());
+
             $(it).text(Label.unPreviewLabel);
         }
     },
@@ -305,7 +308,7 @@ var Settings = {
             },
             success: function (result, textStatus) {
                 if (result.sc) {
-                    $(".list ul").prepend('<li><code>' + result.msg.split(' ')[0] + '</code>' + result.msg.substr(16) + '</li>');
+                    $(".list ul").prepend('<li class="content-reset"><code>' + result.msg.split(' ')[0] + '</code>' + result.msg.substr(16) + '</li>');
                 } else {
                     $("#pointBuyInvitecodeTip").addClass("error").removeClass("succ").html('<ul><li>' + result.msg + '</li></ul>');
                 }
@@ -382,6 +385,7 @@ var Settings = {
                     userFollowingUserStatus: $("#userFollowingUserStatus").prop("checked"),
                     userFollowingTagStatus: $("#userFollowingTagStatus").prop("checked"),
                     userFollowingArticleStatus: $("#userFollowingArticleStatus").prop("checked"),
+                    userWatchingArticleStatus: $("#userWatchingArticleStatus").prop("checked"),
                     userFollowerStatus: $("#userFollowerStatus").prop("checked"),
                     userPointStatus: $("#userPointStatus").prop("checked"),
                     userOnlineStatus: $("#userOnlineStatus").prop("checked"),
@@ -437,13 +441,14 @@ var Settings = {
             },
             success: function (result, textStatus) {
                 if (result.sc) {
-                    $("#" + type.replace(/\//g, "") + "Tip").addClass("succ").removeClass("error").html('<ul><li>' + Label.updateSuccLabel + '</li></ul>');
+                    $("#" + type.replace(/\//g, "") + "Tip").addClass("succ").removeClass("error")
+                    .html('<ul><li>' + Label.updateSuccLabel + '</li></ul>').show();
                     if (type === 'profiles') {
                         $('#userNicknameDom').text(requestJSONObject.userNickname);
                         $('#userTagsDom').text(requestJSONObject.userTags);
                         $('#userURLDom').text(requestJSONObject.userURL).attr('href', requestJSONObject.userURL);
                         $('#userIntroDom').text(requestJSONObject.userIntro);
-                        
+
                         return;
                     }
 
@@ -610,22 +615,6 @@ var Settings = {
         };
     },
     /**
-     * @description 标记指定类型的消息通知为已读状态.
-     * @param {String} type 指定类型："commented"/"at"/"followingUser"/"reply"
-     */
-    makeNotificationRead: function (type) {
-        $.ajax({
-            url: Label.servePath + "/notification/read/" + type,
-            type: "GET",
-            cache: false,
-            success: function (result, textStatus) {
-                if (result.sc) {
-                    window.location.reload();
-                }
-            }
-        });
-    },
-    /**
      * @description 标记所有消息通知为已读状态.
      */
     makeAllNotificationsRead: function () {
@@ -639,21 +628,21 @@ var Settings = {
                 }
             }
         });
+    },
+    /**
+     * @description 设置常用表情点击事件绑定.
+     */
+    initFunction: function () {
+        $("#emojiGrid img").click(function () {
+            var emoji = $(this).attr('alt');
+            if ($("#emotionList").val().indexOf(emoji) !== -1) {
+                return;
+            }
+            if ($("#emotionList").val() !== "") {
+                $("#emotionList").val($("#emotionList").val() + "," + emoji);
+            } else {
+                $("#emotionList").val(emoji);
+            }
+        });
     }
 };
-
-/**
- * @description 设置常用表情点击事件绑定.
- */
-$("#emojiGrid img").click(function () {
-    var emoji = $(this).attr('alt');
-    if ($("#emotionList").val().indexOf(emoji) !== -1) {
-        return;
-    }
-
-    if ($("#emotionList").val() !== "") {
-        $("#emotionList").val($("#emotionList").val() + "," + emoji);
-    } else {
-        $("#emotionList").val(emoji);
-    }
-});

@@ -1,6 +1,6 @@
 /*
  * Symphony - A modern community (forum/SNS/blog) platform written in Java.
- * Copyright (C) 2012-2016,  b3log.org & hacpai.com
+ * Copyright (C) 2012-2017,  b3log.org & hacpai.com
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 /**
  * 前台样式.
  *
  * @author <a href="http://vanessa.b3log.org">Liyuan Li</a>
  * @author <a href="http://88250.b3log.org">Liang Ding</a>
- * @version 2.17.18.40, Nov 18, 2016
+ * @version 2.21.20.48, Jan 23, 2017
  */
 
 @import "variables";
@@ -58,7 +57,11 @@
 
 /* start article */
 .article-module {
-    padding: 10px;
+    padding: 30px 15px;
+}
+
+.article-content {
+    margin: 15px;
 }
 
 #heatBar {
@@ -66,23 +69,22 @@
     top: 2px;
     right: 0px;
     width: 100%;
-    z-index: 71;
+    z-index: 84;
 }
 
 h1.article-title {
     word-break: break-all;
     font-size: 24px;
     font-weight: normal;
-    margin-bottom: 10px;
+    margin: 0 15px;
     line-height: 36px;
 }
 
 .article-info {
-    margin-bottom: 10px;
     border-bottom: 1px solid #eee;
     font-size: 12px;
     line-height: 19px;
-    padding-bottom: 10px;
+    padding: 15px;
 
     .article-info-action {
         font-size: 24px;
@@ -164,8 +166,11 @@ label.cmt-anonymous {
 }
 
 .article-actions {
-    padding-top: 10px;
+    padding-top: 15px;
     text-align: center;
+    height: 22px;
+    line-height: 22px;
+    margin: 0 15px;
 
     .has-cnt {
         border: 1px solid #d9d9d9;
@@ -173,6 +178,7 @@ label.cmt-anonymous {
         transition: 218ms;
         padding: 2px 5px;
         font-size: 13px;
+        vertical-align: top;
     }
 
     .has-cnt:hover {
@@ -267,12 +273,23 @@ label.cmt-anonymous {
     border-bottom-width: 0;
 }
 
+.comment-get-comment.list > ul {
+    padding: 0;
+}
+
 .comment-get-comment.list > ul > li {
     padding-top: 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.comment-get-comment.list>ul>li:last-child {
+    border-bottom: 1px solid #eee;
 }
 
 .comment-replies.list > ul {
     margin-top: 10px;
+    padding: 0;
 }
 
 .comment-replies.list > ul > li {
@@ -285,17 +302,17 @@ label.cmt-anonymous {
 }
 
 .article-no-comment-img {
-	animation: spaceboots 0.5s infinite;
+	animation: spaceboots 1s infinite;
 }
 
 #articleRewardContent {
-    margin-top: 10px;
     padding: 10px;
     background-image: -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, rgba(255, 255, 255, .9)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255, 255, 255, .9)), color-stop(.75, rgba(255, 255, 255, .9)), color-stop(.75, transparent), to(transparent));
     background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .9) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .9) 50%, rgba(255, 255, 255, .9) 75%, transparent 75%, transparent);
     background-image: linear-gradient(-45deg, rgba(255, 255, 255, .9) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .9) 50%, rgba(255, 255, 255, .9) 75%, transparent 75%, transparent);
     background-color: #f7f7f7;
     background-size: 45px 45px;
+    margin: 0 15px;
 }
 
 #articleRewardContent > p {
@@ -405,7 +422,7 @@ label.cmt-anonymous {
 }
 
 .editor-panel {
-    background-color: rgba(250, 250, 250, 0.88);
+    background-color: rgba(241, 247, 254, 0.88);
     border-top: 1px solid #eee;
     padding: 5px 0 10px 0;
     position: fixed;
@@ -451,14 +468,6 @@ label.cmt-anonymous {
 
     .stick li:last-child {
         border-bottom-width: 0;
-    }
-
-    li .stick-remains {
-        vertical-align: top;
-    }
-
-    li:hover .stick-remains {
-        display: inline;
     }
 
     ul > li > h2 {
@@ -651,18 +660,92 @@ label.cmt-anonymous {
     }
     /* end register & login form */
 }
+
+/* start guide */
+.guide {
+    .guide-tab,
+    .step-btn {
+        margin: 50px;
+    }
+
+    .form {
+        margin: 0;
+        width: auto;
+    }
+
+    #avatarUpload label {
+        margin-top: 0;
+    }
+
+    .tag-desc > li {
+        margin: 0 20px 20px 0;
+    }
+
+    .tag-desc > li > div {
+        left: -3px;
+        right: inherit;
+        border-radius: 0px 3px 3px 3px;
+    }
+
+    .tag-desc li.current > a {
+        background-color: $blue;
+        color: #fff;
+        border-color: #f2f2f2;
+    }
+
+    .intro dl {
+        margin-left: 50px;
+    }
+
+    .intro dd {
+        margin-bottom: 50px;
+    }
+
+    .intro dt {
+        position: relative;
+    }
+
+    .intro dt.current {
+        color: #ffac45;
+    }
+
+    .intro dt .index {
+        position: absolute;
+        left: -38px;
+        font-size: 46px;
+        top: -13px;
+        font-family: serif;
+        font-weight: 600;
+    }
+}
+
+
+/* start guide md */
+.guide {
+    .fn-flex > div {
+        padding: 10px;
+        box-sizing: border-content;
+        width: 50%;
+    }
+
+    .md {
+        background-color: #f1f7fe;
+
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    }
+}
+/* end guide md */
+
+/* end guide */
 /* end verify */
 
-/* start tags.html */
-.tags-cold li h2,
-.tags-trend li h2 {
-    display: inline;
-}
-/* end tags.html */
 
 /* start tag-article.html */
 .tag-articles .article-module {
-    padding-bottom: 0;
+    padding: 30px 30px 15px;
 }
 
 .tag-articles-tag-desc.tag-desc {
@@ -733,7 +816,7 @@ code .dec { color: initial; } /* decimal - blue */
 }
 
 .snak-rank {
-    margin: 20px;
+    margin: 30px 15px 0;
 
     .module:last-child {
         margin-left: 20px;
@@ -771,14 +854,6 @@ code .dec { color: initial; } /* decimal - blue */
 
 /* start index */
 .index {
-    .wrapper {
-        width: 90%;
-    }
-
-    .main {
-        padding: 40px 0;
-    }
-
     .index-main {
         width: 60%;
     }
@@ -786,6 +861,15 @@ code .dec { color: initial; } /* decimal - blue */
     .index-side {
         margin-left: 2px;
         width: 40%;
+    }
+
+    .article-list .heat {
+        display: none;
+    }
+
+    .more {
+        display: block;
+        text-align: right;
     }
 
     .index-tabs > span {
@@ -810,13 +894,11 @@ code .dec { color: initial; } /* decimal - blue */
         color: #333;
         text-decoration: none;
         display: block;
-        cursor: auto;
     }
 
     .index-tabs > span.current,
     .index-tabs > span.current:hover {
         color: #333;
-        background-color: #f8f8f8;
     }
 
     .index-tabs > span.tags {
@@ -839,12 +921,12 @@ code .dec { color: initial; } /* decimal - blue */
     }
 
     .index-tabs > span.post {
-        border-bottom-color: #244776;
+        border-bottom-color: #ffac45;
     }
 
     .index-tabs > span:hover,
     .index-tabs > span:hover a {
-        color: #fff
+        color: #fff;
     }
 
     .index-tabs > span:before {
@@ -880,7 +962,7 @@ code .dec { color: initial; } /* decimal - blue */
     }
 
     .index-tabs > span.post:before {
-        background-color: #244776;
+        background-color: #ffac45;
     }
 
     .index-tabs > span:hover:before {
@@ -901,12 +983,16 @@ code .dec { color: initial; } /* decimal - blue */
 
     .index-tabs-panels {
         background-color: #FFF;
-        padding: 15px;
+        padding: 15px 15px 0;
     }
 
-    .index-tabs-panels > ul > li:last-child,
     .perfect-panel.list > ul > li:last-child {
         border-bottom-width: 0;
+    }
+
+    .perfect-panel.list > ul,
+    .index-tabs-panels> ul {
+        padding: 0;
     }
 
     .perfect-panel {
@@ -944,12 +1030,12 @@ code .dec { color: initial; } /* decimal - blue */
         .preview {
             height: 100%;
             width: 100%;
-            padding-top: 25%;
+            padding-top: 50%;
             position: relative;
             box-sizing: border-box;
             display: block;
             transition: all 0.2s ease-out 0s;
-            color: $gray;
+            color: #999;
             text-decoration: none;
         }
 
@@ -960,6 +1046,7 @@ code .dec { color: initial; } /* decimal - blue */
 
         .preview img {
             transition: all 0.2s ease-out 0s;
+            margin-top: -48px;
         }
 
         .preview:hover > img {
@@ -973,6 +1060,10 @@ code .dec { color: initial; } /* decimal - blue */
         }
     }
 
+    .metro-item.ad img {
+        width: 100%;
+    }
+
     .metro-item.mid {
         margin: 0 2px 2px;
     }
@@ -984,8 +1075,8 @@ code .dec { color: initial; } /* decimal - blue */
         margin-top: -2px;
     }
 
-    .metro-border > div.red {
-        background-color: $red;
+    .metro-border > div.yellow {
+        background-color: #f1e05a;
         margin: -2px 2px 2px 2px;
     }
 
@@ -1003,11 +1094,11 @@ code .dec { color: initial; } /* decimal - blue */
         }
 
         .metro-border div {
-            background-color: #563d7c;
+            background-color: $red;
         }
 
-        .metro-border div.yellow {
-            background-color: #f1e05a;
+        .metro-border div.purple {
+            background-color: #563d7c;
             margin-left: 2px;
         }
 
@@ -1018,6 +1109,7 @@ code .dec { color: initial; } /* decimal - blue */
             ul {
                 overflow: hidden;
                 height: 402px;
+                padding: 0;
             }
         }
     }
@@ -1057,3 +1149,10 @@ code .dec { color: initial; } /* decimal - blue */
     }
 }
 /* end symhub */
+
+/* start top */
+.top-ranking {
+    border-top: 1px solid #eee;
+    padding-top: 15px;
+}
+/* end top */
