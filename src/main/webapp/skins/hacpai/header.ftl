@@ -1,7 +1,7 @@
 <div class="nav">
     <div class="logo-wrap">
         <img src="${staticServePath}/skins/hacpai/static/images/logo.png"/>
-        <span class="fn-none">程序员和设计师的天堂</span>
+        <span class="fn-none">夜猫子和守夜人的天堂</span>
     </div>
     <ul class="fn-clear fn-list">
         <li class="current">
