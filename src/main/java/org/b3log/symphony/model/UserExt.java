@@ -648,7 +648,7 @@ public final class UserExt {
      * @return {@code true} if the specified user updated avatar, returns {@code false} otherwise
      */
     public static boolean updatedAvatar(final JSONObject user) {
-        return user.optString(UserExt.USER_AVATAR_URL).contains("_");
+        return user.optString(UserExt.USER_AVATAR_URL).contains("/");
     }
 
     /**
