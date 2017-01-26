@@ -22,17 +22,20 @@
 
                 <div class="fn-right">
                     <span class="ft-gray">&COPY; ${year}</span>
-                    <a rel="copyright" href="https://hacpai.com" target="_blank">hacpai.com</a>
+                    <a rel="copyright" href="http://gater.vip" target="_blank">sky</a>
                     ${visionLabel}</div>
             </div>
+            
+            <!-- 
             <div class="fn-clear ft-smaller ft-fade">
                        ${sloganLabel}
-                    <div class="fn-right">
-                       Powered by <a href="http://b3log.org" class="ft-gray" target="_blank">B3log 开源</a> •
-                            <a href="https://github.com/b3log/symphony" class="ft-gray" target="_blank">Sym</a>
-                            ${version} • ${elapsed?c}ms
-                    </div>
-                </div>
+	            <div class="fn-right">
+	               Powered by <a href="http://b3log.org" class="ft-gray" target="_blank">B3log 开源</a> •
+	                    <a href="https://github.com/b3log/symphony" class="ft-gray" target="_blank">Sym</a>
+	                    ${version} • ${elapsed?c}ms
+	            </div>
+            </div>
+            -->    
         </div>
     </div>
 </div>
