@@ -29,8 +29,11 @@
         <div class="fn-clear ranking">
             <span class="ft-red">♠</span> <a href="${servePath}/top/balance">${wealthRankLabel}</a>
             <span class="ft-green">♥</span> <a href="${servePath}/top/consumption">${consumptionRankLabel}</a>
+            <!-- 
             <a href="${servePath}/member/${currentUser.userName}/points" class="ft-gray fn-right" title="${pointLabel} ${currentUser.userPoint?c}">
                 <#if 0 == currentUser.userAppRole>0x${currentUser.userPointHex}<#else><div class="painter-point" style="background-color: #${currentUser.userPointCC}"></div></#if></a>
+            -->    
+            <a href="${servePath}/member/${currentUser.userName}/points" class="ft-gray fn-right" title="${pointLabel} ${currentUser.userPoint?c}">${pointLabel} ${currentUser.userPoint?c}</a>
         </div>
     </div> 
     <div class="top-left activity-board"></div>
